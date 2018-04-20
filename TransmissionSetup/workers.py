@@ -10,7 +10,7 @@ if not path in sys.path:
 from pyNiDAQ import DAQ
 import ipdb
 
-class TransmissionWorkers():
+class TransmissionWorkers(QObject):
     '''
     ------------------------------------------------------
     tw = TransmissionWorkers(laser = <class>, 
@@ -46,7 +46,7 @@ class TransmissionWorkers():
     __email__ = "gregory.moille@mist.gov"
     __status__ = "Development"
 
-    _DCscan = (None, None, None)
+    _DCscan = pyqtSignal(tuple)
 
     def __init__(self, **kwargs):
         super(TransmissionWorkers, self).__init__()
@@ -57,8 +57,7 @@ class TransmissionWorkers():
 
         # Retrieve equipement
         # ---------------------------------------------
-        self.laser = kwargs.get('laser', None)
-        self.wavemeter = kwargs.get('wavemeter', None)
+        
 
         # Misc
         self._is_Running = False
@@ -69,6 +68,8 @@ class TransmissionWorkers():
         self.DCscan(self, param = <dict>, *args, **kwargs))
 
         Args: 
+            laser: object of a laser from pyNFLaser
+            wavemeter: wavementer object from pyWavemeter
             param: dictionarry with 'laserParam', 
                    'daqParam' and 'wlmParam' keys
                 laserParam keys (cf laser properties): 
@@ -98,8 +99,8 @@ class TransmissionWorkers():
         ------------------------------------------------------
         '''
         
-        laser = self.laser
-        wavemeter = self.wavemeter
+        laser = kwargs.get('laser', None)
+        wavemeter = kwargs.get('wavemeter',None)
         
         # More user frienldy notation
         # ---------------------------------------------
@@ -129,15 +130,14 @@ class TransmissionWorkers():
 
         # Go to start of the scan
         # ---------------------------------------------
-        laser.lbd = laserParam['scan_limit'][0]
-        time.sleep(0.1)
-        print(laser._is_changing_lbd)
-        # Display wavelength changing with
-        # ---------------------------------------------
-        while laser._is_changing_lbd:
-            # ipdb.set_trace()
-            print('changing lbd')
-            self._DCscan.emit((0, laser.lbd, 0, True))
+        # laser.lbd = laserParam['scan_limit'][0]
+        # time.sleep(0.1)
+        # # Display wavelength changing with
+        # # ---------------------------------------------
+        # while laser._is_changing_lbd:
+        #     # ipdb.set_trace()
+        #     print("chanign lbd")
+        #     self._DCscan.emit((0, laser.lbd, 0, True))
             
 
         # Get First wavelength of the scan
@@ -145,7 +145,8 @@ class TransmissionWorkers():
         if wavemeter:
             # get it through the wavemeter
             wavemeter.acquire = True
-            time.sleep(0.5)
+            print('Getting wavemeter')
+            time.sleep(1)
             lbd_start = wavemeter.lbd
             wavemeter.acquire = False
             self._DCscan.emit((2, lbd_start, 0, True))
@@ -155,10 +156,10 @@ class TransmissionWorkers():
         # Setup DAQ for acquisition
         # ---------------------------------------------
         # ipdb.set_trace()
-        scan_time = np.diff(laser.scan_limit)[0]/laser.scan_speed[0]
-        daq = DAQ(t_end = scan_time, dev = daqParam['dev'])
-        daq.SetupRead(read_ch=daqParam['read_ch'])
-        daq.readtask.start()
+        scan_time = np.diff(laser.scan_limit)[0]/laser.scan_speed
+        # daq = DAQ(t_end = scan_time, dev = daqParam['dev'])
+        # daq.SetupRead(read_ch=daqParam['read_ch'])
+        # daq.readtask.start()
         time_start_daq = time.time()
         # Start laser scan
         # ---------------------------------------------
@@ -172,23 +173,21 @@ class TransmissionWorkers():
         lbd_probe = []
         time_probe = []
         while laser._is_scaning:
-            print('Scanning')
             lbd_scan = laser._lbdscan
             lbd_probe.append(lbd_scan)
             time_probe.append(time.time())
-            prgs = np.floor(100*(laserParam['scan_limit'][1] -
-                        lbd_scan)/np.diff(laserParam['scan_limit'])[0])
+            prgs = np.floor(100*(lbd_scan-laserParam['scan_limit'][0])/np.diff(laserParam['scan_limit'])[0])
             self._DCscan.emit((1, lbd_scan, prgs, True))
-        daq.readtask.stop()
+        # daq.readtask.stop()
         time_stop_daq = time.time()
-        print('Stop Scaning')
         
         # Get Last wavelength of the scan
         # ---------------------------------------------
         if wavemeter:
             # get it through the wavemeter
             wavemeter.acquire = True
-            time.sleep(0.5)
+            print('Getting wavemeter')
+            time.sleep()
             lbd_end = wavemeter.lbd
             wavemeter.acquire = False
             self._DCscan.emit((3, lbd_end, 100, True))
@@ -200,17 +199,17 @@ class TransmissionWorkers():
         # Ntry = 0
         # while Ntry<10:
             # try:
-        data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts))
+        # data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts/2))
         
             # except Exception as e: 
             #     print(e)
             #     time.sleep(2)
             #     Ntry += 1
         
-        T = data[0]
-        MZ = data[1]
-        t = np.linspace(time_start_daq,time_stop_daq,len(T))
-        t = t-time_start_daq 
+        # T = data[0]
+        # MZ = data[1]
+        # t = np.linspace(time_start_daq,time_stop_daq,len(T))
+        # t = t-time_start_daq 
         
         # Find out the wavelength during the scan
         # ---------------------------------------------
@@ -218,16 +217,18 @@ class TransmissionWorkers():
         lbd_probe = np.array(lbd_probe)
         time_probe = time_probe - time_probe[0]
 
-        ipdb.set_trace()
-        intpl.splrep(time_probe[:-1], lbd_probe)
-        lbd_daq = intpl.splev(t, f_int)
+        # ipdb.set_trace()
+        # intpl.splrep(time_probe[:-1], lbd_probe)
+        # lbd_daq = intpl.splev(t, f_int)
 
         # Return data and emit everything
-        to_return = (t, lbd_daq, [T, MZ])
+        # to_return = (t, lbd_daq, [T, MZ])
 
-        self._DCscan.emit(-1, to_return, 0, False)
+        # self._DCscan.emit(-1, to_return, 0, False)
+        self._DCscan.emit((-1, 0, 0, False))
         self._is_Running = False
-        return to_return
+        print("Nprobe laser {}".format(len(lbd_probe)))
+        # return to_return
 
     def PiezoScan(self, **kwargs):
         '''

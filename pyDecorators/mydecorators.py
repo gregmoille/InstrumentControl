@@ -112,9 +112,8 @@ class ChangeState(object):
                         laser._is_scaning = True
                         laser._lbdscan = laser.lbd
 
-                    
-                    laser.Querry(stop_word)
                     laser._is_scaning = False
+                    laser.Querry(stop_word)
                     dumm = laser.error
                     
 

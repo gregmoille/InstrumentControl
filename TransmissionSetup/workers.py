@@ -94,6 +94,7 @@ class TransmissionWorkers():
                     3: return wavemeter at end of scan
                 [1] Laser current wavelength
                 [2] Progress bar current %
+                [3] Blinking State
         ------------------------------------------------------
         '''
         
@@ -136,7 +137,7 @@ class TransmissionWorkers():
         while laser._is_changing_lbd:
             # ipdb.set_trace()
             print('changing lbd')
-            self._DCscan.emit((0, laser.lbd, 0))
+            self._DCscan.emit((0, laser.lbd, 0, True))
             
 
         # Get First wavelength of the scan
@@ -147,9 +148,9 @@ class TransmissionWorkers():
             time.sleep(0.5)
             lbd_start = wavemeter.lbd
             wavemeter.acquire = False
-            self._DCscan.emit((2, lbd_start, 0))
+            self._DCscan.emit((2, lbd_start, 0, True))
         else:
-            self._DCscan.emit((2, laser.lbd, 0))
+            self._DCscan.emit((2, laser.lbd, 0, True))
 
         # Setup DAQ for acquisition
         # ---------------------------------------------
@@ -177,7 +178,7 @@ class TransmissionWorkers():
             time_probe.append(time.time())
             prgs = np.floor(100*(laserParam['scan_limit'][1] -
                         lbd_scan)/np.diff(laserParam['scan_limit'])[0])
-            self._DCscan.emit((1, lbd_scan, prgs))
+            self._DCscan.emit((1, lbd_scan, prgs, True))
         daq.readtask.stop()
         time_stop_daq = time.time()
         print('Stop Scaning')
@@ -190,9 +191,9 @@ class TransmissionWorkers():
             time.sleep(0.5)
             lbd_end = wavemeter.lbd
             wavemeter.acquire = False
-            self._DCscan.emit((3, lbd_end, 0))
+            self._DCscan.emit((3, lbd_end, 100, True))
         else:
-            self._DCscan.emit((3, laser.lbd, 0))
+            self._DCscan.emit((3, laser.lbd, 100, True))
    
         # Retrieve DAQ red data
         # ---------------------------------------------
@@ -224,7 +225,7 @@ class TransmissionWorkers():
         # Return data and emit everything
         to_return = (t, lbd_daq, [T, MZ])
 
-        self._DCscan.emit(-1, to_return, 0)
+        self._DCscan.emit(-1, to_return, 0, False)
         self._is_Running = False
         return to_return
 
@@ -250,7 +251,7 @@ class TransmissionWorkers():
     def MZpostProces(self, **kwargs):
         pass
 
-    def _stop(self):
+    def stop(self):
         self._is_Running = False
 
 if __name__ == "__main__":

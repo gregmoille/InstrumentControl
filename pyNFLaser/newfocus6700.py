@@ -18,7 +18,7 @@ import ipdb
 path = os.path.realpath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
-from pyDecorators import InOut, ChangeState
+from pyDecorators import InOut, ChangeState, Catch
 
 
 class NewFocus6700(object):
@@ -135,6 +135,7 @@ class NewFocus6700(object):
         self._haserr = False
         # Miscs
         self._buff = StringBuilder(64)
+        self._err_msg = ''
 
     # -- Decorators --
     # ---------------------------------------------------------
@@ -166,6 +167,7 @@ class NewFocus6700(object):
         return self._open
 
     @connected.setter
+    @Catch.error
     def connected(self,value):
         if value:
             if self._DeviceKey:
@@ -207,6 +209,7 @@ class NewFocus6700(object):
         return self._output
 
     @output.setter
+    @Catch.error
     @InOut.accepts(bool)
     def output(self,value):
         word = "OUTPut:STATe {}".format(int(value))
@@ -221,6 +224,7 @@ class NewFocus6700(object):
         return self._lbd
 
     @lbd.setter
+    @Catch.error
     @ChangeState.lbd
     @InOut.accepts(float)
     def lbd(self, value):
@@ -238,6 +242,7 @@ class NewFocus6700(object):
         return self._cc
 
     @current.setter
+    @Catch.error
     @InOut.accepts(float)
     def current(self, value):
         word = ''.format(value)
@@ -253,6 +258,7 @@ class NewFocus6700(object):
         return self._scan_lim
 
     @scan_limit.setter
+    @Catch.error
     @InOut.accepts(list)
     def scan_limit(self, value):
         start = value[0]
@@ -264,6 +270,7 @@ class NewFocus6700(object):
         self._scan_lim = value
 
     @property
+    @Catch.error
     @InOut.output(float)
     def scan_speed(self):
         word1 = 'SOUR:WAVE:SLEW:FORW?'
@@ -271,6 +278,7 @@ class NewFocus6700(object):
         return self._scan_speed
 
     @scan_speed.setter
+    @Catch.error
     @InOut.accepts(float)
     def scan_speed(self, value):
         word = 'SOUR:WAVE:SLEW:FORW {}'.format(value)
@@ -287,6 +295,7 @@ class NewFocus6700(object):
         return self._scan
 
     @scan.setter
+    @Catch.error
     @ChangeState.scan("OUTPut:SCAN:START",'OUTPut:SCAN:STOP')
     @InOut.accepts(bool)
     def scan(self, value):
@@ -306,6 +315,7 @@ class NewFocus6700(object):
         return self._pzt
 
     @pzt.setter
+    @Catch.error
     @InOut.accepts(float)
     def pzt(self, value):
         word = 'SOUR:VOLT:PIEZ {}'.format(value)
@@ -320,6 +330,7 @@ class NewFocus6700(object):
         return self.beep
 
     @beep.setter
+    @Catch.error
     @InOut.accepts(bool)
     def beep(self, value):
         word = 'BEEP '.format(int(value))
@@ -333,6 +344,7 @@ class NewFocus6700(object):
         return self._id
 
     @property
+    @Catch.error
     @InOut.output(str)
     def error(self):
         word = 'ERRSTR?'

@@ -100,7 +100,7 @@ class Transmission(QMainWindow):
 
     # -- Some Decorators --
     # -----------------------------------------------------------------------------
-    def Blinking(cdt):
+    def Blinking(cdt_word):
         def decorator(fun):
             @wraps(fun)
             def wrapper(*args, **kwargs):
@@ -114,21 +114,19 @@ class Transmission(QMainWindow):
                         self_app.ui.led_SetWavelength.setPixmap(
                             self_app._led[self_app._blink])
                         time.sleep(0.1)
-                        cdt =self_app.laser._is_changing_lbd or \
-                             self_app.laser._is_scaning
+                        cdt = eval(cdt_word)
+
                     self_app.ui.led_SetWavelength.setPixmap(
                         self_app._led[False])
                     self_app.ui.but_dcscan.setEnabled(True)
-                    self_app.ui.but_dcscan.setEnabled(True)
 
                 out = fun(*args, **kwargs)
-                time.sleep(0.1)
                 self_app.threadscan = threading.Thread(target=blink, args=())
                 self_app.threadscan.daemon = True
                 self_app.ui.but_dcscan.setEnabled(False)
                 self_app.threadscan.start()
 
-                return out
+                    return out
             return wrapper
         return decorator
 
@@ -203,7 +201,7 @@ class Transmission(QMainWindow):
         self.ui.led_connected.setPixmap(self._led[self._connected])
 
     @isConnected
-    @Blinking('')
+    @Blinking('self_app.laser._is_changing_lbd')
     def SetWavelength(self, value):
         self.laser.lbd = value
 
@@ -225,27 +223,28 @@ class Transmission(QMainWindow):
         self.laser.scan_speed = self.ui.spnbx_speed.value()
 
     @isConnected
+    @Blinking('self_app._do_blink')
     @blockSignals(True)
     def Scan(self, value):
+        self._do_blink = True
         # -- retrieve params --
         # ---------------------------------------------------------
         if self.ui.check_calib_lbd:
             self.wavemeter = Wavemeter()
             self._param['wlmParam'] = {'channel': int(self.ui.combo_vlmChan.currentText()),
                                       'exposure': 'auto'}
-
-        self._param['laserParam'] = {'scan_speed': self.laser.scan_speed,
-                               'scan_limit': self.laser.scan_limit}
         self._param['daqParam'] = {'read_ch': [self.ui.combo_daqRead.currentText(),
                                             self.ui.combo_daqMZ.currentText()],
                                     'dev': self.ui.combo_daqDev.currentText(),
                                     'write_ch': None}
         self.ui.wdgt_param.setEnabled(False)
+        #Set to the start wavelenght
+        if not np.abs(laser.lbd - laser.scan_lim[0]) < 0.02:
+            laser.lbd = laser.scan_lim[0]
         self.ThreadDCScan.start()
 
     # -- Methods for the Slots --
     # -----------------------------------------------------------------------------
-    @Blinking('_do_blink')
     @pyqtSlot(tuple)
     def _doScan(self, slot):
         # slot:

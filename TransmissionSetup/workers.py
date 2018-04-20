@@ -10,7 +10,7 @@ if not path in sys.path:
 from pyNiDAQ import DAQ
 import ipdb
 
-class TransmissionWorkers(QObject):
+class TransmissionWorkers():
     '''
     ------------------------------------------------------
     tw = TransmissionWorkers(laser = <class>, 
@@ -46,7 +46,7 @@ class TransmissionWorkers(QObject):
     __email__ = "gregory.moille@mist.gov"
     __status__ = "Development"
 
-    _DCscan = pyqtSignal(tuple)
+    _DCscan = (None, None, None, None)
 
     def __init__(self, **kwargs):
         super(TransmissionWorkers, self).__init__()
@@ -99,22 +99,20 @@ class TransmissionWorkers(QObject):
         ------------------------------------------------------
         '''
         
+
+
         laser = kwargs.get('laser', None)
         wavemeter = kwargs.get('wavemeter',None)
         
         # More user frienldy notation
         # ---------------------------------------------
         param = kwargs.get('param', None)
-        laserParam = param['laserParam']
         daqParam = param['daqParam']
         wlmParam = param.get('wlmParam', None)
 
-        # Set laser scan parameters
-        # ---------------------------------------------
-        laser.scan_limit = laserParam['scan_limit']
-        laser.scan_speed = laserParam['scan_speed']
 
-
+        #wait a bit for stabilization
+        time.sleep(1)
         # start the wavemeter if connected
         # ---------------------------------------------
         if wavemeter:
@@ -128,16 +126,16 @@ class TransmissionWorkers(QObject):
             wavemeter.channel = wlmParam['channel']
             wavemeter.exposure = 'auto'
 
-        # Go to start of the scan
-        # ---------------------------------------------
-        laser.lbd = laserParam['scan_limit'][0]
-        time.sleep(0.1)
+        # # Go to start of the scan
+        # # ---------------------------------------------
+        # laser.lbd = laserParam['scan_limit'][0]
+        # time.sleep(0.1)
         # Display wavelength changing with
         # ---------------------------------------------
         while laser._is_changing_lbd:
             # ipdb.set_trace()
             print("chanign lbd")
-            self._DCscan.emit((0, laser.lbd, 0, True))
+            # self._DCscan.emit((0, laser.lbd, 0, True))
             
 
         # Get First wavelength of the scan

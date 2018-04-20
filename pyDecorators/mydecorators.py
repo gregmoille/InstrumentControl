@@ -5,6 +5,20 @@ import ipdb
 import numpy as np
 from functools import wraps
 
+
+class Catch(object):
+
+    def error(fun):
+        def wrap(*args, **kwargs):
+            instr = args[0]
+            out = fun(*args, **kwargs)
+            if hasattr(instr, 'has_err'):
+            if hasattr(instr, 'error'):
+            instr._err_msg += err + '\n'
+            return out
+        return wrap
+
+
 class InOut(object):
     def output(*types):
         def convert(fun):
@@ -28,7 +42,10 @@ class InOut(object):
                     try:
                         ##convert into the right type 
                         for o, t in zip(out, types):
-                            out2[cnt] = t(o)
+                            if t == bool:
+                                out2[cnt] = t(int(o))
+                            else:
+                                out2[cnt] = t(o)
                             cnt+=1
                         break
 
@@ -40,7 +57,8 @@ class InOut(object):
                         print('communication error... retrying...')
                         time.sleep(0.5)
                         if hasattr(instr, 'error'):
-                            err = instr.error
+                            err =  instr.error + 'Comminication issue  ..retrying..'
+                            instr._err_msg +=  err + '\n'
                             print(err)
 
                 # avoid to return a list if the 
@@ -52,6 +70,7 @@ class InOut(object):
 
             return wrap
         return convert
+
     def accepts(*types):
         def check(fun):
             @wraps(fun)
@@ -62,7 +81,6 @@ class InOut(object):
                 for a, t in zip(args[1::], types):
                     if not isinstance(a,t):
                         failed = True
-                
                 if not failed:    
                     while True:
                         out = fun(*args, **kwargs)
@@ -70,7 +88,8 @@ class InOut(object):
                             if not instr.has_error:
                                 break
                             else: 
-                                print('need to fetch the errors!')
+                                instr._err_msg +=  instr.error + '\n'
+                                print(instr._err_msg)
                         else:
                             break
                     return out
@@ -114,10 +133,9 @@ class ChangeState(object):
 
                     laser._is_scaning = False
                     laser.Querry(stop_word)
-                    dumm = laser.error
+                    instr._err_msg +=  laser.error  + 'END OF SCAN--' + '\n'
+                    print(laser.error  + 'END OF SCAN--')
                     
-
-
                 # retrieve params
                 laser = args[0]
                 lim = laser.scan_limit

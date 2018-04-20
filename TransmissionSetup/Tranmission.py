@@ -33,20 +33,19 @@ from pyWavemeter import Wavemeter
 import ipdb
 
 
-
 class DevWind(QMainWindow):
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(DevWind, self).__init__(parent)
         self.ui = Ui_DevWindow()
         self.ui.setupUi(self)
         self.ui.butt_clearError.clicked.connect(lambda:
-                                self.ui.text_lastError.setText(''))
+                                                self.ui.text_lastError.setText(''))
 
         self.parent = parent
         self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
 
     def GetLaserErr(self):
-        try: 
+        try:
             err = self.parent.laser.error
             self.ui.text_lastError.setText(str(err))
         except Exception as err:
@@ -59,12 +58,13 @@ class Transmission(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self._led = {False: QtGui.QPixmap(':/qss_icons/rc/radio_checked.png'),
-                    True: QtGui.QPixmap(':/qss_icons/rc/radio_checked_focus.png')
-                    }
+                     True: QtGui.QPixmap(':/qss_icons/rc/radio_checked_focus.png')
+                     }
         self._blink = False
         self._cst_slide = 100
 
-        self.ui.slide_pzt.valueChanged[int].connect(lambda x: self.ui.spnbx_pzt.setValue(x/self._cst_slide))
+        self.ui.slide_pzt.valueChanged[int].connect(
+            lambda x: self.ui.spnbx_pzt.setValue(x/self._cst_slide))
         self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
         self.ui.spnbx_lbd.valueChanged[float].connect(self.SetWavelength)
         self.ui.spnbx_lbd_start.valueChanged[float].connect(self.ScanLim)
@@ -77,11 +77,10 @@ class Transmission(QMainWindow):
         self.ui.wdgt_plot.setEnabled(False)
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
 
-        self.dev = DevWind(parent = self)
+        self.dev = DevWind(parent=self)
         self.ui.actionGet_Errors.triggered.connect(self.dev.show)
 
-
-        #Misc
+        # Misc
         self._do_blink = False
         self.wlm = None
         self.laser = None
@@ -92,31 +91,33 @@ class Transmission(QMainWindow):
         self.WorkerScan = TransmissionWorkers()
         self.WorkerScan.led_status[QtGui.QPixmap].connect(self._doScan)
         self.WorkerScan.moveToThread(self.ThreadScan)
-        self.ThreadDCScan.started.connect(lambda: 
-                                        self.WorkerScan.DCscan(laser = self.laser, 
-                                                                wavemeter = self.wlm, 
-                                                                param= self._param))
-        
-
+        self.ThreadDCScan.started.connect(lambda:
+                                          self.WorkerScan.DCscan(laser=self.laser,
+                                                                 wavemeter=self.wlm,
+                                                                 param=self._param))
 
     # -- Some Decorators --
     # -----------------------------------------------------------------------------
     def Blinking(condition):
         def decorator(fun):
             @wraps(fun)
-            def wrapper(*args,**kwargs):
+            def wrapper(*args, **kwargs):
                 self_app = args[0]
+
                 def blink():
                     self_app.ui.but_dcscan.setEnabled(False)
-                    print("Lbd changing {}".format(getattr(self_app, condition)))
+                    print("Lbd changing {}".format(
+                        getattr(self_app, condition)))
                     while getattr(self_app, condition):
                         self_app._blink = not(self_app._blink)
-                        self_app.ui.led_SetWavelength.setPixmap(self_app._led[self_app._blink])
+                        self_app.ui.led_SetWavelength.setPixmap(
+                            self_app._led[self_app._blink])
                         time.sleep(0.1)
-                    self_app.ui.led_SetWavelength.setPixmap(self_app._led[False])
+                    self_app.ui.led_SetWavelength.setPixmap(
+                        self_app._led[False])
                     self_app.ui.but_dcscan.setEnabled(True)
 
-                out = fun(*args,**kwargs)
+                out = fun(*args, **kwargs)
                 time.sleep(0.1)
                 print(args[0].laser._is_changing_lbd)
                 self_app.threadscan = threading.Thread(target=blink, args=())
@@ -135,7 +136,8 @@ class Transmission(QMainWindow):
                 out = fun(*args, **kwargs)
             else:
                 out = None
-                self_app.dev.ui.text_lastError.setText('Laser is not connected')
+                self_app.dev.ui.text_lastError.setText(
+                    'Laser is not connected')
             return out
         return wrapper
 
@@ -144,16 +146,16 @@ class Transmission(QMainWindow):
             @wraps(fun)
             def wrapper(*args, **kwargs):
                 self_app = args[0]
-                #block all signals
-                attr = ['spnbx_lbd', 'slide_pzt','spnbx_pzt',
-                'spnbx_lbd_start','spnbx_lbd_start','spnbx_lbd_stop','spnbx_speed']
+                # block all signals
+                attr = ['spnbx_lbd', 'slide_pzt', 'spnbx_pzt',
+                        'spnbx_lbd_start', 'spnbx_lbd_start', 'spnbx_lbd_stop', 'spnbx_speed']
 
                 if not val:
                     out = fun(*args, **kwargs)
 
                 for a in attr:
                     print(a)
-                    setattr(self_app.ui, a + '.blockSignals' , True)
+                    setattr(self_app.ui, a + '.blockSignals', True)
 
                 if val:
                     out = fun(*args, **kwargs)
@@ -167,10 +169,10 @@ class Transmission(QMainWindow):
 
     def Connect(self):
         if not self._connected:
-            try: 
+            try:
                 idLaser = 4106
                 DeviceKey = '6700 SN10027'
-                self.laser = NewFocus6700(id =idLaser, key = DeviceKey)
+                self.laser = NewFocus6700(id=idLaser, key=DeviceKey)
                 print('Connection')
                 self.laser.connected = True
                 # ipdb.set_trace()
@@ -180,7 +182,8 @@ class Transmission(QMainWindow):
                 self.RetrieveLaser()
 
             except Exception as err:
-                err = str(err) + '\nLaser is not connected, please try to connect it.'
+                err = str(err) + \
+                    '\nLaser is not connected, please try to connect it.'
                 self.dev.ui.text_lastError.setText(err)
         else:
             try:
@@ -197,38 +200,53 @@ class Transmission(QMainWindow):
 
     @isConnected
     @Blinking('laser._is_changing_lbd')
-    def SetWavelength(self,value):
+    def SetWavelength(self, value):
         self.laser.lbd = value
         print(self.laser._is_changing_lbd)
 
     @isConnected
-    def Pzt_Value(self,val):
+    def Pzt_Value(self, val):
         print('Setting pzt')
         self.ui.slide_pzt.setValue(val*self._cst_slide)
         self.laser.pzt = val
 
     @isConnected
-    def ScanLim(self,val):
+    def ScanLim(self, val):
         print('Setting limits')
         self.laser.scan_limit = [self.ui.spnbx_lbd_start.value(),
-                                self.ui.spnbx_lbd_stop.value()]
+                                 self.ui.spnbx_lbd_stop.value()]
+
     @isConnected
-    def ScanSpeed(self,val):
+    def ScanSpeed(self, val):
         print('Setting speed')
         self.laser.scan_speed = self.ui.spnbx_speed.value()
 
     @isConnected
     @blockSignals(True)
-    def Scan(self, value) 
+    def Scan(self, value)
+        # -- retrieve params --
+        # ---------------------------------------------------------
+        if self.ui.check_calib_lbd:
+            self.wavemeter = Wavemeter()
+            self.param['wlmParam'] = {'channel': int(self.ui.combo_vlmChan.getText()),
+                                      'exposure': 'auto'}
+
+        self.param['laser'] = {'scan_speed': self.laser.scan_speed,
+                               'scan_limit': self.laser.scan_limit}
+        self.param['daqParam'] = {'read_ch': [self.ui.combo_daqRead.getText(),
+                                            self.ui.combo_daqMZ.getText()],
+                                    'dev': self.ui.combo_daqDev.getText(),
+                                    'write_ch': None}
         self.ui.wdgt_param.setEnabled(False)
         self.ThreadDCScan.start()
 
-    # -- Methods for the Slots -- 
+    # -- Methods for the Slots --
+    # -----------------------------------------------------------------------------
     @Blinking('_do_blink')
     @pyqtSlot(tuple)
-    def _doScan(self,slot):
+    def _doScan(self, slot):
         # slot:
-        # [0] Code for where the  program is in 
+        # [0] Code for where the  program is in
         # the algorithm:
         #     -1 : no scan / end of scan
         #     0 : setting up the start of scan
@@ -239,29 +257,24 @@ class Transmission(QMainWindow):
         # [2] Progress bar current %
         # [3] Blinking State
 
-
         state = slot[0]
         lbd = slot[1]
         prgrs = slot[2]
         self._do_blink = slot[3]
-        
         self.ui.spnbx_lbd.setValue(lbd)
         self.ui.progressBar.setValeu(prgrs)
-
-        if state ==2:
+        if state == 2:
             self._lbd_start = lbd
-
-        if state ==3:
+            self.ui.line_wlmLbd.setText(str(lbd))
+        if state == 3:
             self._lbd_stop = lbd
-
+            self.ui.line_wlmLbd.setText(str(lbd))
         if state = -1:
             data = lbd
             self.ui.wdgt_param.setEnabled(self._connected)
             self.WorkerScan.stop()
             self.ThreadDCScan.quit()
             self.ThreadDCScan.wait()
-
-
 
     # -- Utilities --
     # -----------------------------------------------------------------------------
@@ -273,7 +286,7 @@ class Transmission(QMainWindow):
     def RetrieveLaser(self):
         print("retrieving data")
 
-        #for some reasom there is a bug disable the signal with this guy
+        # for some reasom there is a bug disable the signal with this guy
         self.ui.spnbx_lbd_start.blockSignals(True)
 
         lbd = self.laser.lbd
@@ -281,11 +294,10 @@ class Transmission(QMainWindow):
         scan_lim = self.laser.scan_limit
         scan_speed = self.laser.scan_speed
 
-
         print('-'*30)
         print("Fetching error {}".format(self.laser.error))
         print('-'*30)
-        
+
         print(pzt)
         print(scan_lim)
         self.ui.spnbx_lbd.setValue(lbd)
@@ -294,18 +306,14 @@ class Transmission(QMainWindow):
         self.ui.spnbx_lbd_start.setValue(scan_lim[0])
         self.ui.spnbx_lbd_stop.setValue(scan_lim[1])
         self.ui.spnbx_speed.setValue(scan_speed)
-        
-        #patch for this signal
+
+        # patch for this signal
         self.ui.spnbx_lbd_start.blockSignals(False)
 
 
-    
 if __name__ == "__main__":
     app = QApplication([])
     window = Transmission()
     # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     window.show()
     sys.exit(app.exec_())
-
-
-

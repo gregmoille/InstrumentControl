@@ -2591,7 +2591,7 @@ QDateEdit::down-arrow:focus {
                 <set>Qt::AlignCenter</set>
                </property>
                <property name="keyboardTracking">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="suffix">
                 <string> nm</string>
@@ -2627,7 +2627,7 @@ QDateEdit::down-arrow:focus {
                 <set>Qt::AlignCenter</set>
                </property>
                <property name="keyboardTracking">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="suffix">
                 <string> nm</string>
@@ -2663,7 +2663,7 @@ QDateEdit::down-arrow:focus {
                 <set>Qt::AlignCenter</set>
                </property>
                <property name="keyboardTracking">
-                <bool>true</bool>
+                <bool>false</bool>
                </property>
                <property name="suffix">
                 <string> nm/s</string>
@@ -3849,7 +3849,7 @@ QDateEdit::down-arrow:focus {
      <x>0</x>
      <y>0</y>
      <width>1073</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

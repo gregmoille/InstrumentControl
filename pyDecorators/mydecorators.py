@@ -38,7 +38,7 @@ class InOut(object):
                         
                         # ipdb.set_trace()
                         print('communication error... retrying...')
-                        time.sleep(0.05)
+                        time.sleep(0.5)
                         if hasattr(instr, 'error'):
                             err = instr.error
                             print(err)
@@ -64,12 +64,13 @@ class InOut(object):
                         failed = True
                 
                 if not failed:    
-                    while true:
+                    while True:
                         out = fun(*args, **kwargs)
-                        if hasattr(instr, 'error'):
-                            err = instr.error
-                            if not err == instr._no_error:
+                        if hasattr(instr, 'has_error'):
+                            if not instr.has_error:
                                 break
+                            else: 
+                                print('need to fetch the errors!')
                         else:
                             break
                     return out

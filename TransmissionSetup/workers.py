@@ -10,7 +10,7 @@ if not path in sys.path:
 from pyNiDAQ import DAQ
 import ipdb
 
-class TransmissionWorkers(QObject):
+class TransmissionWorkers():
     '''
     ------------------------------------------------------
     tw = TransmissionWorkers(laser = <class>, 
@@ -46,7 +46,7 @@ class TransmissionWorkers(QObject):
     __email__ = "gregory.moille@mist.gov"
     __status__ = "Development"
 
-    _DCscan = pyqtSignal(tuple)
+    _DCscan = (None, None, None)
 
     def __init__(self, **kwargs):
         super(TransmissionWorkers, self).__init__()

@@ -114,6 +114,7 @@ class NewFocus6700(object):
             clr.AddReference(r'UsbDllWrap')
             import Newport
             self._dev = Newport.USBComm.USB()
+
         except:
             self._dev = None
         # Laser state
@@ -130,7 +131,8 @@ class NewFocus6700(object):
         self._output = 0
         self._is_scaning = False
         self._is_changing_lbd = False
-        instr._no_error = '0....'
+        self._no_error = '0,"NO ERROR"'
+        self._haserr = False
         # Miscs
         self._buff = StringBuilder(64)
 
@@ -164,20 +166,35 @@ class NewFocus6700(object):
         return self._open
 
     @connected.setter
-    @InOut.accepts(bool)
     def connected(self,value):
-        # ipdb.set_trace()
         if value:
             if self._DeviceKey:
                 try: 
-                    out = self._dev.OpenDevices(self._idLaser, True)
-                    dum = self._dev.Query('',self._DeviceKey, self._buff)
-                    if out :
-                        self._open = True
-                        print('Laser Connected')
-                except:
-                    pass
-            time.sleep(0.2)
+                    while True:
+                        out = self._dev.OpenDevices(self._idLaser, True)
+                        tab = self._dev.GetDeviceTable()
+                        #empty buffer
+                        out = self._dev.Read(self._DeviceKey, self._buff)
+                        # ipdb.set_trace()
+                        while not out == -1:
+                            out = self._dev.Read(self._DeviceKey, self._buff)
+                            print('Empyting the buffer: {}'.format(out))
+                            time.sleep(0.5)
+                        idn = self.identity
+                        if not idn == "":
+                            print("\nLaser connected: {}".format(idn))
+                            break
+                        else:
+                            print('Ok reconection try')
+                            self._dev.CloseDevices()
+                            time.sleep(0.2)
+
+                    # ipdb.set_trace()
+                    self.error
+                    self._open = True
+                except Exception as e:
+                    print(e)
+            
         else:
             self._dev.CloseDevices()
             self._open = False
@@ -247,12 +264,10 @@ class NewFocus6700(object):
         self._scan_lim = value
 
     @property
-    @InOut.output(float,float)
+    @InOut.output(float)
     def scan_speed(self):
         word1 = 'SOUR:WAVE:SLEW:FORW?'
-        word2 = 'SOUR:WAVE:SLEW:RET?'
-        self._scan_speed = [self.Querry(word1),
-                        self.Querry(word2)]
+        self._scan_speed = self.Querry(word1)
         return self._scan_speed
 
     @scan_speed.setter
@@ -318,18 +333,42 @@ class NewFocus6700(object):
         return self._id
 
     @property
+    @InOut.output(str)
     def error(self):
         word = 'ERRSTR?'
-        self._error = self.Querry(word)
+        self._error = ''
+        err = self.Querry(word)
+        self._error +=  err
+        # print("Current error: {}".format(err))
+        while not err == self._no_error:
+            err = self.Querry(word)
+            self._error += '\n' + err 
+            
+            # print("Current error: {}".format(err))
+        # print("Finish fetching stuff")
         return self._error
-
+    
+    @property
+    @InOut.output(bool)
+    def has_error(self):
+        word = '*STB?'
+        dum = self.Querry(word)
+        if dum =='128': self._haserr = True
+        if dum == '0': self._haserr = False
+        return self._haserr
 
 if __name__ == '__main__':
     idLaser = 4106
     DeviceKey = '6700 SN10027'
     laser = NewFocus6700(id =idLaser, key = DeviceKey)
-    laser.beep = False
+    # laser.beep = False
     laser.connected = True
+    print("First error caught: {}".format(laser.error))
     old_lbd = laser.lbd
+    pzt = laser.pzt
+    # laser.lbd = old_lbd +2
     print('Laser wavelength:')
     print("\t{}".format(old_lbd))
+    print('Laser piezo:')
+    print("\t{}".format(pzt))
+    laser.connected = False

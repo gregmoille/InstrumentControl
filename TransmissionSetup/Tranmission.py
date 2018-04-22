@@ -43,14 +43,22 @@ class DevWind(QMainWindow):
                                                 self.ui.text_lastError.setText(''))
 
         self.parent = parent
-        self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
+        self.old_err = ''
+        self.GetLaserErr()
+        # self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
 
     def GetLaserErr(self):
-        try:
-            err = self.parent.laser.error
-            self.ui.text_lastError.setText(str(err))
-        except Exception as err:
-            self.ui.text_lastError.setText(str(err))
+        def workerError:
+            while True:
+                if self.parent._connected:
+                    old_err = self.old_err.split('\n')[-1]
+                    new_err = self.paren._err_msg.split('\n')[-1]
+                    if not old_err ==  new_err:
+                        self.old_err +=  '\n' + new_err
+                        self.ui.text_lastError.setText(str(self.old_err))
+        self.threadErr = threading.Thread(target=workerError, args=())
+        self.threadErr.daemon = True
+        self.threadErr.start()
 
 
 class Transmission(QMainWindow):
@@ -227,6 +235,39 @@ class Transmission(QMainWindow):
     @blockSignals(True)
     def Scan(self, value):
         self._do_blink = True
+
+        # define the thread worker
+        # ---------------------------------------------------------
+        def _doScan():
+            # [0] Code for where the  program is in
+            # the algorithm:
+            #     -1 : no scan / end of scan
+            #     0 : setting up the start of scan
+            #     1 : scanning
+            #     2: return wavemeter of begining of scan
+            #     3: return wavemeter at end of scan
+            # [1] Laser current wavelength
+            # [2] Progress bar current %
+            # [3] Blinking State
+            while True:
+                state = self.TransmissionWorkers._DCscan[0]
+                lbd = self.TransmissionWorkers._DCscan[1]
+                prgrs = self.TransmissionWorkers._DCscan[2]
+                data = self.TransmissionWorkers._DCscan[3]
+                self.ui.spnbx_lbd.setValue(lbd)
+                self.ui.progressBar.setValue(prgrs)
+                if state == 2:
+                    self._lbd_start = lbd
+                    self.ui.line_wlmLbd.setText(str(lbd))
+                if state == 3:
+                    self._lbd_stop = lbd
+                    self.ui.line_wlmLbd.setText(str(lbd))
+                if state == -1:
+                    self._dcData = data
+                    self.ui.wdgt_param.setEnabled(True)
+                    self._do_blink = False
+                    break
+
         # -- retrieve params --
         # ---------------------------------------------------------
         if self.ui.check_calib_lbd:
@@ -241,44 +282,22 @@ class Transmission(QMainWindow):
         #Set to the start wavelenght
         if not np.abs(laser.lbd - laser.scan_lim[0]) < 0.02:
             laser.lbd = laser.scan_lim[0]
-        self.ThreadDCScan.start()
 
-    # -- Methods for the Slots --
-    # -----------------------------------------------------------------------------
-    @pyqtSlot(tuple)
-    def _doScan(self, slot):
-        # slot:
-        # [0] Code for where the  program is in
-        # the algorithm:
-        #     -1 : no scan / end of scan
-        #     0 : setting up the start of scan
-        #     1 : scanning
-        #     2: return wavemeter of begining of scan
-        #     3: return wavemeter at end of scan
-        # [1] Laser current wavelength
-        # [2] Progress bar current %
-        # [3] Blinking State
 
-        state = slot[0]
-        lbd = slot[1]
-        prgrs = slot[2]
-        self._do_blink = slot[3]
-        self.ui.spnbx_lbd.setValue(lbd)
-        self.ui.progressBar.setValue(prgrs)
-        QApplication.processEvents()
-        if state == 2:
-            self._lbd_start = lbd
-            self.ui.line_wlmLbd.setText(str(lbd))
-        if state == 3:
-            self._lbd_stop = lbd
-            self.ui.line_wlmLbd.setText(str(lbd))
-        if state == -1:
-            ipdb.set_trace()
-            data = lbd
-            self.ui.wdgt_param.setEnabled(True)
-            self.WorkerScan.stop()
-            self.ThreadDCScan.quit()
-            self.ThreadDCScan.wait()
+        # First thread wich is the DC scan worker
+        self.threadcCWorker = threading.Thread(target=self.TransmissionWorkers.DCscan, 
+                                             kwargs={'laser': self.laser,
+                                                    'wavemeter': self.wavemeter,
+                                                    'paral': self._param})
+        self.threadcCWorker.daemon = True
+        # Second thread which is the DC scan eta fetch
+        self.threadDcFetch = threading.Thread(target=_doScan, 
+                                             args=())
+        self.threadDcFetch.daemon = True
+        # start both thread
+        self.threadcCWorker.start()
+        self.threadDcFetch.start()
+
 
     # -- Utilities --
     # -----------------------------------------------------------------------------

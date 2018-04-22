@@ -14,7 +14,7 @@ class Catch(object):
             out = fun(*args, **kwargs)
             if hasattr(instr, 'has_err'):
             if hasattr(instr, 'error'):
-            instr._err_msg += err + '\n'
+            instr._err_msg += '\n' + err
             return out
         return wrap
 
@@ -58,7 +58,7 @@ class InOut(object):
                         time.sleep(0.5)
                         if hasattr(instr, 'error'):
                             err =  instr.error + 'Comminication issue  ..retrying..'
-                            instr._err_msg +=  err + '\n'
+                            instr._err_msg +=  '\n' + err
                             print(err)
 
                 # avoid to return a list if the 
@@ -88,7 +88,7 @@ class InOut(object):
                             if not instr.has_error:
                                 break
                             else: 
-                                instr._err_msg +=  instr.error + '\n'
+                                instr._err_msg +=  '\n' + instr.error 
                                 print(instr._err_msg)
                         else:
                             break
@@ -133,7 +133,7 @@ class ChangeState(object):
 
                     laser._is_scaning = False
                     laser.Querry(stop_word)
-                    instr._err_msg +=  laser.error  + 'END OF SCAN--' + '\n'
+                    instr._err_msg += + '\n' + laser.error  + 'END OF SCAN--' 
                     print(laser.error  + 'END OF SCAN--')
                     
                 # retrieve params

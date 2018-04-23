@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1022</width>
+    <width>1201</width>
     <height>812</height>
    </rect>
   </property>
@@ -1377,6 +1377,22 @@ QDateEdit::down-arrow:focus {
          </property>
         </spacer>
        </item>
+       <item row="0" column="4">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="0" column="1">
         <widget class="QComboBox" name="comboBox_6">
          <property name="minimumSize">
@@ -1402,22 +1418,6 @@ QDateEdit::down-arrow:focus {
           </property>
          </item>
         </widget>
-       </item>
-       <item row="0" column="4">
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -4297,8 +4297,8 @@ QDateEdit::down-arrow:focus {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1022</width>
-     <height>21</height>
+     <width>1201</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -4326,6 +4326,12 @@ QDateEdit::down-arrow:focus {
    <addaction name="menuDevelopper"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2"/>
+  </widget>
   <action name="actionAbout">
    <property name="text">
     <string>About</string>

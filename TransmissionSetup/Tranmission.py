@@ -30,6 +30,28 @@ from workers import DcScan
 Ui_MainWindow, QtBaseClass = uic.loadUiType('./UI/UITranmission.ui')
 Ui_DevWindow, QtBaseClass = uic.loadUiType('./UI/DevWindow.ui')
 
+def ErrorHandling(QThread):
+    err = pyqtSlot(str)
+
+    def __init__(self, **kwargs):
+        QThread.__init__(self)
+        self.app = kwargs.get('app', None)
+        self._isRunning = False
+
+    def run(self):
+        self._isRunning = True
+         while self._isRunning:
+            if self.app.laser:
+                if self.app._connected:
+                    old_err = self.app._olderr.split('\n')[-1]
+                    new_err = self.app.laser._err_msg.split('\n')[-1]
+                    if not old_err ==  new_errz
+                        self.app.old_err +=  '\n' + new_err
+                        self.err.emit(str(self.app.old_err))
+            time.sleep(1)
+    def stop(self):
+        self._isRunning = False
+
 class DevWind(QMainWindow):
     def __init__(self, parent=None):
         super(DevWind, self).__init__(parent)
@@ -40,24 +62,21 @@ class DevWind(QMainWindow):
 
         self.parent = parent
         self.old_err = ''
+        self.ui.text_lastError.setText('')
         # self.GetLaserErr()
         # self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
 
     def GetLaserErr(self):
-        def workerError():
-            while True:
-                if self.parent.laser:
-                    if self.parent._connected:
-                        old_err = self.old_err.split('\n')[-1]
-                        new_err = self.parent.laser._err_msg.split('\n')[-1]
-                        if not old_err ==  new_err:
-                            self.old_err +=  '\n' + new_err
-                            self.ui.text_lastError.setText(str(self.old_err))
-                time.sleep(1)
-        self.threadErr = threading.Thread(target=workerError, args=())
-        self.threadErr.daemon = True
-        self.threadErr.start()
+        @pyqtSlot(str)
+        def _updateErr(val):
+            self.ui.text_lastError.setText(val)
 
+        self.threadErr = ErrorHandling(app = self.parent)
+        self.threadErr.err.connect(_updateErr)
+        self.threadErr.start()
+        
+    def StopErr(self):
+        self.threadErr.stop()
 
 class Transmission(QMainWindow):
     '''
@@ -130,6 +149,7 @@ class Transmission(QMainWindow):
         self._do_blink = False
         self.wlm = None
         self.laser = None
+        self._olderr = ''
         self._param = {}
 
     # -----------------------------------------------------------------------------
@@ -230,6 +250,7 @@ class Transmission(QMainWindow):
                 self.ui.but_connect.setText('Disconnect')
                 self._connected = True
                 self.RetrieveLaser()
+                self.dev.GetLaserErr()
 
             except Exception as err:
                 err = str(err) + \
@@ -240,6 +261,7 @@ class Transmission(QMainWindow):
                 self.laser.connected = False
                 self.ui.but_connect.setText('Connect')
                 self._connected = False
+                self.dev.StopErr()
             except Exception as err:
                 err = str(err) + '\nCannot disconnect the laser.'
                 self.dev.ui.text_lastError.setText(str(err))

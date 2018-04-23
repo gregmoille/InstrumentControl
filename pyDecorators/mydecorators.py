@@ -7,7 +7,11 @@ from functools import wraps
 
 
 class Catch(object):
-
+    '''
+    ------------------------------------------------------
+    G. Moille - NIST - 2018
+    ------------------------------------------------------
+    ''' 
     def error(fun):
         def wrap(*args, **kwargs):
             instr = args[0]
@@ -20,6 +24,11 @@ class Catch(object):
 
 
 class InOut(object):
+    '''
+    ------------------------------------------------------
+    G. Moille - NIST - 2018
+    ------------------------------------------------------
+    '''
     def output(*types):
         def convert(fun):
             @wraps(fun)

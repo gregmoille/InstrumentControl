@@ -13,7 +13,7 @@ import ipdb
 class DcScan(QThread):
     '''
     ------------------------------------------------------
-    tw = TransmissionWorkers(laser = <class>, 
+    tw = DcScan(laser = <class>, 
                             wavemeter = <class>,
                             *args, **kwargs) 
 
@@ -24,12 +24,38 @@ class DcScan(QThread):
                 pyNFLaser package)
         wavemeter: wavemeter object to controll the
                    equipement (c.f. pyWavemeter package)
-        If no wavemeter if passed, the class will work 
-        without it and will trust the wavelength provided
-        byt the laser internal detector
+                  If no wavemeter if passed, the class will 
+                  work without it and will trust the 
+                  wavelength provided by the laser internal
+                  detector
+        param: dictionary with 'laserParam', 
+                   'daqParam' and 'wlmParam' keys
+                laserParam keys (cf laser properties): 
+                    - scan_speed
+                    - scan_limit
+                wlmParam keys (cf wavemeter properties):
+                    - channel
+                    - exposure 
+                daqParam keys:
+                    - read_ch
+                    - write_ch
+                    - dev
     Methods:
-        self.DCscan: See method doc string
-        self.PiezoScan: See method doc string
+        self.run: See method doc string
+
+    pyQtSlot emissions:
+            self._DCscan <tupple>:
+                [0] Code for where the  program is in 
+                the algorithm:
+                    -1 : no scan / end of scan
+                    0 : setting up the start of scan
+                    1 : scanning
+                    2: return wavemeter of begining of scan
+                    3: return wavemeter at end of scan
+                [1] Laser current wavelength
+                [2] Progress bar current %
+                [3] Blinking State
+
 
     ------------------------------------------------------
     G. Moille - NIST - 2018
@@ -45,8 +71,6 @@ class DcScan(QThread):
     __maintainer__ = "Gregory Moille"
     __email__ = "gregory.moille@mist.gov"
     __status__ = "Development"
-
-    # _DCscan = (0, 0, 0, 0)
     _DCscan = pyqtSignal(tuple)
 
     def __init__(self, **kwargs):
@@ -60,64 +84,25 @@ class DcScan(QThread):
         # Misc
         self._is_Running = False
 
-    def run(self):
-        '''
-        ------------------------------------------------------
-        self.DCscan(self, param = <dict>, *args, **kwargs))
-
-        Args: 
-            laser: object of a laser from pyNFLaser
-            wavemeter: wavementer object from pyWavemeter
-            param: dictionarry with 'laserParam', 
-                   'daqParam' and 'wlmParam' keys
-                laserParam keys (cf laser properties): 
-                    - scan_speed
-                    - scan_limit
-                wlmParam keys (cf wavemeter properties):
-                    - channel
-                    - exposure 
-                daqParam keys:
-                    - read_ch
-                    - write_ch
-                    - dev
-        Return <tuple>:
-            (t, lbd_daq, [T, MZ])
-        pyQtSlot emissions:
-            self._DCscan <tupple>:
-                [0] Code for where the  program is in 
-                the algorithm:
-                    -1 : no scan / end of scan
-                    0 : setting up the start of scan
-                    1 : scanning
-                    2: return wavemeter of begining of scan
-                    3: return wavemeter at end of scan
-                [1] Laser current wavelength
-                [2] Progress bar current %
-                [3] Blinking State
-        ------------------------------------------------------
-        '''
-        
+    def run(self):        
+        # -- Fetch main parameters --
         laser = self.laser
         param = self.param
         wavemeter = self.wavemeter
-       
-
         scan_limit = laser.scan_limit
-        # More user frienldy notation
-        # ---------------------------------------------
+        
+        # -- More user friendly notation --
         daqParam = param['daqParam']
         wlmParam = param.get('wlmParam', None)
 
-
-        # ipdb.set_trace()
-        #wait a bit for stabilization
+        # -- Wait until lbd start of scan --
         while laser._is_changing_lbd:
             time.sleep(0.25)
         
-
+        # -- Wait for stabilization --
         time.sleep(1)
-        # start the wavemeter if connected
-        # ---------------------------------------------
+
+        # -- start the wavemeter if connected -- 
         if wavemeter:
             # check connect
             if not wavemeter.connected:
@@ -129,19 +114,7 @@ class DcScan(QThread):
             wavemeter.channel = wlmParam['channel']
             wavemeter.exposure = 'auto'
 
-        # Go to start of the scan
-        # ---------------------------------------------
-        # Display wavelength changing with
-        # ---------------------------------------------
-        # ipdb.set_trace()
-        # while laser._is_changing_lbd:
-        #     # ipdb.set_trace()
-        #     print("changing lbd")
-            # self._DCscan.emit((0, laser.lbd, 0, True))
-            
-
-        # Get First wavelength of the scan
-        # ---------------------------------------------
+        # -- Get First wavelength of the scan -- 
         if wavemeter:
             # get it through the wavemeter
             wavemeter.acquire = True
@@ -154,23 +127,18 @@ class DcScan(QThread):
         else:
             self._DCscan.emit((2, laser.lbd, 0, None))
 
-        # Setup DAQ for acquisition
-        # ---------------------------------------------
-        # ipdb.set_trace()
+        # -- Setup DAQ for acquisition -- 
         scan_time = np.diff(laser.scan_limit)[0]/laser.scan_speed
         daq = DAQ(t_end = scan_time, dev = daqParam['dev'])
         daq.SetupRead(read_ch=daqParam['read_ch'])
         daq.readtask.start()
         time_start_daq = time.time()
-        # Start laser scan
-        # ---------------------------------------------
-  
+        
+        # -- Start laser scan -- 
         laser.scan = True
         self._is_Running = True
-        # daq.ReadData()
-
-        # Fetch wavelength and progress of scan
-        # ---------------------------------------------
+        
+        # -- Fetch wavelength and progress of scan -- 
         lbd_probe = []
         time_probe = []
         while laser._is_scaning:
@@ -179,59 +147,44 @@ class DcScan(QThread):
             time_probe.append(time.time())
             prgs = np.floor(100*(lbd_scan-scan_limit[0])/np.diff(scan_limit)[0])
             self._DCscan.emit((1, lbd_scan, prgs, None))
+
+        # -- Scan Finished, get DAQ data -- 
         daq.readtask.stop()
         time_stop_daq = time.time()
         data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts))
-        # print(data)
-        # Get Last wavelength of the scan
-        # ---------------------------------------------
+        daq.readtask.close()
+
+        # -- Get Last wavelength of the scan -- 
         if wavemeter:
-            # get it through the wavemeter
             wavemeter.acquire = True
-            print('Getting wavemeter')
             time.sleep(2)
             lbd_end = wavemeter.lbd
             wavemeter.acquire = False
-            print("Wavelength end {:.3f}".format(lbd_end))
             self._DCscan.emit((3, lbd_end, 100, None))
         else:
             self._DCscan.emit((3, laser.lbd, 100, None))
-        daq.readtask.close()
-        # Retrieve DAQ red data
-        # ---------------------------------------------
-        # Ntry = 0
-        # while Ntry<10:
-            # try:
-        # 
         
-            # except Exception as e: 
-            #     print(e)
-            #     time.sleep(2)
-            #     Ntry += 1
+        # -- Process a bit the data --
+        T = data[0]
+        MZ = data[1]
+        tdaq = np.linspace(time_start_daq,time_stop_daq,len(T))
+        tdaq = t-time_start_daq 
         
-        # T = data[0]
-        # MZ = data[1]
-        # t = np.linspace(time_start_daq,time_stop_daq,len(T))
-        # t = t-time_start_daq 
-        
-        # Find out the wavelength during the scan
-        # ---------------------------------------------
+        # -- Find out the wavelength during the scan --
         time_probe = np.array(time_probe)
         lbd_probe = np.array(lbd_probe)
         time_probe = time_probe - time_probe[0]
 
-        # ipdb.set_trace()
-        # intpl.splrep(time_probe[:-1], lbd_probe)
-        # lbd_daq = intpl.splev(t, f_int)
+        # -- interpolate data for better precision --
+        f_int = intpl.splrep(time_probe[:-1], lbd_probe)
+        lbd_daq = intpl.splev(t, f_int)
 
-        # Return data and= everythin
-        # to_return = (t, lbd_daq, [T, MZ])
+        # -- Return data and= everything --
+        to_return = (t_daq, t_probe, lbd_daq, [T, MZ])
 
-        # self._DCscan.emit(-1, to_return, 0, False)
-        self._DCscan.emit((-1, laser.lbd, 0, (time_probe,lbd_probe)))
+        self._DCscan.emit((-1, laser.lbd, 0, to_return))
         self._is_Running = False
-        # print("Nprobe laser {}".format(len(lbd_probe)))
-        # return to_return
+
 
 
 

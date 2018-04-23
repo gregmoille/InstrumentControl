@@ -1,38 +1,34 @@
 #!/usr/bin/env python
 
-import sys
-from PyQt5.QtWidgets import QSlider
-# Import PyQt wrappers
+# -- Import PyQt wrappers -- 
 from PyQt5.QtWidgets import QMainWindow, QApplication
-from PyQt5.QtCore import QObject
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QThread
-# from PyQt5 import QtCore
-# from PyQt5.QtGui import QPainter, QFont, QColor, QPen, QFontDatabase
+from PyQt5.QtCore import pyqtSlot,
 from PyQt5 import uic
-from PyQt5 import QtGui
-import PyQt5
+from PyQt5.QtGui import QPixmap
+
+# -- import classic package --
 from functools import wraps
 import time
 import numpy as np
 import threading
-
 import os
+import ipdb
+
+# -- import custom NIST-ucomb Package --
 path = os.path.realpath('./UI/QDarkStyleSheet-master/qdarkstyle/')
 if not path in sys.path:
     sys.path.insert(0, path)
 path = os.path.realpath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
-
-Ui_MainWindow, QtBaseClass = uic.loadUiType('./UI/UITranmission.ui')
-Ui_DevWindow, QtBaseClass = uic.loadUiType('./UI/DevWindow.ui')
-# from UITranmission import Ui_MainWindow as Ui_MainWindow
 import pyUtilities as ut
 from pyNFLaser import NewFocus6700
 from pyWavemeter import Wavemeter
 from workers import DcScan
-import ipdb
 
+# -- load UI --
+Ui_MainWindow, QtBaseClass = uic.loadUiType('./UI/UITranmission.ui')
+Ui_DevWindow, QtBaseClass = uic.loadUiType('./UI/DevWindow.ui')
 
 class DevWind(QMainWindow):
     def __init__(self, parent=None):
@@ -64,59 +60,85 @@ class DevWind(QMainWindow):
 
 
 class Transmission(QMainWindow):
+    '''
+    --------------------------------------------------------
+    Main Window for the transmission UI software
+    It is long, but it is mostly connection of the buttons,
+    a bit of postprocessing and so on. The work is done 
+    under the hood, through the workers, and through the 
+    different homemande python package to controll the 
+    equipement (see pyNFLaser, pyWavemeter,...)
+    
+    ------------------------------------------------------
+    G. Moille - NIST - 2018
+    ------------------------------------------------------
+    '''
+    __author__ = "Gregory Moille"
+    __copyright__ = "Copyright 2018, NIST"
+    __credits__ = ["Gregory Moille",
+                   "Xiyuan Lu",
+                   "Kartik Srinivasan"]
+    __license__ = "GPL"
+    __version__ = "1.0.0"
+    __maintainer__ = "Gregory Moille"
+    __email__ = "gregory.moille@mist.gov"
+    __status__ = "Development"
+
     def __init__(self, **kwargs):
-        self.laser = None
-        self.wavemeter = None
         super(Transmission, self).__init__()
+
+        # -- setup the UI --
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self._led = {False: QtGui.QPixmap(':/qss_icons/rc/radio_checked.png'),
-                     True: QtGui.QPixmap(':/qss_icons/rc/radio_checked_focus.png')
+
+        # -- setup main attributes --
+        self.laser = None
+        self.wavemeter = None
+        
+        # -- setup useful hidden attributes --
+        self._connected = False
+        self._led = {False: QPixmap(':/qss_icons/rc/radio_checked.png'),
+                     True: QPixmap(':/qss_icons/rc/radio_checked_focus.png')
                      }
         self._blink = False
         self._cst_slide = 100
 
-        self.ui.slide_pzt.valueChanged[int].connect(
-            lambda x: self.ui.spnbx_pzt.setValue(x/self._cst_slide))
+        # -- connect buttons --
+        self.ui.but_connect.clicked.connect(self.Connect)
+        self.ui.but_laserOut.clicked.connect(self.LaserOut)
+        self.ui.but_dcscan.clicked.connect(self.Scan)
+
+        # -- connect spin boxes --
         self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
         self.ui.spnbx_lbd.valueChanged[float].connect(self.SetWavelength)
         self.ui.spnbx_lbd_start.valueChanged[float].connect(self.ScanLim)
         self.ui.spnbx_lbd_stop.valueChanged[float].connect(self.ScanLim)
         self.ui.spnbx_speed.valueChanged[float].connect(self.ScanSpeed)
-        self.ui.but_dcscan.clicked.connect(self.Scan)
 
-        self.ui.but_connect.clicked.connect(self.Connect)
-        self.ui.but_laserOut.clicked.connect(self.LaserOut)
-        self._connected = False
-        self.ui.wdgt_param.setEnabled(False)
-        self.ui.wdgt_plot.setEnabled(False)
+        # -- connect sliders --
+        self.ui.slide_pzt.valueChanged[int].connect(
+            lambda x: self.ui.spnbx_pzt.setValue(x/self._cst_slide))
+
+        # -- Create a graph --
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
 
-        self.dev = DevWind(parent=self)
-        self.ui.actionGet_Errors.triggered.connect(self.dev.show)
+        # -- Setup apparence at launch --
+        self.ui.wdgt_param.setEnabled(False)
+        self.ui.wdgt_plot.setEnabled(False)
 
-        # Misc
-
+        # -- Misc --
         self._do_blink = False
         self.wlm = None
         self.laser = None
         self._param = {}
 
-
-        # self.Worker = TransmissionWorkers()
-        # self.ThreadDCScan = QThread()
-        # self.ThreadPiezoScan = QThread()
-        # self.WorkerScan = TransmissionWorkers()
-        # self.WorkerScan._DCscan[tuple].connect(self._doScan)
-        # self.WorkerScan.moveToThread(self.ThreadDCScan)
-        # self.ThreadDCScan.started.connect(lambda:
-        #                                   self.WorkerScan.DCscan(laser=self.laser,
-        #                                                          wavemeter=self.wlm,
-        #                                                          param=self._param))
-
+    # -----------------------------------------------------------------------------
     # -- Some Decorators --
     # -----------------------------------------------------------------------------
     def Blinking(cdt_word):
+        '''
+        Blinking decorator when changing wavelength
+        '''
         def decorator(fun):
             @wraps(fun)
             def wrapper(*args, **kwargs):
@@ -147,6 +169,10 @@ class Transmission(QMainWindow):
         return decorator
 
     def isConnected(fun):
+        '''
+        Decorator checking of laser connected to perform or no 
+        the operation
+        '''
         @wraps(fun)
         def wrapper(*args, **kwargs):
             self_app = args[0]
@@ -160,6 +186,10 @@ class Transmission(QMainWindow):
         return wrapper
 
     def blockSignals(val):
+        '''
+        Block the signal if spinboxes or other need to be set to a value
+        without sending a command to the instrument
+        '''
         def dec(fun):
             @wraps(fun)
             def wrapper(*args, **kwargs):
@@ -184,9 +214,9 @@ class Transmission(QMainWindow):
             return wrapper
         return dec
 
+    # -----------------------------------------------------------------------------
     # -- Methods --
     # -----------------------------------------------------------------------------
-
     def Connect(self):
         if not self._connected:
             try:
@@ -267,8 +297,7 @@ class Transmission(QMainWindow):
         EnableUIscan(False)
         self.SetWavelength(self.laser.scan_limit[0])
 
-        # define the thread worker
-        # ---------------------------------------------------------
+        # -- define the thread worker -- 
         @pyqtSlot(tuple)
         def _doScan(signal):
             # [0] Code for where the  program is in
@@ -304,7 +333,6 @@ class Transmission(QMainWindow):
 
 
         # -- retrieve params --
-        # ---------------------------------------------------------
         if self.ui.check_calib_lbd.isChecked():
             self.wavemeter = Wavemeter()
             self._param['wlmParam'] = {'channel': int(self.ui.combo_vlmChan.currentText()),
@@ -314,30 +342,17 @@ class Transmission(QMainWindow):
                                     'dev': self.ui.combo_daqDev.currentText(),
                                     'write_ch': None}
         
-        #Set to the start wavelenght
-        # ipdb.set_trace()
+        # -- Set to the start wavelength -- 
         if not np.abs(self.laser.lbd - self.laser.scan_limit[0]) < 0.02:
             self.laser.lbd = self.laser.scan_limit[0]
 
 
-        # First thread wich is the DC scan worker
         self.threadDcWorker = DcScan(laser= self.laser,
                                     wavemeter= self.wavemeter,
                                     param=self._param)
         self.threadDcWorker._DCscan[tuple].connect(_doScan)
         self.threadDcWorker.start()
-        # threading.Thread(target=self.Worker.DCscan, 
-        #                                      kwargs={'laser': self.laser,
-        #                                             'wavemeter': self.wavemeter,
-        #                                             'param': self._param})
-        # self.threadcCWorker.daemon = True
-        # # Second thread which is the DC scan eta fetch
-        # self.threadDcFetch = threading.Thread(target=_doScan, 
-        #                                      args=())
-        # self.threadDcFetch.daemon = True
-        # # start both thread
-        # self.threadcCWorker.start()
-        # self.threadDcFetch.start()
+
 
 
     # -- Utilities --

@@ -4,8 +4,9 @@ import nidaqmx
 
 class DAQ(object):
     '''
-
-
+    ------------------------------------------------------
+    G. Moille - NIST - 2018
+    ------------------------------------------------------
     '''
     __author__ = "Gregory Moille"
     __copyright__ = "Copyright 2018, NIST"

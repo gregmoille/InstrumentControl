@@ -13,7 +13,7 @@ from PyQt5 import QtGui
 import PyQt5
 from functools import wraps
 import time
-
+import numpy as np
 import threading
 
 import os
@@ -30,7 +30,7 @@ Ui_DevWindow, QtBaseClass = uic.loadUiType('./UI/DevWindow.ui')
 import pyUtilities as ut
 from pyNFLaser import NewFocus6700
 from pyWavemeter import Wavemeter
-from workers import TransmissionWorkers
+from workers import DcScan
 import ipdb
 
 
@@ -44,18 +44,20 @@ class DevWind(QMainWindow):
 
         self.parent = parent
         self.old_err = ''
-        self.GetLaserErr()
+        # self.GetLaserErr()
         # self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
 
     def GetLaserErr(self):
-        def workerError:
+        def workerError():
             while True:
-                if self.parent._connected:
-                    old_err = self.old_err.split('\n')[-1]
-                    new_err = self.paren._err_msg.split('\n')[-1]
-                    if not old_err ==  new_err:
-                        self.old_err +=  '\n' + new_err
-                        self.ui.text_lastError.setText(str(self.old_err))
+                if self.parent.laser:
+                    if self.parent._connected:
+                        old_err = self.old_err.split('\n')[-1]
+                        new_err = self.parent.laser._err_msg.split('\n')[-1]
+                        if not old_err ==  new_err:
+                            self.old_err +=  '\n' + new_err
+                            self.ui.text_lastError.setText(str(self.old_err))
+                time.sleep(1)
         self.threadErr = threading.Thread(target=workerError, args=())
         self.threadErr.daemon = True
         self.threadErr.start()
@@ -63,6 +65,8 @@ class DevWind(QMainWindow):
 
 class Transmission(QMainWindow):
     def __init__(self, **kwargs):
+        self.laser = None
+        self.wavemeter = None
         super(Transmission, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -82,6 +86,7 @@ class Transmission(QMainWindow):
         self.ui.but_dcscan.clicked.connect(self.Scan)
 
         self.ui.but_connect.clicked.connect(self.Connect)
+        self.ui.but_laserOut.clicked.connect(self.LaserOut)
         self._connected = False
         self.ui.wdgt_param.setEnabled(False)
         self.ui.wdgt_plot.setEnabled(False)
@@ -91,20 +96,23 @@ class Transmission(QMainWindow):
         self.ui.actionGet_Errors.triggered.connect(self.dev.show)
 
         # Misc
+
         self._do_blink = False
         self.wlm = None
         self.laser = None
         self._param = {}
 
-        self.ThreadDCScan = QThread()
-        self.ThreadPiezoScan = QThread()
-        self.WorkerScan = TransmissionWorkers()
-        self.WorkerScan._DCscan[tuple].connect(self._doScan)
-        self.WorkerScan.moveToThread(self.ThreadDCScan)
-        self.ThreadDCScan.started.connect(lambda:
-                                          self.WorkerScan.DCscan(laser=self.laser,
-                                                                 wavemeter=self.wlm,
-                                                                 param=self._param))
+
+        # self.Worker = TransmissionWorkers()
+        # self.ThreadDCScan = QThread()
+        # self.ThreadPiezoScan = QThread()
+        # self.WorkerScan = TransmissionWorkers()
+        # self.WorkerScan._DCscan[tuple].connect(self._doScan)
+        # self.WorkerScan.moveToThread(self.ThreadDCScan)
+        # self.ThreadDCScan.started.connect(lambda:
+        #                                   self.WorkerScan.DCscan(laser=self.laser,
+        #                                                          wavemeter=self.wlm,
+        #                                                          param=self._param))
 
     # -- Some Decorators --
     # -----------------------------------------------------------------------------
@@ -134,7 +142,7 @@ class Transmission(QMainWindow):
                 self_app.ui.but_dcscan.setEnabled(False)
                 self_app.threadscan.start()
 
-                    return out
+                return out
             return wrapper
         return decorator
 
@@ -166,6 +174,8 @@ class Transmission(QMainWindow):
                 for a in attr:
                     print(a)
                     setattr(self_app.ui, a + '.blockSignals', True)
+                time.sleep(0.2)
+                QApplication.processEvents()
 
                 if val:
                     out = fun(*args, **kwargs)
@@ -208,6 +218,17 @@ class Transmission(QMainWindow):
         self.ui.wdgt_plot.setEnabled(self._connected)
         self.ui.led_connected.setPixmap(self._led[self._connected])
 
+
+    @isConnected
+    def LaserOut(self,val):
+        out = self.laser.output
+        if out:
+            self.laser.output = False
+            self.ui.led_laserOut.setPixmap(self._led[False])
+        else:
+            self.laser.output = True
+            self.ui.led_laserOut.setPixmap(self._led[True])
+
     @isConnected
     @Blinking('self_app.laser._is_changing_lbd')
     def SetWavelength(self, value):
@@ -231,14 +252,25 @@ class Transmission(QMainWindow):
         self.laser.scan_speed = self.ui.spnbx_speed.value()
 
     @isConnected
-    @Blinking('self_app._do_blink')
-    @blockSignals(True)
     def Scan(self, value):
         self._do_blink = True
+        def EnableUIscan(val):
+            self.ui.groupBox_DCscan.setEnabled(val)
+            self.ui.spnbx_I.setEnabled(val)
+            self.ui.spnbx_pzt.setEnabled(val)
+            self.ui.spnbx_lbd.setEnabled(val)
+            self.ui.slide_pzt.setEnabled(val)
+            self.ui.groupBox_Power.setEnabled(val)
+            self.ui.groupBox_DAQ.setEnabled(val)
+            self.ui.groupBox_6.setEnabled(val)
+            self.ui.groupBox_PZT.setEnabled(val)
+        EnableUIscan(False)
+        self.SetWavelength(self.laser.scan_limit[0])
 
         # define the thread worker
         # ---------------------------------------------------------
-        def _doScan():
+        @pyqtSlot(tuple)
+        def _doScan(signal):
             # [0] Code for where the  program is in
             # the algorithm:
             #     -1 : no scan / end of scan
@@ -249,28 +281,31 @@ class Transmission(QMainWindow):
             # [1] Laser current wavelength
             # [2] Progress bar current %
             # [3] Blinking State
-            while True:
-                state = self.TransmissionWorkers._DCscan[0]
-                lbd = self.TransmissionWorkers._DCscan[1]
-                prgrs = self.TransmissionWorkers._DCscan[2]
-                data = self.TransmissionWorkers._DCscan[3]
-                self.ui.spnbx_lbd.setValue(lbd)
-                self.ui.progressBar.setValue(prgrs)
-                if state == 2:
-                    self._lbd_start = lbd
-                    self.ui.line_wlmLbd.setText(str(lbd))
-                if state == 3:
-                    self._lbd_stop = lbd
-                    self.ui.line_wlmLbd.setText(str(lbd))
-                if state == -1:
-                    self._dcData = data
-                    self.ui.wdgt_param.setEnabled(True)
-                    self._do_blink = False
-                    break
+            state = signal[0]
+            lbd = signal[1]
+            prgrs = signal[2]
+            data = signal[3]
+            self.ui.progressBar.setValue(prgrs)
+            if state == 2:
+                self._lbd_start = lbd
+                self.ui.line_wlmLbd.setText("{:.3f}".format(lbd))
+            if state == 3:
+                self._lbd_stop = lbd
+                self.ui.line_wlmLbd.setText("{:.3f}".format(lbd))
+            if state == -1:
+                self._dcData = data
+                self._do_blink = False
+                self.ui.spnbx_lbd.blockSignals(True)
+                self.ui.spnbx_lbd.setValue(self.laser.lbd)
+                self.ui.spnbx_lbd.blockSignals(False)
+
+                ut.ReplaceData(self, self._dcData[1], self._dcData[0])
+                EnableUIscan(True)
+
 
         # -- retrieve params --
         # ---------------------------------------------------------
-        if self.ui.check_calib_lbd:
+        if self.ui.check_calib_lbd.isChecked():
             self.wavemeter = Wavemeter()
             self._param['wlmParam'] = {'channel': int(self.ui.combo_vlmChan.currentText()),
                                       'exposure': 'auto'}
@@ -278,25 +313,31 @@ class Transmission(QMainWindow):
                                             self.ui.combo_daqMZ.currentText()],
                                     'dev': self.ui.combo_daqDev.currentText(),
                                     'write_ch': None}
-        self.ui.wdgt_param.setEnabled(False)
+        
         #Set to the start wavelenght
-        if not np.abs(laser.lbd - laser.scan_lim[0]) < 0.02:
-            laser.lbd = laser.scan_lim[0]
+        # ipdb.set_trace()
+        if not np.abs(self.laser.lbd - self.laser.scan_limit[0]) < 0.02:
+            self.laser.lbd = self.laser.scan_limit[0]
 
 
         # First thread wich is the DC scan worker
-        self.threadcCWorker = threading.Thread(target=self.TransmissionWorkers.DCscan, 
-                                             kwargs={'laser': self.laser,
-                                                    'wavemeter': self.wavemeter,
-                                                    'paral': self._param})
-        self.threadcCWorker.daemon = True
-        # Second thread which is the DC scan eta fetch
-        self.threadDcFetch = threading.Thread(target=_doScan, 
-                                             args=())
-        self.threadDcFetch.daemon = True
-        # start both thread
-        self.threadcCWorker.start()
-        self.threadDcFetch.start()
+        self.threadDcWorker = DcScan(laser= self.laser,
+                                    wavemeter= self.wavemeter,
+                                    param=self._param)
+        self.threadDcWorker._DCscan[tuple].connect(_doScan)
+        self.threadDcWorker.start()
+        # threading.Thread(target=self.Worker.DCscan, 
+        #                                      kwargs={'laser': self.laser,
+        #                                             'wavemeter': self.wavemeter,
+        #                                             'param': self._param})
+        # self.threadcCWorker.daemon = True
+        # # Second thread which is the DC scan eta fetch
+        # self.threadDcFetch = threading.Thread(target=_doScan, 
+        #                                      args=())
+        # self.threadDcFetch.daemon = True
+        # # start both thread
+        # self.threadcCWorker.start()
+        # self.threadDcFetch.start()
 
 
     # -- Utilities --
@@ -316,19 +357,24 @@ class Transmission(QMainWindow):
         pzt = self.laser.pzt
         scan_lim = self.laser.scan_limit
         scan_speed = self.laser.scan_speed
-
+        output = self.laser.output
         print('-'*30)
         print("Fetching error {}".format(self.laser.error))
+        print("Laser output: {}".format(output))
         print('-'*30)
 
-        print(pzt)
-        print(scan_lim)
         self.ui.spnbx_lbd.setValue(lbd)
         self.ui.slide_pzt.setValue(pzt * 100)
         self.ui.spnbx_pzt.setValue(pzt)
         self.ui.spnbx_lbd_start.setValue(scan_lim[0])
         self.ui.spnbx_lbd_stop.setValue(scan_lim[1])
         self.ui.spnbx_speed.setValue(scan_speed)
+
+       
+        if output:
+            self.ui.led_laserOut.setPixmap(self._led[True])
+        else:
+            self.ui.led_laserOut.setPixmap(self._led[False])
 
         # patch for this signal
         self.ui.spnbx_lbd_start.blockSignals(False)

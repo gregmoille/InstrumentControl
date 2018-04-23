@@ -37,7 +37,7 @@ class NewFocus6700(object):
         self.output: ON/OFF output state of the laser
         self.lbd :float: laser wavelength in nm
         self.current :float: laser current in A
-        self.scan_limt :[float, float]: DC scan limit in nm
+        self.scan_limit :[float, float]: DC scan limit in nm
         self.scan_speed :float: DC scan speed in nm
         self.scan :bool: dc scan status
         self.beep :bool: set/disabel beep
@@ -68,9 +68,9 @@ class NewFocus6700(object):
         old_lbd = laser.lbd
         print('Laser wavelength:')
         print("\t{}".format(old_lbd))
-        laser.scan_lim = [1520, 1550]
+        laser.scan_limit = [1520, 1550]
         laser.scan_speed = 10
-        laser.lbd = laser.scan_lim[0]
+        laser.lbd = laser.scan_limit[0]
         print('waiting until laser parked at correct lbd')
         while laser._is_changing_lbd:
             time.sleep(0.25)
@@ -344,22 +344,13 @@ class NewFocus6700(object):
         return self._id
 
     @property
-    @Catch.error
     @InOut.output(str)
     def error(self):
         word = 'ERRSTR?'
         self._error = ''
         err = self.Querry(word)
-        self._error +=  err
-        # print("Current error: {}".format(err))
-        while not err == self._no_error:
-            err = self.Querry(word)
-            self._error += '\n' + err 
-            
-            # print("Current error: {}".format(err))
-        # print("Finish fetching stuff")
-        return self._error
-    
+        return err
+
     @property
     @InOut.output(bool)
     def has_error(self):
@@ -376,6 +367,7 @@ if __name__ == '__main__':
     # laser.beep = False
     laser.connected = True
     print("First error caught: {}".format(laser.error))
+    ipdb.set_trace()
     old_lbd = laser.lbd
     pzt = laser.pzt
     # laser.lbd = old_lbd +2
@@ -383,4 +375,4 @@ if __name__ == '__main__':
     print("\t{}".format(old_lbd))
     print('Laser piezo:')
     print("\t{}".format(pzt))
-    laser.connected = False
+    # laser.connected = False

@@ -1,6 +1,7 @@
 import pyqtgraph as pg
 import numpy as np
 from PyQt5 import QtGui
+import ipdb
 
 def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     labelStyle = {'color': color, 'font-size': '14pt'}
@@ -41,18 +42,35 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     sigma = span/10 * np.random.rand(1)
     y = np.exp(-((x-(xrange[0]+span/2))**2)/(sigma**2))
 
-    app.linepen = pg.mkPen(color='#81caf9', width=1)
-    app.linepen2 = pg.mkPen(color='#ffa691', width=1)
-    app.linepen3 = pg.mkPen(color='#cfffaf', width=1)
+    app.linepen = []
+
+    app.linepen += [pg.mkPen(color='#81caf9', width=1)]
+    app.linepen += [pg.mkPen(color='#ffa691', width=1)]
+    app.linepen += [pg.mkPen(color='#cfffaf', width=1)]
     app.linepenMZ_frwrd = pg.mkPen(color=color, width=1)
     app.linepenMZ_bckwrd = pg.mkPen(color=color, width=1)
 
     app.current_trace = []
     app.current_trace.append(app.my_plot.plot(x, y,
-                                                pen=app.linepen,
+                                                pen=app.linepen[0],
                                                 name='Forward')
                               )
     # for ii in range(app.ui.comboBox_SelectLine.count()):
     #     app.ui.comboBox_SelectLine.removeItem(0)
     # for ii in range(len(app.current_trace)):
     #     app.ui.comboBox_SelectLine.addItem('Line ' + str(ii+1))
+
+def ReplaceData(app, x, y):
+    # ipdb.set_trace()
+    for line in app.current_trace:
+                    app.my_plot.removeItem(line)
+    app.current_trace = []
+    try:
+        for ii in range(x.shape[1]):
+            app.app.current_trace += [app.my_plot.plot(x[ii], y[ii],
+                                                pen=app.linepen[ii],
+                                                name='line{}'.format(ii))]
+    except:
+        app.current_trace += [app.my_plot.plot(x, y,
+                                                pen=app.linepen[0],
+                                                name='line{}'.format(0))]

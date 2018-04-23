@@ -1245,7 +1245,7 @@ QDateEdit::down-arrow:focus {
         <number>0</number>
        </property>
        <item row="0" column="5">
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="but_laserOut">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -1269,7 +1269,7 @@ QDateEdit::down-arrow:focus {
         </widget>
        </item>
        <item row="0" column="6">
-        <widget class="QLabel" name="led_SetWavelength_2">
+        <widget class="QLabel" name="led_laserOut">
          <property name="minimumSize">
           <size>
            <width>20</width>
@@ -1450,7 +1450,7 @@ QDateEdit::down-arrow:focus {
         <number>0</number>
        </property>
        <item row="2" column="3">
-        <widget class="QGroupBox" name="groupBox_5">
+        <widget class="QGroupBox" name="groupBox_DAQ">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -2229,7 +2229,7 @@ QDateEdit::down-arrow:focus {
         </widget>
        </item>
        <item row="2" column="2">
-        <widget class="QGroupBox" name="groupBox_4">
+        <widget class="QGroupBox" name="groupBox_Power">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -3092,7 +3092,7 @@ QDateEdit::down-arrow:focus {
         </widget>
        </item>
        <item row="1" column="4">
-        <widget class="QGroupBox" name="groupBox_3">
+        <widget class="QGroupBox" name="groupBox_PZT">
          <property name="font">
           <font>
            <pointsize>10</pointsize>

@@ -79,6 +79,12 @@ class Wavemeter(object):
         self.lib.SetPulseMode.restype = c_long
         self.lib.SetPulseMode.argtypes = [c_ushort]
 
+        self.lib.GetResultMode.restype = c_ushort
+        self.lib.GetResultMode.argtypes = [c_ushort]
+
+        self.lib.SetResultMode.restype = c_long
+        self.lib.SetResultMode.argtypes = [c_ushort]
+
     @property
     @InOut.output(int)
     def channel(self):
@@ -176,6 +182,36 @@ class Wavemeter(object):
                 pass
             print('Wavemeter Connected!!')
         return out
+
+    @property
+    @InOut.output(str)
+    def resultmode(self):
+        out = self.lib.GetResultMode(0)
+        if out == 0:
+            return 'vacuum'
+        if out == 1:
+            return 'air'
+        if out ==2:
+            return 'frequency'
+        if out == 3:
+            return 'wavenumber'
+        if out == 4:
+            return 'photonenergy'
+
+    @resultmode.setter
+    @InOut.output(str)
+    def resultmode(self, val):
+        if val == 'vacuum':
+            word =  0
+        if val == 'air':
+            word =  1
+        if val =='frequency':
+            word =  2
+        if val == 'wavenumber':
+            word =  3
+        if val == 'photonenergy':
+            word =  4
+        self.lib.SetResultMode(word)
 
 if __name__ == '__main__':
         win = 'hide'

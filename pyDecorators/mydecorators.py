@@ -12,9 +12,9 @@ class Catch(object):
         def wrap(*args, **kwargs):
             instr = args[0]
             out = fun(*args, **kwargs)
-            if hasattr(instr, 'has_err'):
+            # print('catch error')
             if hasattr(instr, 'error'):
-            instr._err_msg += '\n' + err
+                instr._err_msg += '\n' + instr.error
             return out
         return wrap
 
@@ -51,7 +51,9 @@ class InOut(object):
 
                     # if it didnt' work, try to redo
                     # it again
-                    except:
+                    except Exception as e:
+                        print('Exception:')
+                        print(e)
                         
                         # ipdb.set_trace()
                         print('communication error... retrying...')
@@ -82,17 +84,14 @@ class InOut(object):
                     if not isinstance(a,t):
                         failed = True
                 if not failed:    
-                    while True:
-                        out = fun(*args, **kwargs)
-                        if hasattr(instr, 'has_error'):
-                            if not instr.has_error:
-                                break
-                            else: 
-                                instr._err_msg +=  '\n' + instr.error 
-                                print(instr._err_msg)
-                        else:
-                            break
-                    return out
+                    out = fun(*args, **kwargs)
+                    if hasattr(instr, 'has_error'):
+                        if instr.has_error:
+                            print('accept') 
+                            err = instr.error
+                            instr._err_msg +=  '\n' + instr.error 
+                            print(err)
+                return out
             return wrap
         return check
 
@@ -133,7 +132,7 @@ class ChangeState(object):
 
                     laser._is_scaning = False
                     laser.Querry(stop_word)
-                    instr._err_msg += + '\n' + laser.error  + 'END OF SCAN--' 
+                    laser._err_msg += '\n' + str(laser.error)  + 'END OF SCAN--' 
                     print(laser.error  + 'END OF SCAN--')
                     
                 # retrieve params

@@ -15,29 +15,34 @@ import threading
 import os
 import ipdb
 
+work_dir = path = os.path.abspath(sys.argv[0] + '/..') 
+
 # -- import custom NIST-ucomb Package --
-path = os.path.realpath('./UI/QDarkStyleSheet-master/qdarkstyle/')
+path = os.path.abspath(work_dir + '/UI/QDarkStyleSheet-master/qdarkstyle/')
 if not path in sys.path:
     sys.path.insert(0, path)
-path = os.path.realpath('../')
+path = os.path.abspath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
 import pyUtilities as ut
-from pyLaser import NewFocus6700
-from pyWavemeter import Wavemeter
-from workers import DcScan
+# from pyLaser import NewFocus6700
+# from pyWavemeter import Wavemeter
+# from workers import DcScan
 
 # -- load UI --
-Ui_MainWindow, QtBaseClass = uic.loadUiType('./UI/UITranmission.ui')
-Ui_DevWindow, QtBaseClass = uic.loadUiType('./UI/DevWindow.ui')
+print('-'*30)
+print(work_dir)
+print('-'*30)
+Ui_MainWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/UITranmission.ui')
+Ui_DevWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/DevWindow.ui')
 
 class ErrorHandling(QThread):
     err_msg = pyqtSignal(str)
 
     def __init__(self, main_app):
         QThread.__init__(self)
-        ipdb.set_trace()
         self.main_app = main_app
+        self._probe = 0
         self._isRunning = True
 
     def run(self):
@@ -45,12 +50,9 @@ class ErrorHandling(QThread):
         print('Doing First stuff!!!!')
         while self._isRunning:
             print('Doing stuff!!!!')
-            if self.main_app._connected:
-                old_err = self.main_app._olderr.split('\n')[-1]
-                new_err = self.main_app.laser._err_msg.split('\n')[-1]
-                if not old_err ==  new_err:
-                    self.main_app._olderr +=  '\n' + new_err
-                    self.err_msg.emit(str(self.main_app._olderr))
+            print(self.main_app.laser.err_msg)
+            self._probe += 1
+            self.err_msg.emit(str(self.main_app.laser.err_msg))
             time.sleep(1)
     def stop(self):
         self._isRunning = False
@@ -154,9 +156,8 @@ class Transmission(QMainWindow):
         self.laser = None
         self._olderr = ''
         self._param = {}
-        # self.dev = DevWind(parent=self)
-        # self.ui.actionGet_Errors.triggered.connect(self.dev.show)
-
+        self.dev = DevWind(parent=self)
+        self.ui.actionGet_Errors.triggered.connect(self.dev.show)
     # -----------------------------------------------------------------------------
     # -- Some Decorators --
     # -----------------------------------------------------------------------------
@@ -255,7 +256,7 @@ class Transmission(QMainWindow):
                 self.ui.but_connect.setText('Disconnect')
                 self._connected = True
                 self.RetrieveLaser()
-                # self.dev.GetLaserErr()
+                self.dev.GetLaserErr()
 
             except Exception as err:
                 err = str(err) + \

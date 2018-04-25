@@ -8,6 +8,7 @@ from PyQt5.QtGui import QPixmap
 
 # -- import classic package --
 from functools import wraps
+from datetime import datetime
 import time
 import sys
 import numpy as np
@@ -25,9 +26,9 @@ path = os.path.abspath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
 import pyUtilities as ut
-# from pyLaser import NewFocus6700
-# from pyWavemeter import Wavemeter
-# from workers import DcScan
+from pyLaser import NewFocus6700
+from pyWavemeter import Wavemeter
+from workers import DcScan
 
 # -- load UI --
 print('-'*30)
@@ -44,16 +45,17 @@ class ErrorHandling(QThread):
         self.main_app = main_app
         self._probe = 0
         self._isRunning = True
+        self.old_err = ''
 
     def run(self):
         self._isRunning = True
         print('Doing First stuff!!!!')
         while self._isRunning:
-            print('Doing stuff!!!!')
-            print(self.main_app.laser.err_msg)
-            self._probe += 1
-            self.err_msg.emit(str(self.main_app.laser.err_msg))
-            time.sleep(1)
+            if not self.old_err == str(self.main_app.laser._err_msg):
+                self.old_err = str(self.main_app.laser._err_msg)
+                self.main_app._has_err = True
+                self.err_msg.emit(self.old_err)
+                print('doing stuff')
     def stop(self):
         self._isRunning = False
 
@@ -62,26 +64,45 @@ class DevWind(QMainWindow):
         super(DevWind, self).__init__(parent)
         self.ui = Ui_DevWindow()
         self.ui.setupUi(self)
-        self.ui.butt_clearError.clicked.connect(lambda:
-                                                self.ui.text_lastError.setText(''))
+        self.ui.butt_clearError.clicked.connect(lambda: self.ClearError(True))
 
         self.parent = parent
-        self.old_err = ''
         self.ui.text_lastError.setText('')
         # self.GetLaserErr()
         # self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
 
+    def ClearError(self,val):
+        
+        self.parent._has_err = False
+        self.parent._has_checked_err = False
+        print('Puting back everything')
+        self.parent.ui.wdgt_param.setEnabled(val)
+        self.parent.ui.wdgt_plot.setEnabled(val)
+        if val: 
+            self.parent.laser._err_msg = '\n'
+            dumm = self.parent.laser.error
+
     def GetLaserErr(self):
         @pyqtSlot(str)
         def _updateErr(val):
-            self.ui.text_lastError.setText(val)
-
+            
+            self.parent._do_blink = False
+            # self.parent.ui.wdgt_param.setEnabled(False)
+            # self.parent.ui.wdgt_plot.setEnabled(False)
+            ts = time.time()
+            timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            self.ui.text_lastError.setText(timestamp + ' -- ' + val)
+            
+        self.old_err = self.parent.laser._err_msg
         self.threadErr = ErrorHandling(main_app=self.parent)
         self.threadErr.err_msg[str].connect(_updateErr)
         self.threadErr.start()
         
     def StopErr(self):
         self.threadErr.stop()
+        self.ClearError(False)
+        self.threadErr.quit()
+        self.threadErr.wait()
 
 class Transmission(QMainWindow):
     '''
@@ -155,6 +176,8 @@ class Transmission(QMainWindow):
         self.wlm = None
         self.laser = None
         self._olderr = ''
+        self._has_err = False
+        self._has_checked_err = False
         self._param = {}
         self.dev = DevWind(parent=self)
         self.ui.actionGet_Errors.triggered.connect(self.dev.show)
@@ -201,6 +224,7 @@ class Transmission(QMainWindow):
         '''
         @wraps(fun)
         def wrapper(*args, **kwargs):
+            print('Check if Connected')
             self_app = args[0]
             if self_app._connected:
                 out = fun(*args, **kwargs)
@@ -210,6 +234,23 @@ class Transmission(QMainWindow):
                     'Laser is not connected')
             return out
         return wrapper
+
+    def hasError(fun):
+        @wraps(fun)
+        def wrapper(*args, **kwargs):
+            print('Check if has error')
+            self_app = args[0]
+            # old = self_app.RetrieveLaser()
+            out = fun(*args, **kwargs)
+            if self_app._has_err and not self_app._has_checked_err:
+                self_app.ui.wdgt_param.setEnabled(False)
+                self_app.ui.wdgt_plot.setEnabled(False)
+                self_app._do_blink = False
+                self_app.RetrieveLaser()
+                self_app._has_checked_err = True
+            return out
+        return wrapper
+
 
     def blockSignals(val):
         '''
@@ -264,10 +305,15 @@ class Transmission(QMainWindow):
                 self.dev.ui.text_lastError.setText(err)
         else:
             try:
+                print('-'*30)
+                print('Disconnecting')
+                print('-'*30)
+                self.dev.StopErr()
+                time.sleep(0.2)
                 self.laser.connected = False
                 self.ui.but_connect.setText('Connect')
                 self._connected = False
-                # self.dev.StopErr()
+                
             except Exception as err:
                 err = str(err) + '\nCannot disconnect the laser.'
                 self.dev.ui.text_lastError.setText(str(err))
@@ -287,6 +333,7 @@ class Transmission(QMainWindow):
             self.laser.output = True
             self.ui.led_laserOut.setPixmap(self._led[True])
 
+    @hasError
     @isConnected
     @Blinking('self_app.laser._is_changing_lbd')
     def SetWavelength(self, value):
@@ -388,13 +435,17 @@ class Transmission(QMainWindow):
     def FetchDaqParam(self):
         pass
 
-    @blockSignals(True)
-    @blockSignals(False)
-    def RetrieveLaser(self):
-        print("retrieving data")
-
+    def RetrieveLaser(self, old = None):
         # for some reasom there is a bug disable the signal with this guy
         self.ui.spnbx_lbd_start.blockSignals(True)
+        self.ui.spnbx_lbd.blockSignals(True)
+        self.ui.slide_pzt.blockSignals(True)
+        self.ui.spnbx_pzt.blockSignals(True)
+        self.ui.spnbx_lbd_start.blockSignals(True)
+        self.ui.spnbx_lbd_start.blockSignals(True)
+        self.ui.spnbx_lbd_stop.blockSignals(True)
+        self.ui.spnbx_speed.blockSignals(True)
+        print("retrieving data")
 
         lbd = self.laser.lbd
         pzt = self.laser.pzt
@@ -405,7 +456,7 @@ class Transmission(QMainWindow):
         print("Fetching error {}".format(self.laser.error))
         print("Laser output: {}".format(output))
         print('-'*30)
-
+        
         self.ui.spnbx_lbd.setValue(lbd)
         self.ui.slide_pzt.setValue(pzt * 100)
         self.ui.spnbx_pzt.setValue(pzt)
@@ -421,8 +472,22 @@ class Transmission(QMainWindow):
 
         # patch for this signal
         self.ui.spnbx_lbd_start.blockSignals(False)
+        self.ui.spnbx_lbd.blockSignals(False)
+        self.ui.slide_pzt.blockSignals(False)
+        self.ui.spnbx_pzt.blockSignals(False)
+        self.ui.spnbx_lbd_start.blockSignals(False)
+        self.ui.spnbx_lbd_start.blockSignals(False)
+        self.ui.spnbx_lbd_stop.blockSignals(False)
+        self.ui.spnbx_speed.blockSignals(False)
+        self._do_blink = False
+        self.laser.lbd = lbd
 
-
+        return  {'lbd': lbd,
+                'pzt': pzt,
+                'scan_lim': scan_lim,
+                'scan_speed': scan_speed,
+                'output': output,}
+    
 if __name__ == "__main__":
     app = QApplication([])
     window = Transmission()

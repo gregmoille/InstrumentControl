@@ -343,7 +343,6 @@ class NewFocus6700(object):
         return self._id
 
     @property
-    @InOut.output(str)
     def error(self):
         word = 'ERRSTR?'
         self._error = ''
@@ -351,7 +350,6 @@ class NewFocus6700(object):
         return err
 
     @property
-    @InOut.output(bool)
     def has_error(self):
         word = '*STB?'
         dum = self.Querry(word)

@@ -16,9 +16,10 @@ class Catch(object):
         def wrap(*args, **kwargs):
             instr = args[0]
             out = fun(*args, **kwargs)
-            # print('catch error')
-            if hasattr(instr, 'error'):
-                instr._err_msg += '\n' + instr.error
+            # s('catch error')
+            if hasattr(instr, 'has_error'):
+                if instr.has_error:
+                    instr._err_msg += '\n' + instr.error
             return out
         return wrap
 
@@ -38,7 +39,11 @@ class InOut(object):
                     
                     # first get the result
                     out = fun(*args, **kwargs)
-
+                    if hasattr(instr, 'has_error'):
+                        if instr.has_error:
+                            # print('accept') 
+                            err = instr.error
+                            instr._err_msg +=  '\n' + err 
                     # check if we specified a type
                     # for all the outputs
                     if not type(out) == list:
@@ -61,16 +66,16 @@ class InOut(object):
                     # if it didnt' work, try to redo
                     # it again
                     except Exception as e:
+
                         print('Exception:')
                         print(e)
-                        
+                        print(o)
                         # ipdb.set_trace()
-                        print('communication error... retrying...')
-                        time.sleep(0.5)
-                        if hasattr(instr, 'error'):
+                        print('-----communication error... retrying...')
+                        time.sleep(0.1)
+                        if hasattr(instr, 'has_error'):
                             err =  instr.error + 'Comminication issue  ..retrying..'
-                            instr._err_msg +=  '\n' + err
-                            print(err)
+                            # print(err)
 
                 # avoid to return a list if the 
                 # length is only 1
@@ -98,8 +103,7 @@ class InOut(object):
                         if instr.has_error:
                             print('accept') 
                             err = instr.error
-                            instr._err_msg +=  '\n' + instr.error 
-                            print(err)
+                            instr._err_msg +=  '\n' + err 
                 return out
             return wrap
         return check
@@ -115,15 +119,30 @@ class ChangeState(object):
             laser._old_lbd = laser.lbd
             def CheckWavelength():
                 while True:
-                    if not np.abs(target_lbd-laser.lbd)<0.01:
-                        laser._is_changing_lbd = True
+                    print('Changing State Loop')
+                    if laser._open:
+                        err_stat = len(laser._err_msg.split('\n'))<2
+                        print(err_stat)
+                        err_dum = ''.join(laser._err_msg.split('\n'))
+                        print('--' + err_dum + '--')
+                        if not np.abs(target_lbd-laser.lbd)<0.01 and err_stat:
+                            laser._is_changing_lbd = True
+                        else:
+                            laser._is_changing_lbd = False
+                            break
                     else:
                         laser._is_changing_lbd = False
                         break
 
+
             thread = threading.Thread(target=CheckWavelength, args=())
             thread.daemon = True
             out = fun(*args, **kwargs)
+            if hasattr(laser, 'has_error'):
+                if laser.has_error:
+                    # print('accept') 
+                    err = laser.error
+                    laser._err_msg +=  '\n' + err 
             thread.start()
             return out
 
@@ -155,7 +174,11 @@ class ChangeState(object):
 
                 # exec the fun
                 out = fun(*args,**kwargs)
-
+                if hasattr(laser, 'has_error'):
+                    if laser.has_error:
+                        # print('accept') 
+                        err = laser.error
+                        laser._err_msg +=  '\n' + err 
                 if laser._scan:
                     laser._is_scaning = True
                     laser._lbdscan = laser.lbd

@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Package Description: 
 
-* *pyDecorators*: Usefull decorator for instrument control, such as error catching, checking argument type passed, etc ...
+* [*pyDecorators*](https://github.com/gregmoille/InstrumentControl/pyDecorators): Usefull decorator for instrument control, such as error catching, checking argument type passed, etc ...
 * *pyLaser*: laser package to controll the different coded laser. 1 file = 1 laser brand. So far the laser that works are *NewFocus 6700*and *Toptics 1060*
 * *pyNiDAQ*: package to make it more user friendly the use of a National Instrument USB DAQ card
 * *pyPowerMeter*: pacakge to control the Thorlabs powermeter (PM100D, PM100USB, PM16-XXX)

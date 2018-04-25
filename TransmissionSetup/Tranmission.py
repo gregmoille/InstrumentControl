@@ -292,7 +292,6 @@ class Transmission(QMainWindow):
                 self.laser = NewFocus6700(id=idLaser, key=DeviceKey)
                 print('Connection')
                 self.laser.connected = True
-                # ipdb.set_trace()
                 print('Connected... fetching Wavelength')
                 self.ui.but_connect.setText('Disconnect')
                 self._connected = True

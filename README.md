@@ -8,11 +8,11 @@ These instructions will get you a copy of the project up and running on your loc
 
 ## Package Description: 
 
-* [*pyDecorators*](https://github.com/gregmoille/InstrumentControl/pyDecorators): Usefull decorator for instrument control, such as error catching, checking argument type passed, etc ...
-* *pyLaser*: laser package to controll the different coded laser. 1 file = 1 laser brand. So far the laser that works are *NewFocus 6700*and *Toptics 1060*
-* *pyNiDAQ*: package to make it more user friendly the use of a National Instrument USB DAQ card
-* *pyPowerMeter*: pacakge to control the Thorlabs powermeter (PM100D, PM100USB, PM16-XXX)
-* *pyWavemeter*: package to control the Angstrom HighFiness wavemeter. The full software and driver have to be installed as the python script run as a sever
+* [*pyDecorators*](https://github.com/gregmoille/InstrumentControl/tree/master/pyDecorators): Usefull decorator for instrument control, such as error catching, checking argument type passed, etc ...
+* [*pyLaser*](https://github.com/gregmoille/InstrumentControl/tree/master/pyLaser): laser package to controll the different coded laser. 1 file = 1 laser brand. So far the laser that works are *NewFocus 6700*and *Toptics 1060*
+* [*pyNiDAQ*](https://github.com/gregmoille/InstrumentControl/tree/master/pyNiDAQ): package to make it more user friendly the use of a National Instrument USB DAQ card
+* [*pyPowerMeter*](https://github.com/gregmoille/InstrumentControl/tree/master/pyPowerMeter): pacakge to control the Thorlabs powermeter (PM100D, PM100USB, PM16-XXX)
+* [*pyWavemeter*](https://github.com/gregmoille/InstrumentControl/tree/master/pyWavemeter): package to control the Angstrom HighFiness wavemeter. The full software and driver have to be installed as the python script run as a sever
 
 ## Sofwate and UI:
 

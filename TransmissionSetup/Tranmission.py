@@ -200,7 +200,7 @@ class Transmission(QMainWindow):
                         self_app._blink = not(self_app._blink)
                         self_app.ui.led_SetWavelength.setPixmap(
                             self_app._led[self_app._blink])
-                        time.sleep(0.1)
+                        time.sleep(0.6)
                         cdt = eval(cdt_word)
 
                     self_app.ui.led_SetWavelength.setPixmap(
@@ -401,9 +401,11 @@ class Transmission(QMainWindow):
                 self.ui.spnbx_lbd.blockSignals(True)
                 self.ui.spnbx_lbd.setValue(self.laser.lbd)
                 self.ui.spnbx_lbd.blockSignals(False)
-
-                ut.ReplaceData(self, self._dcData[1], self._dcData[0])
+                ut.ReplaceData(self, self._dcData[2], self._dcData[0])
                 EnableUIscan(True)
+                self.threadDcWorker.stop()
+                self.threadDcWorker.quit()
+                self.threadDcWorker.wait()
 
 
         # -- retrieve params --
@@ -418,7 +420,8 @@ class Transmission(QMainWindow):
         
         # -- Set to the start wavelength -- 
         if not np.abs(self.laser.lbd - self.laser.scan_limit[0]) < 0.02:
-            self.laser.lbd = self.laser.scan_limit[0]
+            self.SetWavelength(self.laser.scan_limit[0])
+            time.sleep(0.15)
 
 
         self.threadDcWorker = DcScan(laser= self.laser,

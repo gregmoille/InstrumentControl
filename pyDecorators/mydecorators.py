@@ -67,12 +67,12 @@ class InOut(object):
                     # it again
                     except Exception as e:
 
-                        print('Exception:')
-                        print(e)
-                        print(o)
+                        # print('Exception:')
+                        # print(e)
+                        # print(o)
                         # ipdb.set_trace()
-                        print('-----communication error... retrying...')
-                        time.sleep(0.1)
+                        # print('-----communication error... retrying...')
+                        # time.sleep(0.1)
                         if hasattr(instr, 'has_error'):
                             err =  instr.error + 'Comminication issue  ..retrying..'
                             # print(err)

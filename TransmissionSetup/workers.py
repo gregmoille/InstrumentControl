@@ -96,9 +96,10 @@ class DcScan(QThread):
         wlmParam = param.get('wlmParam', None)
 
         # -- Wait until lbd start of scan --
-        while laser._is_changing_lbd:
-            time.sleep(0.25)
-        
+        while laser._is_changing_lbd and np.abs(laser.lbd - laser.scan_limit[0])>0.5:
+            # print('waiting for the laser to be ok')
+            time.sleep(1)
+        print(laser._is_changing_lbd)
         # -- Wait for stabilization --
         time.sleep(1)
 
@@ -165,10 +166,11 @@ class DcScan(QThread):
             self._DCscan.emit((3, laser.lbd, 100, None))
         
         # -- Process a bit the data --
+        data = np.array(data)
         T = data[0]
         MZ = data[1]
         tdaq = np.linspace(time_start_daq,time_stop_daq,len(T))
-        tdaq = t-time_start_daq 
+        tdaq = tdaq-time_start_daq 
         
         # -- Find out the wavelength during the scan --
         time_probe = np.array(time_probe)
@@ -176,17 +178,18 @@ class DcScan(QThread):
         time_probe = time_probe - time_probe[0]
 
         # -- interpolate data for better precision --
-        f_int = intpl.splrep(time_probe[:-1], lbd_probe)
-        lbd_daq = intpl.splev(t, f_int)
-
+        f_int = np.poly1d(np.polyfit(time_probe, lbd_probe,1))
+        lbd_daq = f_int(tdaq)
+        # ipdb.set_trace()
         # -- Return data and= everything --
-        to_return = (t_daq, t_probe, lbd_daq, [T, MZ])
+        to_return = (tdaq, time_probe, lbd_daq,lbd_probe, [T, MZ])
 
         self._DCscan.emit((-1, laser.lbd, 0, to_return))
         self._is_Running = False
 
 
-
+    def stop(self):
+        pass
 
 if __name__ == "__main__":
     from pyNFLaser import NewFocus6700

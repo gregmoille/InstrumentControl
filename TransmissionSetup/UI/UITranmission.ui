@@ -1417,6 +1417,16 @@ QDateEdit::down-arrow:focus {
            <string>NF6700</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Toptica 1060</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Toptica 980</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>
@@ -2565,7 +2575,10 @@ QDateEdit::down-arrow:focus {
              </font>
             </property>
             <property name="currentText">
-             <string>1</string>
+             <string>4</string>
+            </property>
+            <property name="currentIndex">
+             <number>3</number>
             </property>
             <item>
              <property name="text">

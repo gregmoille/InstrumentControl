@@ -6,61 +6,27 @@ One Paragraph of project description goes here
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
+## Package Description: 
+
+* *pyDecorators*: Usefull decorator for instrument control, such as error catching, checking argument type passed, etc ...
+* *pyLaser*: laser package to controll the different coded laser. 1 file = 1 laser brand. So far the laser that works are *NewFocus 6700*and *Toptics 1060*
+* *pyNiDAQ*: package to make it more user friendly the use of a National Instrument USB DAQ card
+* *pyPowerMeter*: pacakge to control the Thorlabs powermeter (PM100D, PM100USB, PM16-XXX)
+* *pyWavemeter*: package to control the Angstrom HighFiness wavemeter. The full software and driver have to be installed as the python script run as a sever
+
+## Sofwate and UI:
+
+* *TranmissionSetup*: python script with UI in order to characterize the optical tranmission of a device, with user choice of calibrating with the wavemeter the wavelength scan, and ftching the transmission losses with the powermeters.
+
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+* Python >3.4
+* Most of the tools only work on **Windows** as the different drivers for the instruments are only provided for this OS. The driver are obvioulsy need to make these package work as we are directly sending commands to the instruments
+* _as the setup.py is still a work in progress, you'll probably have to "pip" different python package_
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-<!-- * [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds -->
+_WORK IN PROGRESS_
 
 ## Contributing
 

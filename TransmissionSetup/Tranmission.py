@@ -23,7 +23,7 @@ path = os.path.realpath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
 import pyUtilities as ut
-from pyNFLaser import NewFocus6700
+from pyLaser import NewFocus6700
 from pyWavemeter import Wavemeter
 from workers import DcScan
 

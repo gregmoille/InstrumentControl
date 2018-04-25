@@ -1,0 +1,1 @@
+from .newfocus import NewFocus6700

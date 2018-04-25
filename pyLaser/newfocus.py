@@ -357,6 +357,13 @@ class NewFocus6700(object):
         if dum == '0': self._haserr = False
         return self._haserr
 
+    @property
+    def _is_changing_lbd(self):
+        return self.Querry('OUTP:TRACK?')
+    @property
+    def _is_scanning(self):
+        return self.Querry('OUTP:TRACK?')
+
 if __name__ == '__main__':
     idLaser = 4106
     DeviceKey = '6700 SN10027'

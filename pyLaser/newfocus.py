@@ -128,8 +128,8 @@ class NewFocus6700(object):
         self._scan = 0
         self._beep = 0
         self._output = 0
-        self._is_scaning = False
-        self._is_changing_lbd = False
+        # self._is_scaning = False
+        # self._is_changing_lbd = False
         self._no_error = '0,"NO ERROR"'
         self._haserr = False
         # Miscs
@@ -216,16 +216,15 @@ class NewFocus6700(object):
         self._output = value
 
     @property
-    @InOut.output(float)
+    # @InOut.output(float)
     def lbd(self):
         word = 'SENSe:WAVElength?'
         self._lbd = self.Querry(word)
         return self._lbd
 
     @lbd.setter
-    @Catch.error
-    @ChangeState.lbd
     @InOut.accepts(float)
+    @Catch.error
     def lbd(self, value):
         self._targetlbd = value
         self.Querry('OUTP:TRACK 1')
@@ -295,7 +294,7 @@ class NewFocus6700(object):
 
     @scan.setter
     @Catch.error
-    @ChangeState.scan("OUTPut:SCAN:START",'OUTPut:SCAN:STOP')
+    # @ChangeState.scan("OUTPut:SCAN:START",'OUTPut:SCAN:STOP')
     @InOut.accepts(bool)
     def scan(self, value):
         self.Querry('SOUR:WAVE:DESSCANS 1')
@@ -358,9 +357,12 @@ class NewFocus6700(object):
         return self._haserr
 
     @property
+    @InOut.output(bool)
     def _is_changing_lbd(self):
         return self.Querry('OUTP:TRACK?')
+
     @property
+    @InOut.output(bool)
     def _is_scanning(self):
         return self.Querry('OUTP:TRACK?')
 

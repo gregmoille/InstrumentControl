@@ -95,7 +95,9 @@ class InOut(object):
                 assert len(types) == len(args) - 1
                 failed = False
                 for a, t in zip(args[1::], types):
-                    if not isinstance(a,t):
+                    if t == float and type(a) == int:
+                        pass
+                    elif not isinstance(a,t):
                         failed = True
                 if not failed:    
                     out = fun(*args, **kwargs)
@@ -104,6 +106,11 @@ class InOut(object):
                             print('accept') 
                             err = instr.error
                             instr._err_msg +=  '\n' + err 
+                    else:
+                        out = None
+                else:
+                    out = None
+
                 return out
             return wrap
         return check

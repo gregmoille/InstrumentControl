@@ -426,7 +426,8 @@ class Transmission(QMainWindow):
 
         self.threadDcWorker = DcScan(laser= self.laser,
                                     wavemeter= self.wavemeter,
-                                    param=self._param)
+                                    param=self._param, 
+                                    debug = True)
         self.threadDcWorker._DCscan[tuple].connect(_doScan)
         self.threadDcWorker.start()
 

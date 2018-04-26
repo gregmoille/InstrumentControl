@@ -161,13 +161,13 @@ class ChangeState(object):
             def wrapper(*args,**kwargs):
                 # def the function to be thread which check the wavelength
                 def ReturnWavelength():
-                    while not np.abs(target_lbd-laser.lbd)<0.02 and laser._is_scaning:
+                    while not target_lbd-laser.lbd<0.02 and laser._is_scaning :
                         laser._is_scaning = True
                         laser._lbdscan = laser.lbd
 
                     laser._is_scaning = False
                     laser.Querry(stop_word)
-                    laser._err_msg += '\n' + str(laser.error)  + 'END OF SCAN--' 
+                    # laser._err_msg += '\n' + str(laser.error)  + 'END OF SCAN--' 
                     print(laser.error  + 'END OF SCAN--')
                     
                 # retrieve params

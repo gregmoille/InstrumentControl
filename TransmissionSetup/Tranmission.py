@@ -184,38 +184,36 @@ class Transmission(QMainWindow):
     # -----------------------------------------------------------------------------
     # -- Some Decorators --
     # -----------------------------------------------------------------------------
-    def Blinking(cdt_word):
+    def Blinking(fun):
         '''
         Blinking decorator when changing wavelength
         '''
-        def decorator(fun):
-            @wraps(fun)
-            def wrapper(*args, **kwargs):
-                self_app = args[0]
+        @wraps(fun)
+        def wrapper(*args, **kwargs):
+            self_app = args[0]
 
-                def blink():
-                    cdt = True
-                    self_app.ui.but_dcscan.setEnabled(False)
-                    while cdt:
-                        self_app._blink = not(self_app._blink)
-                        self_app.ui.led_SetWavelength.setPixmap(
-                            self_app._led[self_app._blink])
-                        time.sleep(0.6)
-                        cdt = eval(cdt_word)
-
-                    self_app.ui.led_SetWavelength.setPixmap(
-                        self_app._led[False])
-                    self_app.ui.but_dcscan.setEnabled(True)
-
-                out = fun(*args, **kwargs)
-                self_app.threadscan = threading.Thread(target=blink, args=())
-                self_app.threadscan.daemon = True
+            def blink():
+                cdt = True
                 self_app.ui.but_dcscan.setEnabled(False)
-                self_app.threadscan.start()
+                while cdt:
+                    self_app._blink = not(self_app._blink)
+                    self_app.ui.led_SetWavelength.setPixmap(
+                        self_app._led[self_app._blink])
+                    time.sleep(0.6)
+                    cdt = self_app.laser._is_changing_lbd
 
-                return out
-            return wrapper
-        return decorator
+                self_app.ui.led_SetWavelength.setPixmap(
+                    self_app._led[False])
+                self_app.ui.but_dcscan.setEnabled(True)
+
+            out = fun(*args, **kwargs)
+            self_app.threadscan = threading.Thread(target=blink, args=())
+            self_app.threadscan.daemon = True
+            self_app.ui.but_dcscan.setEnabled(False)
+            self_app.threadscan.start()
+
+            return out
+        return wrapper
 
     def isConnected(fun):
         '''
@@ -334,7 +332,7 @@ class Transmission(QMainWindow):
 
     @hasError
     @isConnected
-    @Blinking('self_app.laser._is_changing_lbd')
+    @Blinking
     def SetWavelength(self, value):
         self.laser.lbd = value
 
@@ -401,7 +399,7 @@ class Transmission(QMainWindow):
                 self.ui.spnbx_lbd.blockSignals(True)
                 self.ui.spnbx_lbd.setValue(self.laser.lbd)
                 self.ui.spnbx_lbd.blockSignals(False)
-                ut.ReplaceData(self, self._dcData[2], self._dcData[0])
+                ut.ReplaceData(self, self._dcData[0], self._dcData[-1][0])
                 EnableUIscan(True)
                 self.threadDcWorker.stop()
                 self.threadDcWorker.quit()
@@ -413,8 +411,7 @@ class Transmission(QMainWindow):
             self.wavemeter = Wavemeter()
             self._param['wlmParam'] = {'channel': int(self.ui.combo_vlmChan.currentText()),
                                       'exposure': 'auto'}
-        self._param['daqParam'] = {'read_ch': [self.ui.combo_daqRead.currentText(),
-                                            self.ui.combo_daqMZ.currentText()],
+        self._param['daqParam'] = {'read_ch': [self.ui.combo_daqRead.currentText()],
                                     'dev': self.ui.combo_daqDev.currentText(),
                                     'write_ch': None}
         

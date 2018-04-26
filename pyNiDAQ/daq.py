@@ -45,6 +45,7 @@ class DAQ(object):
         writetask.timing.cfg_samp_clk_timing(int(self.clock),
                                                         sample_mode=AcquisitionType.FINITE,
                                                         samps_per_chan=int(Npts))
+        # AcquisitionType.FINITE,
         self.writetask = writetask
         return writetask
 

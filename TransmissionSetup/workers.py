@@ -13,13 +13,16 @@ import threading
 
 class DcScan(QThread):
     '''
-    ------------------------------------------------------
+    ---------------------------------------------------------
     tw = DcScan(laser = <class>, 
                             wavemeter = <class>,
                             *args, **kwargs) 
 
-    Class for Transmission characterization of nanodevices.
-    ------------------------------------------------------
+    Class for DC Transmission characterization of nanodevices.
+
+    For a full description of the algorithm , go please
+    check the alogorigram in the Docs
+    ----------------------------------------------------------
     Args:
         laser: laser object to control the equipement (c.f.
                 pyNFLaser package)
@@ -92,12 +95,12 @@ class DcScan(QThread):
         scan_limit = laser.scan_limit
         if self._debug:
             print("Scan limit: {}nm - {}nm".format(scan_limit[0], scan_limit[1]))
+        
         # -- More user friendly notation --
         daqParam = param['daqParam']
         wlmParam = param.get('wlmParam', None)
 
         # -- Wait until lbd start of scan --
-
         while True:
             lbd = laser.lbd
             changing = laser._is_changing_lbd
@@ -147,14 +150,13 @@ class DcScan(QThread):
         else:
             self._DCscan.emit((2, laser.lbd, 0, None))
 
-        # -- Setup DAQ for acquisition -- 
+        # -- Setup DAQ for acquisition  and create the reading 
+        #.   THread -- 
         scan_time = np.diff(scan_limit)[0]/laser.scan_speed
         if self._debug:
             print('Scan time: {}s'.format(scan_time))
-
         daq = DAQ(t_end = scan_time, dev = daqParam['dev'])
         daq.SetupRead(read_ch=daqParam['read_ch'])
-        # daq.readtask.start()
         self._done_get_data = False
 
         def _GetData():
@@ -165,11 +167,6 @@ class DcScan(QThread):
 
         self.threadDAQdata = threading.Thread(target=_GetData, args=())
         self.threadDAQdata.daemon = True
-       
-        #blablabla
-
-       
-        self._is_Running = True
         
         # -- Fetch wavelength and progress of scan -- 
         lbd_probe = []
@@ -180,7 +177,8 @@ class DcScan(QThread):
             print('Begining of Scan: '+ '-'*30)
             print('Time sleeping between steps: {}'.format(t_step))
 
-         # -- Start laser scan --
+        # -- Start laser scan --
+        self._is_Running = True
         laser.scan = True
         self.threadDAQdata.start()
         while laser._is_scaning:
@@ -197,9 +195,10 @@ class DcScan(QThread):
         if self._debug:
             print('End of Scan: '+ '-'*30)
 
-        # -- Scan Finished, get DAQ data -- 
-        
-        
+        # -- Scan Finished, get Data -- 
+        while not self._done_get_data:
+            pass
+
         daq.readtask.close()
 
         # -- Get Last wavelength of the scan -- 
@@ -214,29 +213,42 @@ class DcScan(QThread):
         else:
             self._DCscan.emit((3, laser.lbd, 100, None))
         
-        # -- Process a bit the data --
-        while not self._done_get_data:
-            pass
+        # -- Processing of the Data --
+        # -----------------------------------------------------------------
 
+        # -- Better notation of Data --
         data = np.array(self.data)
-        T = data
-        # MZ = data[1]
-        tdaq = np.linspace(0,self.time_stop_daq-self.time_start_daq,len(T))
-
-        # -- Find out the wavelength during the scan --
+        T = data[0]
+        MZ = data[1]
         time_probe = np.array(time_probe)
         lbd_probe = np.array(lbd_probe)
         time_probe = time_probe - time_probe[0]
         if self._debug:
             print("Time End of scan: {}s".format(time_probe[-1]))
+
+        # -- Retrieve the time taken by the daq --
+        tdaq = np.linspace(0,self.time_stop_daq-self.time_start_daq,len(T))
+
+        # -- Only get the data while the scan was running --
+        ind_max = np.where(tdaq<=time_probe[-1])[0][-1]
+        tdaq = tdaq[:ind_max+1]
+        MZ = MZ[:ind_max+1]
+        T = T[:ind_max+1]
+
+        # -- remove any moment the laser had an issue and
+        # and return 0 or None --
+        cdt = [not(aa==0) and not(np.isnan(aa)) for aa in lbd_probe]
+        time_probe = time_probe[cdt]
+        lbd_probe = lbd_probe[cdt]
+
         # -- interpolate data for better precision --
-        # need to be update
-        # f_int = np.polyfit(time_probe, lbd_probe,1)
-        # lbd_daq = f_int(tdaq)
+        f_int = intpl.splrep(time_probe, lbd_probe,1)
+        lbd_daq = intpl.splev(tdaq, f_int)
+
         # ipdb.set_trace()
         # -- Return data and= everything --
         # to_return = (tdaq, time_probe, lbd_daq,lbd_probe, [T, MZ])
-        to_return = (tdaq, time_probe,lbd_probe, [T])
+        to_return = (tdaq, time_probe,lbd_probe, lbd_daq [T, MZ])
 
         self._DCscan.emit((-1, laser.lbd, 0, to_return))
         self._is_Running = False

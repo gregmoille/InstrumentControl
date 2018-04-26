@@ -1778,99 +1778,6 @@ QDateEdit::down-arrow:focus {
                  <number>0</number>
                 </property>
                 <item row="1" column="0">
-                 <widget class="QDoubleSpinBox" name="spnbx_daq_Vmin">
-                  <property name="minimumSize">
-                   <size>
-                    <width>87</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>120</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QDoubleSpinBox" name="spnbx_daq_Vmax">
-                  <property name="minimumSize">
-                   <size>
-                    <width>87</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>120</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <property name="value">
-                   <double>5.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_21">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>15</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>15</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>V&lt;sub&gt;min&lt;/sub&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QLabel" name="label_22">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>15</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>15</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>V&lt;sub&gt;max&lt;/sub&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="2">
                  <widget class="QComboBox" name="comboBox_8">
                   <property name="minimumSize">
                    <size>
@@ -1916,7 +1823,7 @@ QDateEdit::down-arrow:focus {
                   </item>
                  </widget>
                 </item>
-                <item row="0" column="2">
+                <item row="0" column="0">
                  <widget class="QLabel" name="label_28">
                   <property name="font">
                    <font>
@@ -1925,6 +1832,30 @@ QDateEdit::down-arrow:focus {
                   </property>
                   <property name="text">
                    <string>Probe Piezo Channel</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QPushButton" name="but_FreeScan">
+                  <property name="sizeIncrement">
+                   <size>
+                    <width>0</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="baseSize">
+                   <size>
+                    <width>0</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Free Scan</string>
                   </property>
                  </widget>
                 </item>
@@ -3416,36 +3347,22 @@ QDateEdit::down-arrow:focus {
                 <property name="verticalSpacing">
                  <number>0</number>
                 </property>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_12">
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_14">
                   <property name="minimumSize">
                    <size>
-                    <width>87</width>
-                    <height>0</height>
+                    <width>0</width>
+                    <height>25</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>87</width>
-                    <height>16777215</height>
+                    <width>16777215</width>
+                    <height>25</height>
                    </size>
-                  </property>
-                  <property name="sizeIncrement">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
                   </property>
                   <property name="text">
-                   <string>Channel</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   <string/>
                   </property>
                  </widget>
                 </item>
@@ -3518,22 +3435,36 @@ QDateEdit::down-arrow:focus {
                   </item>
                  </widget>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_14">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_12">
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
-                    <height>25</height>
+                    <width>87</width>
+                    <height>0</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>16777215</width>
-                    <height>25</height>
+                    <width>87</width>
+                    <height>16777215</height>
                    </size>
                   </property>
+                  <property name="sizeIncrement">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
                   <property name="text">
-                   <string/>
+                   <string>Channel</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -3672,61 +3603,6 @@ QDateEdit::down-arrow:focus {
                 <property name="spacing">
                  <number>9</number>
                 </property>
-                <item row="0" column="3">
-                 <widget class="QComboBox" name="comboBox_SelectLine">
-                  <property name="minimumSize">
-                   <size>
-                    <width>87</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>85</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>Line 1</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Line 2</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="0" column="2">
-                 <widget class="QPushButton" name="button_DataTip">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>110</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Show Data Tip</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="1" column="3">
                  <widget class="QSpinBox" name="spnbx__downsample">
                   <property name="minimumSize">
@@ -3758,7 +3634,55 @@ QDateEdit::down-arrow:focus {
                  </widget>
                 </item>
                 <item row="1" column="2">
-                 <widget class="QPushButton" name="pushButton_3">
+                 <widget class="QPushButton" name="but_DownS">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>11</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>DownSample</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="3">
+                 <widget class="QPushButton" name="but_DataTip">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>110</width>
+                    <height>25</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Show Data Tip</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QPushButton" name="pushButton">
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
@@ -3777,7 +3701,7 @@ QDateEdit::down-arrow:focus {
                    </font>
                   </property>
                   <property name="text">
-                   <string>DownSample</string>
+                   <string>Clear Plot</string>
                   </property>
                  </widget>
                 </item>
@@ -4423,8 +4347,6 @@ QDateEdit::down-arrow:focus {
   <tabstop>spnbx_pzt_start</tabstop>
   <tabstop>spnbx_pzt_stop</tabstop>
   <tabstop>spinBox_pzt_freq</tabstop>
-  <tabstop>comboBox_SelectLine</tabstop>
-  <tabstop>button_DataTip</tabstop>
   <tabstop>but_setdir</tabstop>
   <tabstop>comboBox_Extension</tabstop>
   <tabstop>text_File</tabstop>
@@ -4439,11 +4361,9 @@ QDateEdit::down-arrow:focus {
   <tabstop>combo_daqDev</tabstop>
   <tabstop>combo_daqRead</tabstop>
   <tabstop>combo_daqMZ</tabstop>
-  <tabstop>spnbx_daq_Vmin</tabstop>
-  <tabstop>spnbx_daq_Vmax</tabstop>
   <tabstop>combo_vlmChan</tabstop>
   <tabstop>line_wlmLbd</tabstop>
-  <tabstop>pushButton_3</tabstop>
+  <tabstop>but_DownS</tabstop>
  </tabstops>
  <resources>
   <include location="QDarkStyleSheet-master/qdarkstyle/style.qrc"/>

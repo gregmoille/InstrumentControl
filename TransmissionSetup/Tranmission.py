@@ -2,7 +2,7 @@
 
 # -- Import PyQt wrappers -- 
 from PyQt5.QtWidgets import QMainWindow, QApplication
-from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal
+from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QPoint
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
 
@@ -15,20 +15,23 @@ import numpy as np
 import threading
 import os
 import ipdb
+import pyqtgraph as pg
 
-work_dir = path = os.path.abspath(sys.argv[0] + '/..') 
-
+work_dir = path = os.path.abspath(__file__ + '/..') 
+print(work_dir)
 # -- import custom NIST-ucomb Package --
 path = os.path.abspath(work_dir + '/UI/QDarkStyleSheet-master/qdarkstyle/')
+
 if not path in sys.path:
     sys.path.insert(0, path)
-path = os.path.abspath('../')
+path = os.path.abspath(work_dir + '/../')
 if not path in sys.path:
     sys.path.insert(0, path)
+    print(path)
 import pyUtilities as ut
-from pyLaser import NewFocus6700
-from pyWavemeter import Wavemeter
-from workers import DcScan
+# from pyLaser import NewFocus6700
+# from pyWavemeter import Wavemeter
+# from workers import DcScan
 
 # -- load UI --
 print('-'*30)
@@ -147,11 +150,16 @@ class Transmission(QMainWindow):
                      }
         self._blink = False
         self._cst_slide = 100
+        self._showhline = False
 
         # -- connect buttons --
         self.ui.but_connect.clicked.connect(self.Connect)
         self.ui.but_laserOut.clicked.connect(self.LaserOut)
         self.ui.but_dcscan.clicked.connect(self.Scan)
+        self.ui.but_DownS.clicked.connect(self.DownSampleTrace)
+        self.ui.but_setdir.clicked.connect(self.ChosePath)
+        self.ui.but_savedata.clicked.connect(self.SaveData)
+        self.ui.but_DataTip.clicked.connect(lambda: ut.ShowDataTip(self))
 
         # -- connect spin boxes --
         self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
@@ -166,10 +174,10 @@ class Transmission(QMainWindow):
 
         # -- Create a graph --
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
-
+        self.my_plot.scene().sigMouseMoved.connect(self.onMove)
         # -- Setup apparence at launch --
         self.ui.wdgt_param.setEnabled(False)
-        self.ui.wdgt_plot.setEnabled(False)
+        self.ui.wdgt_plot.setEnabled(True)
 
         # -- Misc --
         self._do_blink = False
@@ -179,6 +187,7 @@ class Transmission(QMainWindow):
         self._has_err = False
         self._has_checked_err = False
         self._param = {}
+        self._toPlot = []
         self.dev = DevWind(parent=self)
         self.ui.actionGet_Errors.triggered.connect(self.dev.show)
     # -----------------------------------------------------------------------------
@@ -394,12 +403,20 @@ class Transmission(QMainWindow):
                 self._lbd_stop = lbd
                 self.ui.line_wlmLbd.setText("{:.3f}".format(lbd))
             if state == -1:
-                self._dcData = data
+                # data returned
+                # (tdaq, time_probe,lbd_probe,, lbd_daq [T, MZ])
+                self._data = {'tdaq': data[0],
+                             't_laser': data[2],
+                             'lbd_Laser': data[3],
+                             'lbd_daq': data[4],
+                             'T': data[5][0],
+                             'MZ': data[5][1]}
+                self._toPlot = [self._data['lbd_daq'],self._data['T']]
                 self._do_blink = False
                 self.ui.spnbx_lbd.blockSignals(True)
                 self.ui.spnbx_lbd.setValue(self.laser.lbd)
                 self.ui.spnbx_lbd.blockSignals(False)
-                ut.ReplaceData(self, self._dcData[0], self._dcData[-1][0])
+                ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
                 EnableUIscan(True)
                 self.threadDcWorker.stop()
                 self.threadDcWorker.quit()
@@ -411,7 +428,8 @@ class Transmission(QMainWindow):
             self.wavemeter = Wavemeter()
             self._param['wlmParam'] = {'channel': int(self.ui.combo_vlmChan.currentText()),
                                       'exposure': 'auto'}
-        self._param['daqParam'] = {'read_ch': [self.ui.combo_daqRead.currentText()],
+        self._param['daqParam'] = {'read_ch': [self.ui.combo_daqRead.currentText(),
+                                                self.ui.combo_daqMZ.currentText()],
                                     'dev': self.ui.combo_daqDev.currentText(),
                                     'write_ch': None}
         
@@ -429,6 +447,44 @@ class Transmission(QMainWindow):
         self.threadDcWorker.start()
 
 
+    # -- Saving and stuff --
+    # -----------------------------------------------------------------------------
+    @isConnected
+    def ChosePath(self):
+        # Open the popup window to pick a directory
+        dir_ = str(QtGui.QFileDialog.getExistingDirectory(
+            self, "Select Directory", expanduser("Z:\\"),
+            QtGui.QFileDialog.ShowDirsOnly))
+        self.ui.text_Dir.setText(dir_.strip())
+        # self.UpdateDir()
+
+
+    def SaveData(self):
+        _save = True
+
+        # Check that directory was picked
+        drcty = self.ui.text_Dir.text().strip()
+        fname = self.ui.text_File.text().strip()
+        ext = self.ui.comboBox_Extension.currentText()
+        if drcty == '':
+            _save = False
+            self.ui.text_Dir.setText('Chose a directory!')
+        if fname == '':
+            _save = False
+            self.ui.text_File.setText('Chose a File Name!')
+        if _save:
+            if ext == '.mat':
+                filename = drcty + '\\' + fname + '.mat'
+                io.savemat(filename, self._data)
+            if ext == '.dill':
+                filename = drcty + '\\' + fname + '.dill'
+                with open(filename, 'bw') as fn:
+                    dill.dump(self._data, fn)
+            if ext == 'all':
+                filename = drcty + '\\' + fname
+                io.savemat(filenamem + '.mat', self._data)
+                with open(filename + '.dill', 'bw') as fn:
+                    dill.dump(self._data, fn)
 
     # -- Utilities --
     # -----------------------------------------------------------------------------
@@ -488,6 +544,70 @@ class Transmission(QMainWindow):
                 'scan_speed': scan_speed,
                 'output': output,}
     
+    # -- Graph Interaction -- 
+    def DownSampleTrace(self):
+        step = self.ui.spnbx__downsample.getValue()
+        if not self._toPlot == []:
+            PlotDownSampleTrace(self, self._toPlot[0], self._toPlot[1], step)
+
+    def onMove(self, pos):
+        if self._showhline:
+            if self.vLine.isUnderMouse():
+                pen = ut.SetPen(self._clr[self._ind_curve])
+                self.hLine.setPen(pen)
+                self.vLine.setPen(pen)
+                xline = self.vLine.getXPos()
+                x = self.current_trace[self._ind_curve].getData()[0]
+                y = self.current_trace[self._ind_curve].getData()[1]
+                ind = np.abs(x-xline).argmin()
+                xcur = x[ind]
+                ycur = y[ind]
+                # xlim = self.my_plot.getXRange()
+                # ylim = self.my_plot.getYRange()
+                # ipdb.set_trace()
+                xlim = self.my_plot.getPlotItem().getAxis('bottom').range
+                ylim = self.my_plot.getPlotItem().getAxis('left').range
+                xpos = xlim[0] + 0.05*np.diff(xlim)
+                ypos = ylim[0] + 0.05*np.diff(ylim)
+                self.txt.setPos(QPoint(xpos,ypos))
+                self.txt.setText("lbd = {:.3f} nm – {:.3f} V".format(xcur,ycur))
+                # self.ui.xPos.setText("{:.3f}".format(xcur) + 'nm')
+                # self.ui.yPos.setText("{:.3f}".format(ycur) + 'V')
+                self.vLine.setPos([xcur, 0])
+                self.hLine.setPos([0, ycur])
+
+    # -- Help and About --
+    # -----------------------------------------------------------------------------
+    def Help(self):
+        msgBox = QtGui.QMessageBox()
+        msgBox.setTextFormat(QtCore.Qt.RichText)
+        txt = 'OK Go see the GitHub Page'
+        # ipdb.set_trace()
+        msgBox.setWindowTitle(self.tr("Help"))
+        msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
+        msgBox.setText(txt)
+        msgBox.exec_()
+
+    def About(self):
+        msgBox = QtGui.QMessageBox()
+        msgBox.setTextFormat(QtCore.Qt.RichText)
+        urlLink = '<a href="mailto:gregory.moille@nist.gov' + \
+            '?Subject=Bug%20With%20Transmission%20UI%20Software">' + \
+            'this link</a>'
+        urlRequest = '<a href="mailto:gregory.moille@nist.gov' + \
+            '?Subject=Request%20For%Transmission%20UI%20Software">' + \
+            'this link</a>'
+        txt = '<b>Topica UI - v2.0</b><br><br>Developed by G. Moille<br>' +\
+            'National Institute of Standards And Technology<br>' +\
+            '2019br><br>' +\
+            'Please report through ' + urlLink + \
+            '<br>Please report any request though ' + urlRequest
+        # ipdb.set_trace()
+        msgBox.setWindowTitle(self.tr("About"))
+        msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
+        msgBox.setText(txt)
+        msgBox.exec_()
+
 if __name__ == "__main__":
     app = QApplication([])
     window = Transmission()

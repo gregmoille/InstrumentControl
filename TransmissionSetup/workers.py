@@ -166,7 +166,7 @@ class DcScan(QThread):
         self.threadDAQdata = threading.Thread(target=_GetData, args=())
         self.threadDAQdata.daemon = True
        
-
+        #blablabla
 
        
         self._is_Running = True

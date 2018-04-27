@@ -4280,7 +4280,7 @@ QDateEdit::down-arrow:focus {
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -4303,9 +4303,16 @@ QDateEdit::down-arrow:focus {
     </property>
     <addaction name="actionGet_Errors"/>
    </widget>
+   <widget class="QMenu" name="menuConnectivity">
+    <property name="title">
+     <string>Connectivity</string>
+    </property>
+    <addaction name="actionSet_Instrument_Address"/>
+   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuHelp"/>
+   <addaction name="menuConnectivity"/>
    <addaction name="menuDevelopper"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionAbout">
@@ -4331,6 +4338,11 @@ QDateEdit::down-arrow:focus {
   <action name="actionSave_Data">
    <property name="text">
     <string>Save Data</string>
+   </property>
+  </action>
+  <action name="actionSet_Instrument_Address">
+   <property name="text">
+    <string>Set Instrument Address</string>
    </property>
   </action>
  </widget>

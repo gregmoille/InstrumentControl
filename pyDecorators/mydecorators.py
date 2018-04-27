@@ -166,7 +166,7 @@ class ChangeState(object):
                         laser._lbdscan = laser.lbd
 
                     laser._is_scaning = False
-                    laser.Querry(stop_word)
+                    laser.Query(stop_word)
                     # laser._err_msg += '\n' + str(laser.error)  + 'END OF SCAN--' 
                     print(laser.error  + 'END OF SCAN--')
                     

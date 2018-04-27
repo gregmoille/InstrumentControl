@@ -29,9 +29,9 @@ if not path in sys.path:
     sys.path.insert(0, path)
     print(path)
 import pyUtilities as ut
-# from pyLaser import NewFocus6700
-# from pyWavemeter import Wavemeter
-# from workers import DcScan
+from pyLaser import NewFocus6700
+from pyWavemeter import Wavemeter
+from workers import DcScan
 
 # -- load UI --
 print('-'*30)
@@ -39,6 +39,7 @@ print(work_dir)
 print('-'*30)
 Ui_MainWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/UITranmission.ui')
 Ui_DevWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/DevWindow.ui')
+Ui_InstrWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/InstrumentAddress.ui')
 
 class ErrorHandling(QThread):
     err_msg = pyqtSignal(str)
@@ -106,6 +107,12 @@ class DevWind(QMainWindow):
         self.ClearError(False)
         self.threadErr.quit()
         self.threadErr.wait()
+
+class InstrAddr(QMainWindow):
+    def __init__(self, parent=None):
+        super(InstrAddr, self).__init__(parent)
+        self.ui = Ui_InstrWindow()
+        self.ui.setupUi(self)
 
 class Transmission(QMainWindow):
     '''
@@ -190,6 +197,10 @@ class Transmission(QMainWindow):
         self._toPlot = []
         self.dev = DevWind(parent=self)
         self.ui.actionGet_Errors.triggered.connect(self.dev.show)
+        
+        self.instrWin = InstrAddr(parent=self)
+        self.ui.actionSet_Instrument_Address.triggered.connect(self.instrWin.show)
+
     # -----------------------------------------------------------------------------
     # -- Some Decorators --
     # -----------------------------------------------------------------------------

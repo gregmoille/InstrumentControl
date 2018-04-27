@@ -67,12 +67,12 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
             if c is curve:
                 # print('ehehe')
                 # c.setPen(pen=app.linepen[i])
-                c.setPen(width=3,color = app._clr[i])
+                c.setPen(width=2,color = app._clr[i])
                 # c.setPen(pen=app.linepen[i])
                 app._ind_curve = i
                 print(app._ind_curve)
             else:
-                c.setPen(width=2,color = app._clr[i])
+                c.setPen(width=1,color = app._clr[i])
 
     for c in app.current_trace:
         app.my_plot.addItem(c)
@@ -114,14 +114,12 @@ def SetPen(clr):
 
 def ShowDataTip(app):
     clr = '#FFFFFF'
-    app.mrkrpen = SetPen(clr)
+    app.mrkrpen = SetPen(app._clr[app._ind_curve])
     app.txt = pg.TextItem('',color=(255, 255, 255),anchor=(0, 1), border = app.mrkrpen)
-    if not app._showhline:
-        ind_line = - app.ui.comboBox_SelectLine.currentIndex()
+    if not app._showhline:        
         
-        
-        x = app.current_trace[0].getData()[0]
-        y = app.current_trace[0].getData()[1]
+        x = app.current_trace[app._ind_curve].getData()[0]
+        y = app.current_trace[app._ind_curve].getData()[1]
 
         xlim = app.my_plot.plotItem.getAxis('bottom').range
 

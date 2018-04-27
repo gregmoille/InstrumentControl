@@ -172,7 +172,6 @@ class Transmission(QMainWindow):
         self.ui.but_laserOut.clicked.connect(self.LaserOut)
         self.ui.but_dcscan.clicked.connect(self.Scan)
         self.ui.but_freeScan.clicked.connect(self.FreeScan)
-        self.ui.but_DownS.clicked.connect(self.DownSampleTrace)
         self.ui.but_setdir.clicked.connect(self.ChosePath)
         self.ui.but_savedata.clicked.connect(self.SaveData)
         self.ui.but_DataTip.clicked.connect(lambda: ut.ShowDataTip(self))
@@ -655,15 +654,10 @@ class Transmission(QMainWindow):
             self.ui.but_ClearPlot.setText('Clear Plot')
             self._doClear = True
 
-    def DownSampleTrace(self):
-        step = self.ui.spnbx_downsample.value()
-        if not self._toPlot == []:
-            ut.PlotDownSampleTrace(
-                self, self._toPlot[0], self._toPlot[1], step)
-
     def onMove(self, pos):
         if self._showhline:
             if self.vLine.isUnderMouse():
+                self._ind_curve = self.ui.combo_line.currentIndex()
                 pen = ut.SetPen(self._clr[self._ind_curve])
                 self.hLine.setPen(pen)
                 self.vLine.setPen(pen)
@@ -683,6 +677,7 @@ class Transmission(QMainWindow):
                 self.txt.setPos(QPointF(xpos, ypos))
                 self.txt.setText(
                     "lbd = {:.3f} nm – {:.3f} V".format(xcur, ycur))
+                self.txt.setColor(self._clr[self._ind_curve])
                 # self.ui.xPos.setText("{:.3f}".format(xcur) + 'nm')
                 # self.ui.yPos.setText("{:.3f}".format(ycur) + 'V')
                 self.vLine.setPos([xcur, 0])

@@ -18,6 +18,8 @@ class CustomPlotItem(pg.PlotDataItem):
 
 
 def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
+    for ii in range(app.ui.combo_line.count()):
+        app.ui.combo_line.removeItem(0)
     labelStyle = {'color': color, 'font-size': '14pt'}
     axispen = pg.mkPen(color=color, fontsize='14pt')
     axisfont = QtGui.QFont()
@@ -57,7 +59,7 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     x = np.linspace(xrange[0], xrange[1], 1e7)
     span = xrange[1] - xrange[0]
     sigma = span/10 * np.random.rand(1)
-    y = np.sin(1e1*sigma*x/span)
+    y = np.sin(1e6*sigma*x/span)
     sigma = span/5 * np.random.rand(1)
     y2 = np.exp(-((x-(xrange[0]+span/2))**2)/(sigma**2))
     app._clr = ['#81caf9', '#ffa691', '#cfffaf']
@@ -74,35 +76,37 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     
     app.current_trace[0].setPen(width=1, color = app._clr[0])
     app._ind_curve = 0
-    def SelectCurve(curve):
-        print('ehehehehehhe')
-        for i,c in enumerate(app.current_trace):
-            if c is curve:
-                # print('ehehe')
-                # c.setPen(pen=app.linepen[i])
-                c.setPen(width=1,color = app._clr[i])
-                # c.setPen(pen=app.linepen[i])
-                app._ind_curve = i
-            else:
-                c.setPen(width=1,color = app._clr_deact[i])
-        app.mrkrpen = SetPen(app._clr[app._ind_curve])
-        print(app._clr[app._ind_curve])
-        app.txt.setColor(app._clr[app._ind_curve])
+    # def SelectCurve(curve):
+    #     print('ehehehehehhe')
+    #     for i,c in enumerate(app.current_trace):
+    #         if c is curve:
+    #             # print('ehehe')
+    #             # c.setPen(pen=app.linepen[i])
+    #             c.setPen(width=1,color = app._clr[i])
+    #             # c.setPen(pen=app.linepen[i])
+    #             app._ind_curve = i
+    #         else:
+    #             c.setPen(width=1,color = app._clr_deact[i])
+    #     app.mrkrpen = SetPen(app._clr[app._ind_curve])
+    #     print(app._clr[app._ind_curve])
+    #     app.txt.setColor(app._clr[app._ind_curve])
     
-
+    cnt = 0
     for c in app.current_trace:
         app.my_plot.addItem(c)
-        c.sigClicked.connect(SelectCurve)
+        app.ui.combo_line.addItem('Trace {}'.format(cnt))
+        cnt += 1
         # c.setDownsampling(auto=True, method="subsample")
 
     app._toPlot = [np.array([x,x]), np.array([y,y2])]
 
 def ReplaceData(app, x, y):
     # ipdb.set_trace()
+    for ii in range(app.ui.combo_line.count()):
+        app.ui.combo_line.removeItem(0)
     for line in app.current_trace:
-                    app.my_plot.removeItem(line)
+        app.my_plot.removeItem(line)
     app.current_trace = []
-    app._ind_curve = 0
     try:
         for ii in range(x.shape[0]):
             app.current_trace += [pg.PlotDataItem(x = x[ii], y = y[ii], 
@@ -111,24 +115,11 @@ def ReplaceData(app, x, y):
         app.current_trace += [pg.PlotDataItem(x = x, y = y, 
                                     pen=app.linepen[0],color = app._clr[0], clickable=True)]
     app.current_trace[0].setPen(width=2, color = app._clr[0])
-    def SelectCurve(curve):
-        # print('ehehehehehhe')
-        for i,c in enumerate(app.current_trace):
-            if c is curve:
-                # print('ehehe')
-                # c.setPen(pen=app.linepen[i])
-                c.setPen(width=1, color = app._clr[i])
-                # c.setPen(pen=app.linepen[i])
-                app._ind_curve = i
-            else:
-                c.setPen(width=1,color = app._clr_deact[i])
-        app.mrkrpen = SetPen(app._clr[app._ind_curve])
-        print(app._clr[app._ind_curve])
-        app.txt.setColor(app._clr[app._ind_curve])
+    cnt = 0
     for c in app.current_trace:
         app.my_plot.addItem(c)
-        c.sigClicked.connect(SelectCurve)
-        c.setDownsampling(auto=True, method="subsample")
+        app.ui.combo_line.addItem('Trace {}'.format(cnt))
+        cnt += 1
     print('Done replacing')
 
 

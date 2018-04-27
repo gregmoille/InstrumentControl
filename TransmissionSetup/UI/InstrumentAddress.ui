@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>494</height>
+    <width>570</width>
+    <height>257</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1234,13 +1234,6 @@ QDateEdit::down-arrow:focus {
       </property>
      </widget>
     </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Toptica 1050 IP Address</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="0">
      <widget class="QLabel" name="label_3">
       <property name="text">
@@ -1248,32 +1241,183 @@ QDateEdit::down-arrow:focus {
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="lineEdit">
+    <item row="0" column="0">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string>TBD</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLineEdit" name="lineEdit_2">
-      <property name="text">
-       <string>TBD</string>
+       <string>Toptica 1050 IP Address</string>
       </property>
      </widget>
     </item>
     <item row="2" column="1">
-     <widget class="QLineEdit" name="lineEdit_3">
+     <widget class="QLineEdit" name="line_PowerIn">
       <property name="text">
        <string>USB0::0x1313::0x807B::17121241::INSTR</string>
       </property>
      </widget>
     </item>
     <item row="3" column="1">
-     <widget class="QLineEdit" name="lineEdit_4">
+     <widget class="QLineEdit" name="line_PowerOut">
       <property name="text">
        <string>USB0::0x1313::0x8072::P2009986::INSTR</string>
       </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>DAQ Card</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QComboBox" name="combo_daqDev"/>
+    </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="combo_Toptica1050">
+      <item>
+       <property name="text">
+        <string>169.254.122.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.10</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.11</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.12</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.13</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.14</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QComboBox" name="combo_Toptica950">
+      <item>
+       <property name="text">
+        <string>169.254.122.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.5</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.6</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.7</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.10</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.11</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.12</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.13</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>169.254.122.14</string>
+       </property>
+      </item>
      </widget>
     </item>
    </layout>
@@ -1283,8 +1427,8 @@ QDateEdit::down-arrow:focus {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>21</height>
+     <width>570</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>

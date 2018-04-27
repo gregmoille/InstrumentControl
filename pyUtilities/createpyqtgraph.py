@@ -70,13 +70,19 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
                 c.setPen(width=2,color = app._clr[i])
                 # c.setPen(pen=app.linepen[i])
                 app._ind_curve = i
-                print(app._ind_curve)
             else:
                 c.setPen(width=1,color = app._clr[i])
+        app.mrkrpen = SetPen(app._clr[app._ind_curve])
+        print(app._clr[app._ind_curve])
+        app.txt.setColor(app._clr[app._ind_curve])
+    
 
     for c in app.current_trace:
         app.my_plot.addItem(c)
         c.sigClicked.connect(SelectCurve)
+
+    app._toPlot = [np.array([x,x]), np.array([y,y2])]
+
 def ReplaceData(app, x, y):
     # ipdb.set_trace()
     for line in app.current_trace:
@@ -84,8 +90,8 @@ def ReplaceData(app, x, y):
     app.current_trace = []
     app._ind_curve = 0
     try:
-        for ii in range(x.shape[1]):
-            app.app.current_trace += [pg.PlotCurveItem(x = x[ii], y = y[ii], 
+        for ii in range(x.shape[0]):
+            app.current_trace += [pg.PlotCurveItem(x = x[ii], y = y[ii], 
                                     pen=app.linepen[ii],color = app._clr[ii], clickable=True)]
     except:
         app.current_trace += [pg.PlotCurveItem(x = x, y = y, 
@@ -97,13 +103,14 @@ def ReplaceData(app, x, y):
             if c is curve:
                 # print('ehehe')
                 # c.setPen(pen=app.linepen[i])
-                c.setPen(width=3,color = app._clr[i])
+                c.setPen(width=2,color = app._clr[i])
                 # c.setPen(pen=app.linepen[i])
                 app._ind_curve = i
-                print(app._ind_curve)
             else:
-                c.setPen(width=2,color = app._clr[i])
-
+                c.setPen(width=1,color = app._clr[i])
+        app.mrkrpen = SetPen(app._clr[app._ind_curve])
+        print(app._clr[app._ind_curve])
+        app.txt.setColor(app._clr[app._ind_curve])
     for c in app.current_trace:
         app.my_plot.addItem(c)
         c.sigClicked.connect(SelectCurve)
@@ -115,9 +122,9 @@ def SetPen(clr):
 def ShowDataTip(app):
     clr = '#FFFFFF'
     app.mrkrpen = SetPen(app._clr[app._ind_curve])
-    app.txt = pg.TextItem('',color=(255, 255, 255),anchor=(0, 1), border = app.mrkrpen)
+    txtpen = SetPen(clr)
     if not app._showhline:        
-        
+        app.txt = pg.TextItem('',color=app._clr[app._ind_curve],anchor=(0, 1), border = txtpen)    
         x = app.current_trace[app._ind_curve].getData()[0]
         y = app.current_trace[app._ind_curve].getData()[1]
 
@@ -141,6 +148,7 @@ def ShowDataTip(app):
     else:
         app.my_plot.removeItem(app.vLine)
         app.my_plot.removeItem(app.hLine)
+        app.my_plot.removeItem(app.txt)
         app.ui.but_DataTip.setText('Show Data Tip')
         app._showhline = False
 
@@ -151,11 +159,28 @@ def PlotDownSampleTrace(app, x, y, step):
                     app.my_plot.removeItem(line)
     app.current_trace = []
     try:
-        for ii in range(x.shape[1]):
-            app.app.current_trace += [app.my_plot.plot(x[ii][::step], y[ii][::step],
-                                                pen=app.linepen[ii],
-                                                name='line{}'.format(ii))]
+        for ii in range(x.shape[0]):
+            app.current_trace += [pg.PlotCurveItem(x = x[ii][::step], y = y[ii][::step], 
+                                    pen=app.linepen[ii],color = app._clr[ii], clickable=True)]
     except:
-        app.current_trace += [app.my_plot.plot(x, y,
-                                                pen=app.linepen[0],
-                                                name='line{}'.format(0))]
+        app.current_trace += [pg.PlotCurveItem(x = x[::step], y = y[::step], 
+                                    pen=app.linepen[0],color = app._clr[0], clickable=True)]
+
+    app.current_trace[0].setPen(width=2, color = app._clr[0])
+    def SelectCurve(curve):
+        # print('ehehehehehhe')
+        for i,c in enumerate(app.current_trace):
+            if c is curve:
+                # print('ehehe')
+                # c.setPen(pen=app.linepen[i])
+                c.setPen(width=2,color = app._clr[i])
+                # c.setPen(pen=app.linepen[i])
+                app._ind_curve = i
+            else:
+                c.setPen(width=1,color = app._clr[i])
+        app.mrkrpen = SetPen(app._clr[app._ind_curve])
+        print(app._clr[app._ind_curve])
+        app.txt.setColor(app._clr[app._ind_curve])
+    for c in app.current_trace:
+        app.my_plot.addItem(c)
+        c.sigClicked.connect(SelectCurve)

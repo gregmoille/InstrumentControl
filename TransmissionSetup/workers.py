@@ -257,6 +257,50 @@ class DcScan(QThread):
     def stop(self):
         pass
 
+
+class FreeScan(QThread):
+    __author__ = "Gregory Moille"
+    __copyright__ = "Copyright 2018, NIST"
+    __credits__ = ["Gregory Moille",
+                   "Xiyuan Lu",
+                   "Kartik Srinivasan"]
+    __license__ = "GPL"
+    __version__ = "1.0.0"
+    __maintainer__ = "Gregory Moille"
+    __email__ = "gregory.moille@mist.gov"
+    __status__ = "Development"
+    _Freescan = pyqtSignal(list)
+
+    def __init__(self, **kwargs):
+        QThread.__init__(self)
+        self.laser = kwargs.get('laser', None)
+        self.param = kwargs.get('param', None)
+        self._debug = kwargs.get('debug', False)
+        self._is_Running = True
+    
+    def run(self):
+        daqParam = self.param['daqParam']
+        daq = DAQ(t_end = 0.25, dev = daqParam['dev'])
+
+        def _GetData():
+            self.time_start_daq = time.time()
+            self.data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts))
+            self.time_stop_daq = time.time()
+            self._done_get_data = True
+
+        while self._is_Running:
+            self.threadDAQdata = threading.Thread(target=_GetData, args=())
+            self.threadDAQdata.daemon = True
+
+            daq.SetupRead(read_ch=daqParam['read_ch'])
+            self.threadDAQdata.start()
+            while not self_.done_get_data:
+                pass
+            self._Freescan.emit(self.data)
+
+    def stop(self):
+        self._is_Running = False
+
 if __name__ == "__main__":
     from pyNFLaser import NewFocus6700
     from pyWavemeter import Wavemeter

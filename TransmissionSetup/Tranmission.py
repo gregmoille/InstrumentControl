@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-# -- Import PyQt wrappers -- 
+# -- Import PyQt wrappers --
 from PyQt5.QtWidgets import QMainWindow, QApplication
-from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QPoint
+from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QPointF
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
+from PyQt5 import QtGui
 
 # -- import classic package --
 from functools import wraps
@@ -17,7 +18,7 @@ import os
 import ipdb
 import pyqtgraph as pg
 
-work_dir = path = os.path.abspath(__file__ + '/..') 
+work_dir = path = os.path.abspath(__file__ + '/..')
 print(work_dir)
 # -- import custom NIST-ucomb Package --
 path = os.path.abspath(work_dir + '/UI/QDarkStyleSheet-master/qdarkstyle/')
@@ -31,7 +32,7 @@ if not path in sys.path:
 import pyUtilities as ut
 from pyLaser import NewFocus6700
 from pyWavemeter import Wavemeter
-from workers import DcScan
+from workers import DcScan, FreeScan
 
 # -- load UI --
 print('-'*30)
@@ -39,7 +40,9 @@ print(work_dir)
 print('-'*30)
 Ui_MainWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/UITranmission.ui')
 Ui_DevWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/DevWindow.ui')
-Ui_InstrWindow, QtBaseClass = uic.loadUiType(work_dir + '/UI/InstrumentAddress.ui')
+Ui_InstrWindow, QtBaseClass = uic.loadUiType(
+    work_dir + '/UI/InstrumentAddress.ui')
+
 
 class ErrorHandling(QThread):
     err_msg = pyqtSignal(str)
@@ -60,8 +63,10 @@ class ErrorHandling(QThread):
                 self.main_app._has_err = True
                 self.err_msg.emit(self.old_err)
                 print('doing stuff')
+
     def stop(self):
         self._isRunning = False
+
 
 class DevWind(QMainWindow):
     def __init__(self, parent=None):
@@ -75,44 +80,47 @@ class DevWind(QMainWindow):
         # self.GetLaserErr()
         # self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
 
-    def ClearError(self,val):
-        
+    def ClearError(self, val):
+
         self.parent._has_err = False
         self.parent._has_checked_err = False
         print('Puting back everything')
         self.parent.ui.wdgt_param.setEnabled(val)
         self.parent.ui.wdgt_plot.setEnabled(val)
-        if val: 
+        if val:
             self.parent.laser._err_msg = '\n'
             dumm = self.parent.laser.error
 
     def GetLaserErr(self):
         @pyqtSlot(str)
         def _updateErr(val):
-            
+
             self.parent._do_blink = False
             # self.parent.ui.wdgt_param.setEnabled(False)
             # self.parent.ui.wdgt_plot.setEnabled(False)
             ts = time.time()
-            timestamp = datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            timestamp = datetime.fromtimestamp(
+                ts).strftime('%Y-%m-%d %H:%M:%S')
             self.ui.text_lastError.setText(timestamp + ' -- ' + val)
-            
+
         self.old_err = self.parent.laser._err_msg
         self.threadErr = ErrorHandling(main_app=self.parent)
         self.threadErr.err_msg[str].connect(_updateErr)
         self.threadErr.start()
-        
+
     def StopErr(self):
         self.threadErr.stop()
         self.ClearError(False)
         self.threadErr.quit()
         self.threadErr.wait()
 
+
 class InstrAddr(QMainWindow):
     def __init__(self, parent=None):
         super(InstrAddr, self).__init__(parent)
         self.ui = Ui_InstrWindow()
         self.ui.setupUi(self)
+
 
 class Transmission(QMainWindow):
     '''
@@ -123,7 +131,7 @@ class Transmission(QMainWindow):
     under the hood, through the workers, and through the 
     different homemande python package to controll the 
     equipement (see pyNFLaser, pyWavemeter,...)
-    
+
     ------------------------------------------------------
     G. Moille - NIST - 2018
     ------------------------------------------------------
@@ -149,7 +157,7 @@ class Transmission(QMainWindow):
         # -- setup main attributes --
         self.laser = None
         self.wavemeter = None
-        
+
         # -- setup useful hidden attributes --
         self._connected = False
         self._led = {False: QPixmap(':/qss_icons/rc/radio_checked.png'),
@@ -163,10 +171,12 @@ class Transmission(QMainWindow):
         self.ui.but_connect.clicked.connect(self.Connect)
         self.ui.but_laserOut.clicked.connect(self.LaserOut)
         self.ui.but_dcscan.clicked.connect(self.Scan)
+        self.ui.but_freeScan.clicked.connect(self.FreeScan)
         self.ui.but_DownS.clicked.connect(self.DownSampleTrace)
         self.ui.but_setdir.clicked.connect(self.ChosePath)
         self.ui.but_savedata.clicked.connect(self.SaveData)
         self.ui.but_DataTip.clicked.connect(lambda: ut.ShowDataTip(self))
+        self.ui.but_ClearPlot.clicked.connect(self.ClearDiaplayPlot)
 
         # -- connect spin boxes --
         self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
@@ -179,13 +189,17 @@ class Transmission(QMainWindow):
         self.ui.slide_pzt.valueChanged[int].connect(
             lambda x: self.ui.spnbx_pzt.setValue(x/self._cst_slide))
 
+        # -- connect checkBoxes --
+        # ipdb.set_trace()
+        self.ui.check_lbdMZ.stateChanged.connect(self.PlotCalibrated)
+
         # -- Create a graph --
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
         self.my_plot.scene().sigMouseMoved.connect(self.onMove)
         # -- Setup apparence at launch --
-        self.ui.wdgt_param.setEnabled(False)
-        self.ui.wdgt_plot.setEnabled(True)
-
+        # self.ui.wdgt_param.setEnabled(False)
+        # self.ui.wdgt_plot.setEnabled(False)
+        self.ui.group_PostProc.setEnabled(False)
         # -- Misc --
         self._do_blink = False
         self.wlm = None
@@ -193,13 +207,15 @@ class Transmission(QMainWindow):
         self._olderr = ''
         self._has_err = False
         self._has_checked_err = False
+        self._doClear = True
         self._param = {}
-        self._toPlot = []
+        self._postproc = False
         self.dev = DevWind(parent=self)
         self.ui.actionGet_Errors.triggered.connect(self.dev.show)
-        
+
         self.instrWin = InstrAddr(parent=self)
-        self.ui.actionSet_Instrument_Address.triggered.connect(self.instrWin.show)
+        self.ui.actionSet_Instrument_Address.triggered.connect(
+            self.instrWin.show)
 
     # -----------------------------------------------------------------------------
     # -- Some Decorators --
@@ -269,7 +285,6 @@ class Transmission(QMainWindow):
             return out
         return wrapper
 
-
     def blockSignals(val):
         '''
         Block the signal if spinboxes or other need to be set to a value
@@ -281,7 +296,8 @@ class Transmission(QMainWindow):
                 self_app = args[0]
                 # block all signals
                 attr = ['spnbx_lbd', 'slide_pzt', 'spnbx_pzt',
-                        'spnbx_lbd_start', 'spnbx_lbd_start', 'spnbx_lbd_stop', 'spnbx_speed']
+                        'spnbx_lbd_start', 'spnbx_lbd_start',
+                        'spnbx_lbd_stop', 'spnbx_speed']
 
                 if not val:
                     out = fun(*args, **kwargs)
@@ -330,7 +346,7 @@ class Transmission(QMainWindow):
                 self.laser.connected = False
                 self.ui.but_connect.setText('Connect')
                 self._connected = False
-                
+
             except Exception as err:
                 err = str(err) + '\nCannot disconnect the laser.'
                 self.dev.ui.text_lastError.setText(str(err))
@@ -339,9 +355,8 @@ class Transmission(QMainWindow):
         self.ui.wdgt_plot.setEnabled(self._connected)
         self.ui.led_connected.setPixmap(self._led[self._connected])
 
-
     @isConnected
-    def LaserOut(self,val):
+    def LaserOut(self, val):
         out = self.laser.output
         if out:
             self.laser.output = False
@@ -373,9 +388,14 @@ class Transmission(QMainWindow):
         print('Setting speed')
         self.laser.scan_speed = self.ui.spnbx_speed.value()
 
+    # -----------------------------------------------------------------------------
+    # -- DC Scan --
+    # -----------------------------------------------------------------------------
     @isConnected
     def Scan(self, value):
         self._do_blink = True
+        self._postproc = True
+
         def EnableUIscan(val):
             self.ui.groupBox_DCscan.setEnabled(val)
             self.ui.spnbx_I.setEnabled(val)
@@ -389,7 +409,7 @@ class Transmission(QMainWindow):
         EnableUIscan(False)
         self.SetWavelength(self.laser.scan_limit[0])
 
-        # -- define the thread worker -- 
+        # -- define the thread worker --
         @pyqtSlot(tuple)
         def _doScan(signal):
             # [0] Code for where the  program is in
@@ -417,12 +437,12 @@ class Transmission(QMainWindow):
                 # data returned
                 # (tdaq, time_probe,lbd_probe,, lbd_daq [T, MZ])
                 self._data = {'tdaq': data[0],
-                             't_laser': data[2],
-                             'lbd_Laser': data[3],
-                             'lbd_daq': data[4],
-                             'T': data[5][0],
-                             'MZ': data[5][1]}
-                self._toPlot = [self._data['lbd_daq'],self._data['T']]
+                              't_laser': data[2],
+                              'lbd_Laser': data[3],
+                              'lbd_daq': data[4],
+                              'T': data[5][0],
+                              'MZ': data[5][1]}
+                self._toPlot = [self._data['lbd_daq'], self._data['T']]
                 self._do_blink = False
                 self.ui.spnbx_lbd.blockSignals(True)
                 self.ui.spnbx_lbd.setValue(self.laser.lbd)
@@ -432,43 +452,92 @@ class Transmission(QMainWindow):
                 self.threadDcWorker.stop()
                 self.threadDcWorker.quit()
                 self.threadDcWorker.wait()
-
-
+                self.ui.group_PostProc.setEnabled(self._postproc)
         # -- retrieve params --
         if self.ui.check_calib_lbd.isChecked():
             self.wavemeter = Wavemeter()
-            self._param['wlmParam'] = {'channel': int(self.ui.combo_vlmChan.currentText()),
-                                      'exposure': 'auto'}
-        self._param['daqParam'] = {'read_ch': [self.ui.combo_daqRead.currentText(),
-                                                self.ui.combo_daqMZ.currentText()],
-                                    'dev': self.ui.combo_daqDev.currentText(),
-                                    'write_ch': None}
-        
-        # -- Set to the start wavelength -- 
+            ch = int(self.ui.combo_vlmChan.currentText())
+            self._param['wlmParam'] = {'channel': ch,
+                                       'exposure': 'auto'}
+        daqDev = self.instrWin.ui.combo_daqDev.currentText()
+        daqTch = self.ui.combo_daqRead.currentText()
+        daqMZch = self.ui.combo_daqMZ.currentText()
+        self._param['daqParam'] = {'read_ch': [daqTch, daqMZch],
+                                   'dev': daqDev,
+                                   'write_ch': None}
+
+        # -- Set to the start wavelength --
         if not np.abs(self.laser.lbd - self.laser.scan_limit[0]) < 0.02:
             self.SetWavelength(self.laser.scan_limit[0])
             time.sleep(0.15)
 
-
-        self.threadDcWorker = DcScan(laser= self.laser,
-                                    wavemeter= self.wavemeter,
-                                    param=self._param, 
-                                    debug = True)
+        self.threadDcWorker = DcScan(laser=self.laser,
+                                     wavemeter=self.wavemeter,
+                                     param=self._param,
+                                     debug=True)
         self.threadDcWorker._DCscan[tuple].connect(_doScan)
         self.threadDcWorker.start()
 
+    def PlotCalibrated(self, val):
+        if val is 2:
+            print('plotting calibrated stuff')
+        if val is 0:
+            print('plotting normal stuff')
 
+    # -----------------------------------------------------------------------------
+    # -- Free Scan --
+    # -----------------------------------------------------------------------------
+    # @isConnected
+    def FreeScan(self, val):
+        self._postproc = False
+
+        def _enable(val):
+            self.ui.but_dcscan.setEnabled(val)
+            self.ui.but_pztscan.setEnabled(val)
+            self.ui.group_plotSetting.setEnabled(val)
+            self.ui.but_savedata.setEnabled(val)
+            if val:
+                self.ui.group_PostProc.setEnabled(self._postproc)
+
+        @pyqtSlot(list)
+        def _doFreeScan(l):
+            data = np.array(l)
+            x = np.linspace(0, 100, data.size)
+            self._toPlot = [x, data]
+            ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
+
+        if val:
+            self.ui.but_freeScan.setText('Stop Scan')
+            _enable(False)
+            daqTch = self.ui.combo_daqRead.currentText()
+            daqDev = self.instrWin.ui.combo_daqDev.currentText()
+            self._param['daqParam'] = {'read_ch': [daqTch],
+                                       'dev': daqDev,
+                                       'write_ch': None}
+
+            self.threadFreeWorker = FreeScan(laser=self.laser,
+                                             param=self._param,
+                                             debug=True)
+            self.threadFreeWorker._Freescan[tuple].connect(_doFreeScan)
+            self.threadFreeWorker.start()
+
+        else:
+            self.ui.but_freeScan.setText('Free Scan')
+            _enable(True)
+            self.threadFreeWorker.stop()
+            self.threadFreeWorker.quit()
+            self.threadFreeWorker.wait()
+
+    # -----------------------------------------------------------------------------
     # -- Saving and stuff --
     # -----------------------------------------------------------------------------
-    @isConnected
     def ChosePath(self):
         # Open the popup window to pick a directory
         dir_ = str(QtGui.QFileDialog.getExistingDirectory(
-            self, "Select Directory", expanduser("Z:\\"),
+            self, "Select Directory", os.path.expanduser("Z:\\"),
             QtGui.QFileDialog.ShowDirsOnly))
         self.ui.text_Dir.setText(dir_.strip())
         # self.UpdateDir()
-
 
     def SaveData(self):
         _save = True
@@ -497,12 +566,10 @@ class Transmission(QMainWindow):
                 with open(filename + '.dill', 'bw') as fn:
                     dill.dump(self._data, fn)
 
+    # -----------------------------------------------------------------------------
     # -- Utilities --
     # -----------------------------------------------------------------------------
-    def FetchDaqParam(self):
-        pass
-
-    def RetrieveLaser(self, old = None):
+    def RetrieveLaser(self, old=None):
         # for some reasom there is a bug disable the signal with this guy
         self.ui.spnbx_lbd_start.blockSignals(True)
         self.ui.spnbx_lbd.blockSignals(True)
@@ -523,7 +590,7 @@ class Transmission(QMainWindow):
         print("Fetching error {}".format(self.laser.error))
         print("Laser output: {}".format(output))
         print('-'*30)
-        
+
         self.ui.spnbx_lbd.setValue(lbd)
         self.ui.slide_pzt.setValue(pzt * 100)
         self.ui.spnbx_pzt.setValue(pzt)
@@ -531,7 +598,6 @@ class Transmission(QMainWindow):
         self.ui.spnbx_lbd_stop.setValue(scan_lim[1])
         self.ui.spnbx_speed.setValue(scan_speed)
 
-       
         if output:
             self.ui.led_laserOut.setPixmap(self._led[True])
         else:
@@ -549,17 +615,34 @@ class Transmission(QMainWindow):
         self._do_blink = False
         self.laser.lbd = lbd
 
-        return  {'lbd': lbd,
+        return {'lbd': lbd,
                 'pzt': pzt,
                 'scan_lim': scan_lim,
                 'scan_speed': scan_speed,
-                'output': output,}
-    
-    # -- Graph Interaction -- 
+                'output': output, }
+
+    # -----------------------------------------------------------------------------
+    # -- Graph Interaction --
+    # -----------------------------------------------------------------------------
+    def ClearDiaplayPlot(self):
+        if self._doClear:
+            for line in self.current_trace:
+                self.my_plot.removeItem(line)
+            self.current_trace = []
+            self.ui.but_ClearPlot.setText('Display Plot')
+            self._doClear = False
+            if self._showhline:
+                self.ui.but_DataTip.click()
+        else:
+            ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
+            self.ui.but_ClearPlot.setText('Clear Plot')
+            self._doClear = True
+
     def DownSampleTrace(self):
-        step = self.ui.spnbx__downsample.getValue()
+        step = self.ui.spnbx_downsample.value()
         if not self._toPlot == []:
-            PlotDownSampleTrace(self, self._toPlot[0], self._toPlot[1], step)
+            ut.PlotDownSampleTrace(
+                self, self._toPlot[0], self._toPlot[1], step)
 
     def onMove(self, pos):
         if self._showhline:
@@ -578,15 +661,17 @@ class Transmission(QMainWindow):
                 # ipdb.set_trace()
                 xlim = self.my_plot.getPlotItem().getAxis('bottom').range
                 ylim = self.my_plot.getPlotItem().getAxis('left').range
-                xpos = xlim[0] + 0.05*np.diff(xlim)
-                ypos = ylim[0] + 0.05*np.diff(ylim)
-                self.txt.setPos(QPoint(xpos,ypos))
-                self.txt.setText("lbd = {:.3f} nm – {:.3f} V".format(xcur,ycur))
+                xpos = xlim[0] + 0.025*np.diff(xlim)[0]
+                ypos = ylim[0] + 0.025*np.diff(ylim)[0]
+                self.txt.setPos(QPointF(xpos, ypos))
+                self.txt.setText(
+                    "lbd = {:.3f} nm – {:.3f} V".format(xcur, ycur))
                 # self.ui.xPos.setText("{:.3f}".format(xcur) + 'nm')
                 # self.ui.yPos.setText("{:.3f}".format(ycur) + 'V')
                 self.vLine.setPos([xcur, 0])
                 self.hLine.setPos([0, ycur])
 
+    # -----------------------------------------------------------------------------
     # -- Help and About --
     # -----------------------------------------------------------------------------
     def Help(self):
@@ -618,6 +703,7 @@ class Transmission(QMainWindow):
         msgBox.setStandardButtons(QtGui.QMessageBox.Ok)
         msgBox.setText(txt)
         msgBox.exec_()
+
 
 if __name__ == "__main__":
     app = QApplication([])

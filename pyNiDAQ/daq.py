@@ -1,5 +1,8 @@
-from nidaqmx.constants import AcquisitionType, TaskMode
-import nidaqmx
+try:
+    from nidaqmx.constants import AcquisitionType, TaskMode
+    import nidaqmx
+except:
+    pass
 
 
 class DAQ(object):

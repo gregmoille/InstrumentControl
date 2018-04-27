@@ -60,7 +60,7 @@ class DAQ(object):
             self.read_ch = [self.read_ch]
         self.Nch_read = len(self.read_ch)
         # self.Npts = self.Npts/self.Nch_read
-        print("Npts= {}".format(self.Npts))
+        # print("Npts= {}".format(self.Npts))
         self.read_ch = self._dev + '/' +  ',{}/'.format(self._dev).join(self.read_ch)
         Npts = self.Npts
         readtask = nidaqmx.Task()

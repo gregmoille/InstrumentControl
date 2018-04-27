@@ -197,6 +197,8 @@ class DcScan(QThread):
 
         # -- Scan Finished, get Data -- 
         while not self._done_get_data:
+            if self._debug:
+                print('Waiting for daq')
             pass
 
         daq.readtask.close()
@@ -242,17 +244,18 @@ class DcScan(QThread):
         lbd_probe = lbd_probe[cdt]
 
         # -- interpolate data for better precision --
-        f_int = intpl.splrep(time_probe, lbd_probe,1)
-        lbd_daq = intpl.splev(tdaq, f_int)
+        # f_int = intpl.splrep(time_probe, lbd_probe,1)
+        # lbd_daq = intpl.splev(tdaq, f_int)
 
         # ipdb.set_trace()
         # -- Return data and= everything --
         # to_return = (tdaq, time_probe, lbd_daq,lbd_probe, [T, MZ])
-        to_return = (tdaq, time_probe,lbd_probe, lbd_daq [T, MZ])
+        to_return = (tdaq, time_probe,lbd_probe, [T, MZ])
 
         self._DCscan.emit((-1, laser.lbd, 0, to_return))
         self._is_Running = False
-
+        if self._debug:
+            print('Done DC Scan')
 
     def stop(self):
         pass
@@ -280,13 +283,16 @@ class FreeScan(QThread):
     
     def run(self):
         daqParam = self.param['daqParam']
-        daq = DAQ(t_end = 0.25, dev = daqParam['dev'])
+        daq = DAQ(t_end = 0.1, dev = daqParam['dev'])
 
         def _GetData():
+            self._done_get_data = False
             self.time_start_daq = time.time()
             self.data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts))
             self.time_stop_daq = time.time()
             self._done_get_data = True
+            daq.readtask.stop()
+            daq.readtask.close()
 
         while self._is_Running:
             self.threadDAQdata = threading.Thread(target=_GetData, args=())
@@ -294,9 +300,9 @@ class FreeScan(QThread):
 
             daq.SetupRead(read_ch=daqParam['read_ch'])
             self.threadDAQdata.start()
-            while not self_.done_get_data:
+            while not self._done_get_data:
                 pass
-            self._Freescan.emit(self.data)
+            self._Freescan.emit(self.data[::100])
 
     def stop(self):
         self._is_Running = False

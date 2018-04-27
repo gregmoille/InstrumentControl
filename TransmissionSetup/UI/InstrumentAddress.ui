@@ -1270,7 +1270,28 @@ QDateEdit::down-arrow:focus {
      </widget>
     </item>
     <item row="4" column="1">
-     <widget class="QComboBox" name="combo_daqDev"/>
+     <widget class="QComboBox" name="combo_daqDev">
+      <item>
+       <property name="text">
+        <string>Dev1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Dev2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Dev3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Dev4</string>
+       </property>
+      </item>
+     </widget>
     </item>
     <item row="0" column="1">
      <widget class="QComboBox" name="combo_Toptica1050">
@@ -1348,6 +1369,9 @@ QDateEdit::down-arrow:focus {
     </item>
     <item row="1" column="1">
      <widget class="QComboBox" name="combo_Toptica950">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
       <item>
        <property name="text">
         <string>169.254.122.1</string>
@@ -1428,7 +1452,7 @@ QDateEdit::down-arrow:focus {
      <x>0</x>
      <y>0</y>
      <width>570</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

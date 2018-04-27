@@ -197,7 +197,7 @@ class Transmission(QMainWindow):
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
         self.my_plot.scene().sigMouseMoved.connect(self.onMove)
         # -- Setup apparence at launch --
-        # self.ui.wdgt_param.setEnabled(False)
+        self.ui.wdgt_param.setEnabled(False)
         # self.ui.wdgt_plot.setEnabled(False)
         self.ui.group_PostProc.setEnabled(False)
         # -- Misc --
@@ -210,6 +210,7 @@ class Transmission(QMainWindow):
         self._doClear = True
         self._param = {}
         self._postproc = False
+        self._debug = True
         self.dev = DevWind(parent=self)
         self.ui.actionGet_Errors.triggered.connect(self.dev.show)
 
@@ -258,7 +259,6 @@ class Transmission(QMainWindow):
         '''
         @wraps(fun)
         def wrapper(*args, **kwargs):
-            print('Check if Connected')
             self_app = args[0]
             if self_app._connected:
                 out = fun(*args, **kwargs)
@@ -373,19 +373,22 @@ class Transmission(QMainWindow):
 
     @isConnected
     def Pzt_Value(self, val):
-        print('Setting pzt')
+        if self._debug:
+            print('Setting pzt')
         self.ui.slide_pzt.setValue(val*self._cst_slide)
         self.laser.pzt = val
 
     @isConnected
     def ScanLim(self, val):
-        print('Setting limits')
+        if self._debug:
+            print('Setting limits')
         self.laser.scan_limit = [self.ui.spnbx_lbd_start.value(),
                                  self.ui.spnbx_lbd_stop.value()]
 
     @isConnected
     def ScanSpeed(self, val):
-        print('Setting speed')
+        if self._debug:
+            print('Setting speed')
         self.laser.scan_speed = self.ui.spnbx_speed.value()
 
     # -----------------------------------------------------------------------------
@@ -437,18 +440,21 @@ class Transmission(QMainWindow):
                 # data returned
                 # (tdaq, time_probe,lbd_probe,, lbd_daq [T, MZ])
                 self._data = {'tdaq': data[0],
-                              't_laser': data[2],
-                              'lbd_Laser': data[3],
-                              'lbd_daq': data[4],
-                              'T': data[5][0],
-                              'MZ': data[5][1]}
-                self._toPlot = [self._data['lbd_daq'], self._data['T']]
+                              'tlaser': data[1],
+                              'lbd_Laser': data[2],
+                              'T': data[3][0],
+                              'MZ': data[3][1]}
+                self._toPlot = [self._data['tdaq'], self._data['T']]
                 self._do_blink = False
                 self.ui.spnbx_lbd.blockSignals(True)
                 self.ui.spnbx_lbd.setValue(self.laser.lbd)
                 self.ui.spnbx_lbd.blockSignals(False)
+                if self._debug:
+                    print('Ploting Data...')
                 ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
                 EnableUIscan(True)
+                if self._debug:
+                    print('Killing Thread...')
                 self.threadDcWorker.stop()
                 self.threadDcWorker.quit()
                 self.threadDcWorker.wait()
@@ -474,7 +480,7 @@ class Transmission(QMainWindow):
         self.threadDcWorker = DcScan(laser=self.laser,
                                      wavemeter=self.wavemeter,
                                      param=self._param,
-                                     debug=True)
+                                     debug=self._debug)
         self.threadDcWorker._DCscan[tuple].connect(_doScan)
         self.threadDcWorker.start()
 
@@ -504,10 +510,21 @@ class Transmission(QMainWindow):
             data = np.array(l)
             x = np.linspace(0, 100, data.size)
             self._toPlot = [x, data]
-            ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
+            self.current_trace[0].setData(x=x, y=data)
 
         if val:
+            # ipdb.set_trace()
+            for line in self.current_trace:
+                    self.my_plot.removeItem(line)
+            self.current_trace = []
+            self.current_trace += [pg.PlotCurveItem(x = np.array([0]), y = np.array([0]), 
+                                    pen=self.linepen[0],color = self._clr[0], clickable=False)]
+            self.current_trace[0].setPen(width=1, color = self._clr[0])
+            self._ind_curve = 0
+            for c in self.current_trace:
+                self.my_plot.addItem(c)
             self.ui.but_freeScan.setText('Stop Scan')
+
             _enable(False)
             daqTch = self.ui.combo_daqRead.currentText()
             daqDev = self.instrWin.ui.combo_daqDev.currentText()
@@ -518,7 +535,7 @@ class Transmission(QMainWindow):
             self.threadFreeWorker = FreeScan(laser=self.laser,
                                              param=self._param,
                                              debug=True)
-            self.threadFreeWorker._Freescan[tuple].connect(_doFreeScan)
+            self.threadFreeWorker._Freescan[list].connect(_doFreeScan)
             self.threadFreeWorker.start()
 
         else:

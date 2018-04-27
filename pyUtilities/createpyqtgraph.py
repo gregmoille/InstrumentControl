@@ -1,10 +1,20 @@
 import pyqtgraph as pg
 import numpy as np
 from PyQt5 import QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, Signal
 import ipdb
 
+class CustomPlotItem(pg.PlotDataItem):
+    sigClicked = Signal(object)
+    def __init__(self, *args, **kargs):
+        super().__init__(*args, **kargs)
+        # Need to switch off the "has no contents" flag
+        # self.setFlags(self.flags() & ~self.ItemHasNoContents)
 
+    def mouseDragEvent(self, ev):
+        print(self.clickable)
+        self.sigClicked.emit(self)
+        print('Yep you clicked')
 
 
 def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
@@ -15,7 +25,7 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     axisfont.setPointSize(22)
     axisfont.setBold(True)
     app.my_plot = pg.PlotWidget()
-
+    # ipdb.set_trace()
 
     app.my_plot.setBackground(background=None)
     app.my_plot.showGrid(x=True, y=True, alpha=0.25)
@@ -40,38 +50,41 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     app.my_plot.plotItem.showAxis('top', show=True)
     app.my_plot.plotItem.showAxis('bottom', show=True)
 
+    app.my_plot.plotItem.setDownsampling(auto=True, mode="subsample")
+
     plot_widget.addWidget(app.my_plot)
 
-    x = np.linspace(xrange[0], xrange[1], 10000)
+    x = np.linspace(xrange[0], xrange[1], 1e7)
     span = xrange[1] - xrange[0]
     sigma = span/10 * np.random.rand(1)
-    y = np.exp(-((x-(xrange[0]+span/2))**2)/(sigma**2))
+    y = np.sin(1e1*sigma*x/span)
     sigma = span/5 * np.random.rand(1)
     y2 = np.exp(-((x-(xrange[0]+span/2))**2)/(sigma**2))
     app._clr = ['#81caf9', '#ffa691', '#cfffaf']
+    app._clr_deact = ['#5788a8', '#a06759', '#7b9968']
     app.linepen = []
-    app.linepen += [pg.mkPen(color=(129, 202, 249), width=1)]
-    app.linepen += [pg.mkPen(color=(255, 166, 145), width=1)]
-    app.linepen += [pg.mkPen(color='#cfffaf', width=1)]
+    app.linepen += [pg.mkPen(color=(129, 202, 249), width=2)]
+    app.linepen += [pg.mkPen(color=(255, 166, 145), width=2)]
+    app.linepen += [pg.mkPen(color='#cfffaf', width= 1)]
     app.linepenMZ_frwrd = pg.mkPen(color=color, width=1)
     app.linepenMZ_bckwrd = pg.mkPen(color=color, width=1)
 
-    app.current_trace = [pg.PlotCurveItem(x = x, y = y, pen=app.linepen[0],color = app._clr[0], clickable=True),
-                        pg.PlotCurveItem(x = x, y = y2, pen=app.linepen[1], color = app._clr[1], clickable=True),]
+    app.current_trace = [pg.PlotDataItem(x = x, y = y, pen=app.linepen[0],color = app._clr_deact[0], clickable=True),
+                        pg.PlotDataItem(x = x, y = y2, pen=app.linepen[1], color = app._clr_deact[1], clickable=True),]
     
-    app.current_trace[0].setPen(width=2, color = app._clr[0])
+    app.current_trace[0].setPen(width=1, color = app._clr[0])
     app._ind_curve = 0
     def SelectCurve(curve):
-        # print('ehehehehehhe')
+        print('ehehehehehhe')
         for i,c in enumerate(app.current_trace):
             if c is curve:
                 # print('ehehe')
                 # c.setPen(pen=app.linepen[i])
-                c.setPen(width=2,color = app._clr[i])
+                c.setPen(width=1,color = app._clr[i])
                 # c.setPen(pen=app.linepen[i])
                 app._ind_curve = i
             else:
-                c.setPen(width=1,color = app._clr[i])
+                c.setPen(width=1,color = app._clr_deact[i])
         app.mrkrpen = SetPen(app._clr[app._ind_curve])
         print(app._clr[app._ind_curve])
         app.txt.setColor(app._clr[app._ind_curve])
@@ -80,6 +93,7 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     for c in app.current_trace:
         app.my_plot.addItem(c)
         c.sigClicked.connect(SelectCurve)
+        # c.setDownsampling(auto=True, method="subsample")
 
     app._toPlot = [np.array([x,x]), np.array([y,y2])]
 
@@ -91,10 +105,10 @@ def ReplaceData(app, x, y):
     app._ind_curve = 0
     try:
         for ii in range(x.shape[0]):
-            app.current_trace += [pg.PlotCurveItem(x = x[ii], y = y[ii], 
+            app.current_trace += [pg.PlotDataItem(x = x[ii], y = y[ii], 
                                     pen=app.linepen[ii],color = app._clr[ii], clickable=True)]
     except:
-        app.current_trace += [pg.PlotCurveItem(x = x, y = y, 
+        app.current_trace += [pg.PlotDataItem(x = x, y = y, 
                                     pen=app.linepen[0],color = app._clr[0], clickable=True)]
     app.current_trace[0].setPen(width=2, color = app._clr[0])
     def SelectCurve(curve):
@@ -103,17 +117,19 @@ def ReplaceData(app, x, y):
             if c is curve:
                 # print('ehehe')
                 # c.setPen(pen=app.linepen[i])
-                c.setPen(width=2,color = app._clr[i])
+                c.setPen(width=1, color = app._clr[i])
                 # c.setPen(pen=app.linepen[i])
                 app._ind_curve = i
             else:
-                c.setPen(width=1,color = app._clr[i])
+                c.setPen(width=1,color = app._clr_deact[i])
         app.mrkrpen = SetPen(app._clr[app._ind_curve])
         print(app._clr[app._ind_curve])
         app.txt.setColor(app._clr[app._ind_curve])
     for c in app.current_trace:
         app.my_plot.addItem(c)
         c.sigClicked.connect(SelectCurve)
+        c.setDownsampling(auto=True, method="subsample")
+    print('Done replacing')
 
 
 def SetPen(clr):
@@ -160,27 +176,28 @@ def PlotDownSampleTrace(app, x, y, step):
     app.current_trace = []
     try:
         for ii in range(x.shape[0]):
-            app.current_trace += [pg.PlotCurveItem(x = x[ii][::step], y = y[ii][::step], 
-                                    pen=app.linepen[ii],color = app._clr[ii], clickable=True)]
+            app.current_trace += [pg.PlotDataItem(x = x[ii][::step], y = y[ii][::step], 
+                                    pen=app.linepen[ii],color = app._clr_deact[ii], clickable=True)]
     except:
-        app.current_trace += [pg.PlotCurveItem(x = x[::step], y = y[::step], 
-                                    pen=app.linepen[0],color = app._clr[0], clickable=True)]
+        app.current_trace += [pg.PlotDataItem(x = x[::step], y = y[::step], 
+                                    pen=app.linepen[0],color = app._clr_deact[0], clickable=True)]
 
-    app.current_trace[0].setPen(width=2, color = app._clr[0])
+    app.current_trace[0].setPen(width=1, color = app._clr[0])
     def SelectCurve(curve):
         # print('ehehehehehhe')
         for i,c in enumerate(app.current_trace):
             if c is curve:
                 # print('ehehe')
                 # c.setPen(pen=app.linepen[i])
-                c.setPen(width=2,color = app._clr[i])
+                c.setPen(width=1,color = app._clr[i])
                 # c.setPen(pen=app.linepen[i])
                 app._ind_curve = i
             else:
-                c.setPen(width=1,color = app._clr[i])
+                c.setPen(width=1,color = app._clr_deact[i])
         app.mrkrpen = SetPen(app._clr[app._ind_curve])
         print(app._clr[app._ind_curve])
         app.txt.setColor(app._clr[app._ind_curve])
     for c in app.current_trace:
         app.my_plot.addItem(c)
         c.sigClicked.connect(SelectCurve)
+        c.setDownsampling(auto=True, method="subsample")

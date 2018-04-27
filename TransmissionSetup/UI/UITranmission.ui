@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>795</height>
+    <width>1074</width>
+    <height>788</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1550,13 +1550,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -1591,13 +1591,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="sizeIncrement">
@@ -1713,13 +1713,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <item>
@@ -1780,6 +1780,18 @@ QDateEdit::down-arrow:focus {
                 </property>
                 <item row="1" column="1">
                  <widget class="QPushButton" name="but_freeScan">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>27</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>27</height>
+                   </size>
+                  </property>
                   <property name="sizeIncrement">
                    <size>
                     <width>0</width>
@@ -1795,9 +1807,9 @@ QDateEdit::down-arrow:focus {
                   <property name="font">
                    <font>
                     <pointsize>10</pointsize>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                    <underline>true</underline>
+                    <weight>50</weight>
+                    <bold>false</bold>
+                    <underline>false</underline>
                    </font>
                   </property>
                   <property name="cursor">
@@ -1966,13 +1978,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2002,13 +2014,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2086,13 +2098,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2212,13 +2224,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="text">
@@ -2288,13 +2300,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2312,13 +2324,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2443,13 +2455,13 @@ QDateEdit::down-arrow:focus {
                <property name="minimumSize">
                 <size>
                  <width>87</width>
-                 <height>25</height>
+                 <height>27</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>87</width>
-                 <height>25</height>
+                 <height>27</height>
                 </size>
                </property>
                <property name="sizeIncrement">
@@ -2473,13 +2485,13 @@ QDateEdit::down-arrow:focus {
                <property name="minimumSize">
                 <size>
                  <width>87</width>
-                 <height>25</height>
+                 <height>27</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>87</width>
-                 <height>25</height>
+                 <height>27</height>
                 </size>
                </property>
                <property name="font">
@@ -2602,13 +2614,13 @@ QDateEdit::down-arrow:focus {
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>25</height>
+                 <height>27</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>25</height>
+                 <height>27</height>
                 </size>
                </property>
                <property name="text">
@@ -2749,13 +2761,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2785,13 +2797,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2821,13 +2833,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -2905,21 +2917,21 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>120</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
                     <pointsize>10</pointsize>
-                    <weight>75</weight>
-                    <bold>true</bold>
-                    <underline>true</underline>
+                    <weight>50</weight>
+                    <bold>false</bold>
+                    <underline>false</underline>
                     <strikeout>false</strikeout>
                    </font>
                   </property>
@@ -2948,13 +2960,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>250</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>250</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3160,13 +3172,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="sizeIncrement">
@@ -3196,13 +3208,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3232,13 +3244,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3330,22 +3342,22 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
                     <pointsize>10</pointsize>
-                    <weight>75</weight>
+                    <weight>50</weight>
                     <italic>false</italic>
-                    <bold>true</bold>
-                    <underline>true</underline>
+                    <bold>false</bold>
+                    <underline>false</underline>
                    </font>
                   </property>
                   <property name="cursor">
@@ -3370,13 +3382,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>87</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3406,13 +3418,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>87</width>
-                    <height>0</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>87</width>
-                    <height>16777215</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="sizeIncrement">
@@ -3574,13 +3586,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>110</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3598,18 +3610,18 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
                    <font>
-                    <pointsize>11</pointsize>
+                    <pointsize>10</pointsize>
                    </font>
                   </property>
                   <property name="text">
@@ -3621,14 +3633,14 @@ QDateEdit::down-arrow:focus {
                  <widget class="QSpinBox" name="spnbx_downsample">
                   <property name="minimumSize">
                    <size>
-                    <width>87</width>
-                    <height>25</height>
+                    <width>110</width>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>85</width>
-                    <height>25</height>
+                    <width>110</width>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3652,13 +3664,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3685,7 +3697,7 @@ QDateEdit::down-arrow:focus {
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>160</height>
+                 <height>165</height>
                 </size>
                </property>
                <property name="font">
@@ -3747,13 +3759,13 @@ QDateEdit::down-arrow:focus {
                      <property name="minimumSize">
                       <size>
                        <width>40</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
                        <width>40</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="font">
@@ -3795,13 +3807,13 @@ QDateEdit::down-arrow:focus {
                      <property name="minimumSize">
                       <size>
                        <width>87</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
                        <width>175</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="font">
@@ -3834,13 +3846,13 @@ QDateEdit::down-arrow:focus {
                      <property name="minimumSize">
                       <size>
                        <width>160</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
                        <width>175</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="font">
@@ -3855,13 +3867,13 @@ QDateEdit::down-arrow:focus {
                      <property name="minimumSize">
                       <size>
                        <width>160</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="maximumSize">
                       <size>
                        <width>175</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <property name="font">
@@ -3903,13 +3915,13 @@ QDateEdit::down-arrow:focus {
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>27</height>
                    </size>
                   </property>
                   <property name="font">
@@ -3936,7 +3948,7 @@ QDateEdit::down-arrow:focus {
                <property name="minimumSize">
                 <size>
                  <width>0</width>
-                 <height>160</height>
+                 <height>165</height>
                 </size>
                </property>
                <property name="font">
@@ -4031,7 +4043,7 @@ QDateEdit::down-arrow:focus {
                      <property name="maximumSize">
                       <size>
                        <width>16777215</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -4082,13 +4094,13 @@ QDateEdit::down-arrow:focus {
                         <property name="minimumSize">
                          <size>
                           <width>87</width>
-                          <height>25</height>
+                          <height>27</height>
                          </size>
                         </property>
                         <property name="maximumSize">
                          <size>
                           <width>110</width>
-                          <height>25</height>
+                          <height>27</height>
                          </size>
                         </property>
                         <property name="font">
@@ -4115,7 +4127,7 @@ QDateEdit::down-arrow:focus {
                      <property name="maximumSize">
                       <size>
                        <width>16777215</width>
-                       <height>25</height>
+                       <height>27</height>
                       </size>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -4139,7 +4151,7 @@ QDateEdit::down-arrow:focus {
                         <property name="maximumSize">
                          <size>
                           <width>16777215</width>
-                          <height>40</height>
+                          <height>45</height>
                          </size>
                         </property>
                         <property name="font">
@@ -4195,13 +4207,13 @@ QDateEdit::down-arrow:focus {
                            <property name="minimumSize">
                             <size>
                              <width>110</width>
-                             <height>25</height>
+                             <height>27</height>
                             </size>
                            </property>
                            <property name="maximumSize">
                             <size>
                              <width>110</width>
-                             <height>25</height>
+                             <height>27</height>
                             </size>
                            </property>
                            <property name="font">
@@ -4245,8 +4257,8 @@ QDateEdit::down-arrow:focus {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
-     <height>22</height>
+     <width>1074</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

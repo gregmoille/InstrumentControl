@@ -235,7 +235,7 @@ class NewFocus6700(object):
     @property
     @InOut.output(float)
     def current(self):
-        word = ''
+        word = 'SOUR:CURR:DIOD?'
         self._cc = self.Query(word)
         return self._cc
 
@@ -243,7 +243,8 @@ class NewFocus6700(object):
     @Catch.error
     @InOut.accepts(float)
     def current(self, value):
-        word = ''.format(value)
+        word = 'SOUR:CURR:DIOD {}'.format(value)
+        self.Query(word)
         self._cc = value
 
     @property
@@ -380,7 +381,7 @@ if __name__ == '__main__':
     # laser.beep = False
     laser.connected = True
     print("First error caught: {}".format(laser.error))
-    ipdb.set_trace()
+    # ipdb.set_trace()
     old_lbd = laser.lbd
     pzt = laser.pzt
     # laser.lbd = old_lbd +2

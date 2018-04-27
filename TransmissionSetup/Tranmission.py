@@ -17,6 +17,7 @@ import threading
 import os
 import ipdb
 import pyqtgraph as pg
+import scipy.io as io
 
 work_dir = path = os.path.abspath(__file__ + '/..')
 print(work_dir)
@@ -183,7 +184,7 @@ class Transmission(QMainWindow):
         self.ui.spnbx_lbd_start.valueChanged[float].connect(self.ScanLim)
         self.ui.spnbx_lbd_stop.valueChanged[float].connect(self.ScanLim)
         self.ui.spnbx_speed.valueChanged[float].connect(self.ScanSpeed)
-
+        self.ui.spnbx_I.valueChanged[float].connect(self.Current)
         # -- connect sliders --
         self.ui.slide_pzt.valueChanged[int].connect(
             lambda x: self.ui.spnbx_pzt.setValue(x/self._cst_slide))
@@ -367,27 +368,36 @@ class Transmission(QMainWindow):
     @hasError
     @isConnected
     @Blinking
-    def SetWavelength(self, value):
-        self.laser.lbd = value
+    def SetWavelength(self, val):
+        if self._debug:
+            print('Setting lbd {}'.format(val))
+        self.laser.lbd = val
+
+    @hasError
+    @isConnected
+    def Current(self, val):
+        if self._debug:
+            print('Setting current {}'.format(val))
+        self.laser.current = val
 
     @isConnected
     def Pzt_Value(self, val):
         if self._debug:
-            print('Setting pzt')
+            print('Setting pzt {}'.format(val))
         self.ui.slide_pzt.setValue(val*self._cst_slide)
         self.laser.pzt = val
 
     @isConnected
     def ScanLim(self, val):
         if self._debug:
-            print('Setting limits')
+            print('Setting limits {}'.format(val))
         self.laser.scan_limit = [self.ui.spnbx_lbd_start.value(),
                                  self.ui.spnbx_lbd_stop.value()]
 
     @isConnected
     def ScanSpeed(self, val):
         if self._debug:
-            print('Setting speed')
+            print('Setting speed {}'.format(val))
         self.laser.scan_speed = self.ui.spnbx_speed.value()
 
     # -----------------------------------------------------------------------------
@@ -450,6 +460,8 @@ class Transmission(QMainWindow):
                 self.ui.spnbx_lbd.blockSignals(False)
                 if self._debug:
                     print('Ploting Data...')
+                if not self._doClear:
+                    self.ui.but_ClearPlot.click()
                 ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
                 EnableUIscan(True)
                 if self._debug:
@@ -458,6 +470,8 @@ class Transmission(QMainWindow):
                 self.threadDcWorker.quit()
                 self.threadDcWorker.wait()
                 self.ui.group_PostProc.setEnabled(self._postproc)
+        
+
         # -- retrieve params --
         if self.ui.check_calib_lbd.isChecked():
             self.wavemeter = Wavemeter()
@@ -595,6 +609,7 @@ class Transmission(QMainWindow):
         self.ui.spnbx_lbd_start.blockSignals(True)
         self.ui.spnbx_lbd_stop.blockSignals(True)
         self.ui.spnbx_speed.blockSignals(True)
+        self.ui.spnbx_I.blockSignals(True)
         print("retrieving data")
 
         lbd = self.laser.lbd
@@ -602,6 +617,7 @@ class Transmission(QMainWindow):
         scan_lim = self.laser.scan_limit
         scan_speed = self.laser.scan_speed
         output = self.laser.output
+        I = self.laser.current
         print('-'*30)
         print("Fetching error {}".format(self.laser.error))
         print("Laser output: {}".format(output))
@@ -613,6 +629,7 @@ class Transmission(QMainWindow):
         self.ui.spnbx_lbd_start.setValue(scan_lim[0])
         self.ui.spnbx_lbd_stop.setValue(scan_lim[1])
         self.ui.spnbx_speed.setValue(scan_speed)
+        self.ui.spnbx_I.setValue(I)
 
         if output:
             self.ui.led_laserOut.setPixmap(self._led[True])
@@ -628,6 +645,7 @@ class Transmission(QMainWindow):
         self.ui.spnbx_lbd_start.blockSignals(False)
         self.ui.spnbx_lbd_stop.blockSignals(False)
         self.ui.spnbx_speed.blockSignals(False)
+        self.ui.spnbx_I.blockSignals(False)
         self._do_blink = False
         self.laser.lbd = lbd
 

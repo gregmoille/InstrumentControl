@@ -164,6 +164,8 @@ class DcScan(QThread):
             self.data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts))
             self.time_stop_daq = time.time()
             self._done_get_data = True
+            daq.readtask.stop()
+            daq.readtask.close()
 
         self.threadDAQdata = threading.Thread(target=_GetData, args=())
         self.threadDAQdata.daemon = True
@@ -191,7 +193,7 @@ class DcScan(QThread):
                 print('Progress: {}%'.format(prgs))
             self._DCscan.emit((1, lbd_scan, prgs, None))
             time.sleep(t_step)
-        daq.readtask.stop()
+        
         if self._debug:
             print('End of Scan: '+ '-'*30)
 
@@ -199,9 +201,9 @@ class DcScan(QThread):
         while not self._done_get_data:
             if self._debug:
                 print('Waiting for daq')
-            pass
+            time.sleep(0.1)
 
-        daq.readtask.close()
+        
 
         # -- Get Last wavelength of the scan -- 
         if wavemeter:
@@ -233,6 +235,8 @@ class DcScan(QThread):
 
         # -- Only get the data while the scan was running --
         ind_max = np.where(tdaq<=time_probe[-1])[0][-1]
+        if self._debug:
+            print("Index End of scan: {}s".format(ind_max))
         tdaq = tdaq[:ind_max+1]
         MZ = MZ[:ind_max+1]
         T = T[:ind_max+1]

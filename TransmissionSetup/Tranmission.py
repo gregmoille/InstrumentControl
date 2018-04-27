@@ -453,9 +453,9 @@ class Transmission(QMainWindow):
                               'lbd_Laser': data[2],
                               'T': data[3][0],
                               'MZ': data[3][1], 
-                              'lbd_start': self._lbd_start
+                              'lbd_start': self._lbd_start,
                               'lbd_stop': self._lbd_stop}
-                self._toPlot = [self._data['tdaq'], self._data['T']]
+                self._toPlot = [[self._data['tdaq']], [self._data['T']]]
                 self._do_blink = False
                 self.ui.spnbx_lbd.blockSignals(True)
                 self.ui.spnbx_lbd.setValue(self.laser.lbd)
@@ -664,6 +664,9 @@ class Transmission(QMainWindow):
     def RemoveSubSamb(self, val):
         xlim = self.my_plot.getPlotItem().getAxis('bottom').range
         xr = np.diff(xlim)
+        if self._debug:
+                        print("left limit: {}".format(xlim[0]))
+                        print("right limit: {}".format(xlim[1]))
         if val:
             self._toPlotFull = [[None],[None]]
             try:
@@ -674,7 +677,7 @@ class Transmission(QMainWindow):
                     
                     indl  += [np.where(xx-xlim[0]>0)[0][0]]
                     indr  += [np.where(xx-xlim[1]<0)[0][-1]]
-                
+                    
                     self._toPlotFull[0] += [self._toPlot[0][ii][indl[ii]:indr[ii]]]
                     self._toPlotFull[1] += [self._toPlot[1][ii][indl[ii]:indr[ii]]]
                     ii += 1

@@ -27,7 +27,7 @@ class DAQ(object):
         super(DAQ, self).__init__()
         self.t_end = kwargs.get('t_end', None)
         self._dev = kwargs.get('dev', None)
-        self.clock = kwargs.get('dev', 0.75e6)
+        self.clock = kwargs.get('clock', 0.75e6)
         self.Npts = self.t_end*self.clock
         
         system = nidaqmx.system.System.local()
@@ -65,7 +65,7 @@ class DAQ(object):
         Npts = self.Npts
         readtask = nidaqmx.Task()
         readtask.ai_channels.add_ai_voltage_chan(self.read_ch)
-        readtask.timing.cfg_samp_clk_timing(int(self.clock),
+        readtask.timing.cfg_samp_clk_timing(int(self.clock),\
                                                     sample_mode=AcquisitionType.FINITE,
                                                     samps_per_chan=int(self.Npts))
 

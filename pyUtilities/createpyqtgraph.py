@@ -10,14 +10,14 @@ def PlotDownSampleTrace(app, x, y, step):
     for line in app.current_trace:
                     app.my_plot.removeItem(line)
     app.current_trace = []
-    try:
-        for ii in range(x.shape[0]):
+    if type(x) is list:
+        for ii in range(len(x)):
             app.current_trace += [app.my_plot.plot(x[ii][::step],y[ii][::step], 
                                     pen=app.linepen[ii],color = app._clr_deact[ii])]
-    except Exception as err:
-        print('--'*30)
-        print(err)
-        print('--'*30)
+    else:
+        # print('--'*30)
+        # print(err)
+        # print('--'*30)
         app.current_trace += [app.my_plot.plot(x[::step], y[::step], 
                                     pen=app.linepen[0],color = app._clr_deact[0])]
 
@@ -88,7 +88,7 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     app.linepenMZ_frwrd = pg.mkPen(color=color, width=1)
     app.linepenMZ_bckwrd = pg.mkPen(color=color, width=1)
     app.current_trace = []
-    PlotDownSampleTrace(app,np.array([x,x]), np.array([y,y2]), app._subsamb)
+    PlotDownSampleTrace(app,[x,x], [y,y2], app._subsamb)
 
 def ReplaceData(app, x, y):
     # ipdb.set_trace()

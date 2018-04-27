@@ -27,7 +27,7 @@ class DAQ(object):
         super(DAQ, self).__init__()
         self.t_end = kwargs.get('t_end', None)
         self._dev = kwargs.get('dev', None)
-        self.clock = 0.5e6
+        self.clock = kwargs.get('dev', 0.75e6)
         self.Npts = self.t_end*self.clock
         
         system = nidaqmx.system.System.local()

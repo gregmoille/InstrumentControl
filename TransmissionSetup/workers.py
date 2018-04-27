@@ -243,9 +243,9 @@ class DcScan(QThread):
 
         # -- remove any moment the laser had an issue and
         # and return 0 or None --
-        cdt = [not(aa==0) and not(np.isnan(aa)) for aa in lbd_probe]
-        time_probe = time_probe[cdt]
-        lbd_probe = lbd_probe[cdt]
+        # cdt = [not(aa==0) and not(np.isnan(aa)) for aa in lbd_probe]
+        # time_probe = time_probe[cdt]
+        # lbd_probe = lbd_probe[cdt]
 
         # -- interpolate data for better precision --
         # f_int = intpl.splrep(time_probe, lbd_probe,1)

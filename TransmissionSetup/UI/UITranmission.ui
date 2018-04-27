@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1074</width>
-    <height>797</height>
+    <height>803</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -3609,7 +3609,7 @@ QDateEdit::down-arrow:focus {
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="QPushButton" name="but_ClearPlot">
+                    <widget class="QPushButton" name="but_noDownSamp">
                      <property name="minimumSize">
                       <size>
                        <width>0</width>
@@ -3628,7 +3628,10 @@ QDateEdit::down-arrow:focus {
                       </font>
                      </property>
                      <property name="text">
-                      <string>Clear Plot</string>
+                      <string>DownSample</string>
+                     </property>
+                     <property name="checkable">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>

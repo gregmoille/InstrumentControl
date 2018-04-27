@@ -18,6 +18,7 @@ import os
 import ipdb
 import pyqtgraph as pg
 import scipy.io as io
+from copy import copy
 
 work_dir = path = os.path.abspath(__file__ + '/..')
 print(work_dir)
@@ -176,8 +177,7 @@ class Transmission(QMainWindow):
         self.ui.but_setdir.clicked.connect(self.ChosePath)
         self.ui.but_savedata.clicked.connect(self.SaveData)
         self.ui.but_DataTip.clicked.connect(lambda: ut.ShowDataTip(self))
-        self.ui.but_ClearPlot.clicked.connect(self.ClearDiaplayPlot)
-
+        self.ui.but_noDownSamp.clicked.connect(self.RemoveSubSamb)
         # -- connect spin boxes --
         self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
         self.ui.spnbx_lbd.valueChanged[float].connect(self.SetWavelength)
@@ -452,7 +452,9 @@ class Transmission(QMainWindow):
                               'tlaser': data[1],
                               'lbd_Laser': data[2],
                               'T': data[3][0],
-                              'MZ': data[3][1]}
+                              'MZ': data[3][1], 
+                              'lbd_start': self._lbd_start
+                              'lbd_stop': self._lbd_stop}
                 self._toPlot = [self._data['tdaq'], self._data['T']]
                 self._do_blink = False
                 self.ui.spnbx_lbd.blockSignals(True)
@@ -462,7 +464,7 @@ class Transmission(QMainWindow):
                     print('Ploting Data...')
                 if not self._doClear:
                     self.ui.but_ClearPlot.click()
-                ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
+                ut.PlotDownSampleTrace(self, self._toPlot[0], self._toPlot[1], 100)
                 EnableUIscan(True)
                 if self._debug:
                     print('Killing Thread...')
@@ -658,19 +660,36 @@ class Transmission(QMainWindow):
     # -----------------------------------------------------------------------------
     # -- Graph Interaction --
     # -----------------------------------------------------------------------------
-    def ClearDiaplayPlot(self):
-        if self._doClear:
-            for line in self.current_trace:
-                self.my_plot.removeItem(line)
-            self.current_trace = []
-            self.ui.but_ClearPlot.setText('Display Plot')
-            self._doClear = False
-            if self._showhline:
-                self.ui.but_DataTip.click()
+
+    def RemoveSubSamb(self, val):
+        xlim = self.my_plot.getPlotItem().getAxis('bottom').range
+        xr = np.diff(xlim)
+        if val:
+            self._toPlotFull = [[None],[None]]
+            try:
+                indl  = []
+                indr = []
+                ii = 0
+                for xx in self._toPlot[0]:
+                    
+                    indl  += [np.where(xx-xlim[0]>0)[0][0]]
+                    indr  += [np.where(xx-xlim[1]<0)[0][-1]]
+                
+                    self._toPlotFull[0] += [self._toPlot[0][ii][indl[ii]:indr[ii]]]
+                    self._toPlotFull[1] += [self._toPlot[1][ii][indl[ii]:indr[ii]]]
+                    ii += 1
+            except:
+                indl  += [np.argmin(self._toPlotFull[0]-xlim[0]>0)[0]]
+                indr  += [np.argmin(self._toPlotFull[0]-xlim[1]<0)[-1]]
+                self._toPlotFull[0] = self._toPlot[0][indl:indr]
+                self._toPlotFull[1] = self._toPlot[1][indl:indr]
+
+            # ipdb.set_trace()
+            ut.PlotDownSampleTrace(self, np.array(self._toPlotFull[0][1::]), np.array(self._toPlotFull[1][1::]), 1)
+            self.ui.but_noDownSamp.setText('No DownSampling')
         else:
-            ut.ReplaceData(self, self._toPlot[0], self._toPlot[1])
-            self.ui.but_ClearPlot.setText('Clear Plot')
-            self._doClear = True
+            ut.PlotDownSampleTrace(self, self._toPlot[0], self._toPlot[1], 100)
+            self.ui.but_noDownSamp.setText('DownSample')
 
     def onMove(self, pos):
         if self._showhline:

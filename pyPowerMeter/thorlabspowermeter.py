@@ -1,7 +1,13 @@
 
 
 import numpy as np
+import os
+import sys
+path = os.path.realpath('../')
+if not path in sys.path:
+    sys.path.insert(0, path)
 from pyDecorators import InOut, ChangeState, Catch
+
 try:
     import visa
 except Exception as e:

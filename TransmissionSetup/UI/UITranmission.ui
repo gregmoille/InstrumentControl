@@ -1584,6 +1584,66 @@ QDateEdit::down-arrow:focus {
                     <string>ai3</string>
                    </property>
                   </item>
+                  <item>
+                   <property name="text">
+                    <string>ai4</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai5</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai6</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai7</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai16</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai17</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai18</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai19</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai20</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai21</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai22</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai23</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                 <item row="1" column="1">
@@ -1611,8 +1671,11 @@ QDateEdit::down-arrow:focus {
                     <pointsize>10</pointsize>
                    </font>
                   </property>
+                  <property name="currentText">
+                   <string>ai23</string>
+                  </property>
                   <property name="currentIndex">
-                   <number>1</number>
+                   <number>15</number>
                   </property>
                   <item>
                    <property name="text">
@@ -1632,6 +1695,66 @@ QDateEdit::down-arrow:focus {
                   <item>
                    <property name="text">
                     <string>ai3</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai4</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai5</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai6</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai7</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai16</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai17</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai18</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai19</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai20</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai21</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai22</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai23</string>
                    </property>
                   </item>
                  </widget>
@@ -1692,6 +1815,9 @@ QDateEdit::down-arrow:focus {
                     <height>27</height>
                    </size>
                   </property>
+                  <property name="currentText">
+                   <string>ai16</string>
+                  </property>
                   <item>
                    <property name="text">
                     <string>ai1</string>
@@ -1720,6 +1846,51 @@ QDateEdit::down-arrow:focus {
                   <item>
                    <property name="text">
                     <string>ai6</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai7</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai16</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai17</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai18</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai19</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai20</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai21</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai22</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>ai23</string>
                    </property>
                   </item>
                  </widget>
@@ -2205,7 +2376,7 @@ QDateEdit::down-arrow:focus {
               <number>0</number>
              </property>
              <item row="2" column="2">
-              <widget class="QLineEdit" name="lineEdit_2">
+              <widget class="QLineEdit" name="line_Pin">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -2250,7 +2421,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QPushButton" name="pushButton_4">
+              <widget class="QPushButton" name="but_updatePwr">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -2272,7 +2443,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item row="1" column="2">
-              <widget class="QLineEdit" name="lineEdit">
+              <widget class="QLineEdit" name="line_Pout">
                <property name="enabled">
                 <bool>false</bool>
                </property>
@@ -2320,7 +2491,7 @@ QDateEdit::down-arrow:focus {
               <widget class="QWidget" name="widget" native="true">
                <layout class="QHBoxLayout" name="horizontalLayout_6">
                 <property name="spacing">
-                 <number>-1</number>
+                 <number>6</number>
                 </property>
                 <property name="leftMargin">
                  <number>0</number>
@@ -4285,7 +4456,7 @@ Update</string>
      <x>0</x>
      <y>0</y>
      <width>1074</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -4484,8 +4655,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>952</x>
-     <y>322</y>
+     <x>958</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
      <x>779</x>
@@ -4548,8 +4719,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>870</x>
-     <y>299</y>
+     <x>958</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
      <x>1048</x>
@@ -4564,8 +4735,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>952</x>
-     <y>322</y>
+     <x>958</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
      <x>952</x>
@@ -4580,8 +4751,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>952</x>
-     <y>319</y>
+     <x>958</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
      <x>1048</x>
@@ -4596,12 +4767,12 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>952</x>
-     <y>319</y>
+     <x>958</x>
+     <y>318</y>
     </hint>
     <hint type="destinationlabel">
-     <x>489</x>
-     <y>176</y>
+     <x>615</x>
+     <y>193</y>
     </hint>
    </hints>
   </connection>
@@ -4624,7 +4795,7 @@ Update</string>
   <connection>
    <sender>check_powermeter</sender>
    <signal>clicked(bool)</signal>
-   <receiver>pushButton_4</receiver>
+   <receiver>but_updatePwr</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -4656,7 +4827,7 @@ Update</string>
   <connection>
    <sender>check_powermeter</sender>
    <signal>clicked(bool)</signal>
-   <receiver>lineEdit_2</receiver>
+   <receiver>line_Pin</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -4664,20 +4835,20 @@ Update</string>
      <y>293</y>
     </hint>
     <hint type="destinationlabel">
-     <x>307</x>
-     <y>306</y>
+     <x>333</x>
+     <y>305</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>check_powermeter</sender>
    <signal>toggled(bool)</signal>
-   <receiver>lineEdit</receiver>
+   <receiver>line_Pout</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>88</x>
-     <y>311</y>
+     <x>90</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
      <x>270</x>
@@ -4692,19 +4863,19 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>88</x>
-     <y>311</y>
+     <x>90</x>
+     <y>304</y>
     </hint>
     <hint type="destinationlabel">
-     <x>365</x>
-     <y>182</y>
+     <x>490</x>
+     <y>193</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>check_pwrPerm</sender>
    <signal>toggled(bool)</signal>
-   <receiver>pushButton_4</receiver>
+   <receiver>but_updatePwr</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -4714,6 +4885,38 @@ Update</string>
     <hint type="destinationlabel">
      <x>155</x>
      <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_powermeter</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>label_18</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>58</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>292</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_powermeter</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>label_15</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>283</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>266</y>
     </hint>
    </hints>
   </connection>

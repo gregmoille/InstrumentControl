@@ -1230,14 +1230,14 @@ QDateEdit::down-arrow:focus {
     <item row="1" column="1">
      <widget class="QLineEdit" name="line_right">
       <property name="text">
-       <string>USB0::0x1313::0x8072::P2009986::INSTR</string>
+       <string>ASRL6::INSTR</string>
       </property>
      </widget>
     </item>
     <item row="0" column="1">
      <widget class="QLineEdit" name="line_left">
       <property name="text">
-       <string>USB0::0x1313::0x807B::17121241::INSTR</string>
+       <string>ASRL4::INSTR</string>
       </property>
      </widget>
     </item>
@@ -1256,7 +1256,7 @@ QDateEdit::down-arrow:focus {
      <x>0</x>
      <y>0</y>
      <width>563</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

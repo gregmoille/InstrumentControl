@@ -53,7 +53,7 @@ class Stage(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self._connected = False
-
+        self._slidefact = 1e3
         # Set Led Pixmap
         self._ledoff = QtGui.QPixmap(':/qss_icons/rc/radio_checked.png')
         self._ledon = QtGui.QPixmap(':/qss_icons/rc/radio_checked_focus.png')
@@ -147,6 +147,7 @@ class Stage(QMainWindow):
         axis = ['X', 'Y', 'Z']
         for aa in axis:
             # time.sleep(0.5)
+
             pzt.axis = aa
             self.lcdpiezo[stage + aa].display(pzt.V)
             self.piezo[stage+aa].setValue(pzt.V*1e2)
@@ -167,14 +168,19 @@ class Stage(QMainWindow):
             _sucess = True
             for kk in self.piezo_address.keys():
                 try:
-                    self.piezomotor[kk] = Piezo(address=self.piezo_address[kk])
+                    self.piezomotor[kk] = Piezo(address=self.piezo_address[kk]())
                     led = getattr(self.ui, 'led_' + kk + 'Piezo')
                     led.setPixmap(self._ledon)
                     # self.iuobutton.click()
                     syncbut = getattr(self.ui, 'pushButtonsync_' + kk)
                     syncbut.click()
-                except:
-                    pass
+                except Exception as e:
+                        print('\033[93m' + '-'*10 + 'EXCEPTION:')
+                        print(e)
+                        print('-'*10 + 'end exception' + '\033[0m')
+
+
+                
 
             self.ui.pushButtonConnect.setEnabled(True)
             self.ui.pushButtonExit.setEnabled(True)
@@ -210,10 +216,8 @@ class Stage(QMainWindow):
     def ConnectMovePiezo(self,strstep):
         name = strstep[0]
         x = strstep[1]
-        print(name)
         lcdpiezo = self.lcdpiezo[name]
-        print(x)
-        lcdpiezo.display(x/1e2)
+        lcdpiezo.display(x/self._slidefact)
 
         # retrieve axis and name
         axis = re.split('left|right', name)[1]
@@ -222,8 +226,8 @@ class Stage(QMainWindow):
         pzt = self.piezomotor[stage]
         if self._connected:
             pzt.axis = axis
-            pzt.V = x/1e2
-            lcdpiezo.display(x/1e2)
+            pzt.V = x/self._slidefact
+            lcdpiezo.display(x/self._slidefact)
 
 # -------------------------------------------------------------------------------
 #                           --  Main --

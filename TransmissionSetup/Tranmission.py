@@ -179,7 +179,9 @@ class Transmission(QMainWindow):
         self.ui.but_savedata.clicked.connect(self.SaveData)
         self.ui.but_DataTip.clicked.connect(lambda: ut.ShowDataTip(self))
         self.ui.but_noDownSamp.clicked.connect(self.RemoveSubSamb)
-        
+        self.ui.but_updatePwr.clicked.connect(self.PowerUpdate)
+
+
         # -- connect spin boxes --
         self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
         self.ui.spnbx_lbd.valueChanged[float].connect(self.SetWavelength)
@@ -195,14 +197,14 @@ class Transmission(QMainWindow):
         # -- connect checkBoxes --
         self.ui.check_powermeter.stateChanged.connect(self.PwrCalib)
         self.ui.check_lbdMZ.stateChanged.connect(self.PlotCalibrated)
-
+        self.ui.check_pwrPerm.stateChanged.connect(self.PermUpdate)
         # -- Create a graph --
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
         self.my_plot.scene().sigMouseMoved.connect(self.onMove)
         # -- Setup apparence at launch --
-        # self.ui.wdgt_param.setEnabled(False)
-        # self.ui.wdgt_plot.setEnabled(False)
-        # self.ui.group_PostProc.setEnabled(False)
+        self.ui.wdgt_param.setEnabled(False)
+        self.ui.wdgt_plot.setEnabled(False)
+        self.ui.group_PostProc.setEnabled(False)
         # -- Misc --
         self._do_blink = False
         self.wlm = None
@@ -508,6 +510,9 @@ class Transmission(QMainWindow):
         if val is 0:
             print('plotting normal stuff')
 
+
+
+
     def PwrCalib(self,val):
         if val is 2:
             print('ok getting the Pozer')
@@ -543,6 +548,41 @@ class Transmission(QMainWindow):
         if val is 0:
             print ("forget about power")
             self.ui.check_pwrPerm.setChecked(False)
+
+
+    def PowerUpdate(self):
+        intp = self.Pmetter['in'].read 
+        intp = intp / self.Pmetter['in_ratio']
+        intp = 10*np.log10(intp*1000)
+        outp = self.Pmetter['out'].read 
+        outp = outp / self.Pmetter['out_ratio']
+        outp = 10*np.log10(outp*1000)
+        self.ui.line_Pin.setText('{:.2f} dBm'.format(intp))
+        self.ui.line_Pout.setText('{:.2f} dBm'.format(outp))
+
+    def PermUpdate(self, val):
+        if val:
+            def _FetchPower():
+                while self._doFetchPower:
+                    intp = self.Pmetter['in'].read 
+                    intp = intp / self.Pmetter['in_ratio']
+                    intp = 10*np.log10(intp*1000)
+                    outp = self.Pmetter['out'].read 
+                    outp = outp / self.Pmetter['out_ratio']
+                    outp = 10*np.log10(outp*1000)
+                    self.ui.line_Pin.setText('{:.2f} dBm'.format(intp))
+                    self.ui.line_Pout.setText('{:.2f} dBm'.format(outp))
+                    time.sleep(0.1)
+
+            self._doFetchPower = True
+            self.threadPwr = threading.Thread(target=_FetchPower, args=())
+            self.threadPwr.daemon = True
+            # self.ui.but_dcscan.setEnabled(False)
+            self.threadPwr.start()
+        else:
+            self._doFetchPower = False
+
+
     # -----------------------------------------------------------------------------
     # -- Free Scan --
     # -----------------------------------------------------------------------------

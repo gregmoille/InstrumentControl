@@ -1666,36 +1666,6 @@ QDateEdit::down-arrow:focus {
                   </property>
                  </widget>
                 </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_19">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>15</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>15</height>
-                   </size>
-                  </property>
-                  <property name="sizeIncrement">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>T. Channel</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="2">
                  <widget class="QLabel" name="label_28">
                   <property name="font">
@@ -1752,6 +1722,36 @@ QDateEdit::down-arrow:focus {
                     <string>ai6</string>
                    </property>
                   </item>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_19">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                  <property name="sizeIncrement">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>T. Channel</string>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -2185,59 +2185,155 @@ QDateEdit::down-arrow:focus {
             <property name="title">
              <string>Power Detectors</string>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <property name="spacing">
-              <number>0</number>
-             </property>
+            <layout class="QGridLayout" name="gridLayout_12">
              <property name="leftMargin">
-              <number>0</number>
+              <number>12</number>
              </property>
              <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
               <number>0</number>
              </property>
+             <property name="rightMargin">
+              <number>12</number>
+             </property>
              <property name="bottomMargin">
+              <number>12</number>
+             </property>
+             <property name="horizontalSpacing">
               <number>9</number>
              </property>
-             <item>
-              <widget class="QWidget" name="widget" native="true">
+             <property name="verticalSpacing">
+              <number>0</number>
+             </property>
+             <item row="2" column="2">
+              <widget class="QLineEdit" name="lineEdit_2">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
-                 <height>0</height>
+                 <width>0</width>
+                 <height>27</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>100</width>
+                 <width>120</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QLabel" name="label_18">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
                  <height>16777215</height>
                 </size>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_8">
-                <item>
-                 <widget class="QPushButton" name="pushButton_4">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Update</string>
-                  </property>
-                 </widget>
-                </item>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;P&lt;span style=&quot; vertical-align:sub;&quot;&gt;in&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="pushButton_4">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Update</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLineEdit" name="lineEdit">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>120</width>
+                 <height>27</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="label_15">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>P&lt;sub&gt;out&lt;/sub&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QWidget" name="widget" native="true">
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <property name="spacing">
+                 <number>-1</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <widget class="QCheckBox" name="check_powermeter">
                   <property name="minimumSize">
@@ -2248,7 +2344,7 @@ QDateEdit::down-arrow:focus {
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
+                    <width>16777215</width>
                     <height>25</height>
                    </size>
                   </property>
@@ -2262,127 +2358,53 @@ QDateEdit::down-arrow:focus {
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QCheckBox" name="check_pwrPerm">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Permanent
+Update</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
-             <item>
-              <widget class="QWidget" name="widget_3" native="true">
-               <property name="maximumSize">
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_21">
+               <property name="minimumSize">
                 <size>
-                 <width>100</width>
-                 <height>16777215</height>
+                 <width>0</width>
+                 <height>15</height>
                 </size>
                </property>
-               <layout class="QGridLayout" name="gridLayout_6">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <property name="horizontalSpacing">
-                 <number>9</number>
-                </property>
-                <property name="verticalSpacing">
-                 <number>0</number>
-                </property>
-                <item row="0" column="1">
-                 <widget class="QLineEdit" name="lineEdit">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>120</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QLineEdit" name="lineEdit_2">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>120</width>
-                    <height>27</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_15">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>30</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>P&lt;sub&gt;out&lt;/sub&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_8">
-                  <property name="enabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>30</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <pointsize>10</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;P&lt;span style=&quot; vertical-align:sub;&quot;&gt;in&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>15</height>
+                </size>
+               </property>
+               <property name="sizeIncrement">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
               </widget>
              </item>
             </layout>
@@ -4349,8 +4371,6 @@ QDateEdit::down-arrow:focus {
   <tabstop>but_savedata</tabstop>
   <tabstop>but_pztscan</tabstop>
   <tabstop>comboBox</tabstop>
-  <tabstop>lineEdit</tabstop>
-  <tabstop>lineEdit_2</tabstop>
   <tabstop>slide_pzt</tabstop>
   <tabstop>combo_daqRead</tabstop>
   <tabstop>combo_daqMZ</tabstop>
@@ -4372,40 +4392,8 @@ QDateEdit::down-arrow:focus {
      <y>314</y>
     </hint>
     <hint type="destinationlabel">
-     <x>827</x>
-     <y>268</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>check_powermeter</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>label_15</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>81</x>
-     <y>289</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>170</x>
-     <y>295</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>check_powermeter</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>pushButton_4</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>112</x>
-     <y>304</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>52</x>
-     <y>252</y>
+     <x>952</x>
+     <y>284</y>
     </hint>
    </hints>
   </connection>
@@ -4416,28 +4404,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>903</x>
-     <y>656</y>
+     <x>1051</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
-     <x>918</x>
-     <y>719</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>check_powermeter</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>label_8</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>115</x>
-     <y>285</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>177</x>
-     <y>270</y>
+     <x>1051</x>
+     <y>718</y>
     </hint>
    </hints>
   </connection>
@@ -4448,8 +4420,8 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>990</x>
-     <y>661</y>
+     <x>1051</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
      <x>991</x>
@@ -4464,8 +4436,8 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>878</x>
-     <y>724</y>
+     <x>931</x>
+     <y>714</y>
     </hint>
     <hint type="destinationlabel">
      <x>886</x>
@@ -4480,8 +4452,8 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>824</x>
-     <y>658</y>
+     <x>1051</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
      <x>889</x>
@@ -4496,8 +4468,8 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>824</x>
-     <y>717</y>
+     <x>931</x>
+     <y>714</y>
     </hint>
     <hint type="destinationlabel">
      <x>884</x>
@@ -4512,28 +4484,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>896</x>
-     <y>296</y>
+     <x>952</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>779</x>
      <y>273</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>check_powermeter</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>lineEdit_2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>124</x>
-     <y>304</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>199</x>
-     <y>288</y>
     </hint>
    </hints>
   </connection>
@@ -4544,28 +4500,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>862</x>
-     <y>661</y>
+     <x>1051</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
-     <x>856</x>
-     <y>720</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>check_powermeter</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>check_Tmeasure</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>93</x>
-     <y>286</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>324</x>
-     <y>180</y>
+     <x>931</x>
+     <y>714</y>
     </hint>
    </hints>
   </connection>
@@ -4576,12 +4516,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>956</x>
-     <y>658</y>
+     <x>1051</x>
+     <y>654</y>
     </hint>
     <hint type="destinationlabel">
-     <x>957</x>
-     <y>686</y>
+     <x>1051</x>
+     <y>680</y>
     </hint>
    </hints>
   </connection>
@@ -4592,12 +4532,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>798</x>
-     <y>716</y>
+     <x>931</x>
+     <y>714</y>
     </hint>
     <hint type="destinationlabel">
-     <x>798</x>
-     <y>751</y>
+     <x>931</x>
+     <y>752</y>
     </hint>
    </hints>
   </connection>
@@ -4612,8 +4552,8 @@ QDateEdit::down-arrow:focus {
      <y>299</y>
     </hint>
     <hint type="destinationlabel">
-     <x>927</x>
-     <y>264</y>
+     <x>1048</x>
+     <y>284</y>
     </hint>
    </hints>
   </connection>
@@ -4624,12 +4564,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>878</x>
-     <y>295</y>
+     <x>952</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>826</x>
-     <y>238</y>
+     <x>952</x>
+     <y>247</y>
     </hint>
    </hints>
   </connection>
@@ -4640,12 +4580,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>858</x>
-     <y>296</y>
+     <x>952</x>
+     <y>319</y>
     </hint>
     <hint type="destinationlabel">
-     <x>922</x>
-     <y>236</y>
+     <x>1048</x>
+     <y>247</y>
     </hint>
    </hints>
   </connection>
@@ -4656,28 +4596,12 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>831</x>
-     <y>296</y>
+     <x>952</x>
+     <y>319</y>
     </hint>
     <hint type="destinationlabel">
      <x>489</x>
      <y>176</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>check_powermeter</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>lineEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>123</x>
-     <y>291</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>209</x>
-     <y>257</y>
     </hint>
    </hints>
   </connection>
@@ -4688,12 +4612,108 @@ QDateEdit::down-arrow:focus {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>845</x>
-     <y>716</y>
+     <x>931</x>
+     <y>714</y>
     </hint>
     <hint type="destinationlabel">
-     <x>929</x>
-     <y>753</y>
+     <x>1051</x>
+     <y>756</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_powermeter</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>pushButton_4</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>35</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>36</x>
+     <y>264</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_powermeter</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>check_pwrPerm</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>78</x>
+     <y>303</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>125</x>
+     <y>303</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_powermeter</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>lineEdit_2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>88</x>
+     <y>293</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>307</x>
+     <y>306</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_powermeter</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>88</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>270</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_powermeter</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>check_Tmeasure</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>88</x>
+     <y>311</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>365</x>
+     <y>182</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>check_pwrPerm</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButton_4</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>161</x>
+     <y>291</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>155</x>
+     <y>271</y>
     </hint>
    </hints>
   </connection>

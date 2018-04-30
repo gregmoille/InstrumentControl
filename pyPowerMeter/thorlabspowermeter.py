@@ -1,7 +1,15 @@
 
-import visa
+
 import numpy as np
 from pyDecorators import InOut, ChangeState, Catch
+try:
+    import visa
+except Exception as e:
+    print('\033[93m' + '-'*10 + 'EXCEPTION:')
+    print(__file__)
+    print(e)
+    print('-'*10 + 'end exception' + '\033[0m')
+
 
 class ThorlabsP1xx(object):
 
@@ -46,10 +54,10 @@ class ThorlabsP1xx(object):
         auto = self.Querry('POW:RANGE:AUTO?')
         if auto: 
             return 'auto'
-        else
+        else:
             return self.Query('POW:RANGE:UPP?')
 
 
 if __name__ == "__main__":
-    P = ThorlabsP100()
+    P = ThorlabsP1xx()
     print("Power Read: {}".format(P.read))

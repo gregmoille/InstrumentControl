@@ -4,7 +4,7 @@
 from PyQt5.QtWidgets import QMainWindow, QApplication
 from PyQt5.QtCore import pyqtSlot, QThread, pyqtSignal, QPointF
 from PyQt5 import uic
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QColor
 from PyQt5 import QtGui
 
 # -- import classic package --
@@ -34,6 +34,7 @@ if not path in sys.path:
 import pyUtilities as ut
 from pyLaser import NewFocus6700
 from pyWavemeter import Wavemeter
+from pyPowerMeter import ThorlabsP1xx
 from workers import DcScan, FreeScan
 
 # -- load UI --
@@ -76,7 +77,7 @@ class DevWind(QMainWindow):
         self.ui = Ui_DevWindow()
         self.ui.setupUi(self)
         self.ui.butt_clearError.clicked.connect(lambda: self.ClearError(True))
-
+        self.ui.butt_getClearUp.clicked.connect(lambda: self.ui.text_error.setText(''))
         self.parent = parent
         self.ui.text_lastError.setText('')
         # self.GetLaserErr()
@@ -178,6 +179,7 @@ class Transmission(QMainWindow):
         self.ui.but_savedata.clicked.connect(self.SaveData)
         self.ui.but_DataTip.clicked.connect(lambda: ut.ShowDataTip(self))
         self.ui.but_noDownSamp.clicked.connect(self.RemoveSubSamb)
+        
         # -- connect spin boxes --
         self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
         self.ui.spnbx_lbd.valueChanged[float].connect(self.SetWavelength)
@@ -185,21 +187,22 @@ class Transmission(QMainWindow):
         self.ui.spnbx_lbd_stop.valueChanged[float].connect(self.ScanLim)
         self.ui.spnbx_speed.valueChanged[float].connect(self.ScanSpeed)
         self.ui.spnbx_I.valueChanged[float].connect(self.Current)
+        
         # -- connect sliders --
         self.ui.slide_pzt.valueChanged[int].connect(
             lambda x: self.ui.spnbx_pzt.setValue(x/self._cst_slide))
 
         # -- connect checkBoxes --
-        # ipdb.set_trace()
+        self.ui.check_powermeter.stateChanged.connect(self.PwrCalib)
         self.ui.check_lbdMZ.stateChanged.connect(self.PlotCalibrated)
 
         # -- Create a graph --
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
         self.my_plot.scene().sigMouseMoved.connect(self.onMove)
         # -- Setup apparence at launch --
-        self.ui.wdgt_param.setEnabled(False)
+        # self.ui.wdgt_param.setEnabled(False)
         # self.ui.wdgt_plot.setEnabled(False)
-        self.ui.group_PostProc.setEnabled(False)
+        # self.ui.group_PostProc.setEnabled(False)
         # -- Misc --
         self._do_blink = False
         self.wlm = None
@@ -505,6 +508,41 @@ class Transmission(QMainWindow):
         if val is 0:
             print('plotting normal stuff')
 
+    def PwrCalib(self,val):
+        if val is 2:
+            print('ok getting the Pozer')
+            try: 
+                in_add = self.instrWin.ui.line_PowerIn.text()
+                out_add = self.instrWin.ui.line_PowerOut.text()
+                in_ratio = eval(self.instrWin.ui.line_ratioIn.text())
+                out_ratio = eval(self.instrWin.ui.line_ratioOut.text())
+                self.Pmetter = {'in': ThorlabsP1xx(address = in_add),
+                                'out': ThorlabsP1xx(address = out_add), 
+                                'in_ratio': in_ratio,
+                                'out_ratio': out_ratio,}
+
+
+
+            except Exception as e:
+                ts = time.time()
+                timestamp = datetime.fromtimestamp(
+                                ts).strftime('%Y-%m-%d %H:%M:%S')
+                txt = self.dev.ui.text_error.toPlainText()
+                span_start = "<span style=\" font-weight:600; color:#ff0000;\" >"
+                span_stop = "<\span>"
+
+                redColor = QColor(255, 0, 0)
+                blackColor = QColor(255, 255, 255)
+
+                self.dev.ui.text_error.setTextColor(redColor)
+                self.dev.ui.text_error.insertPlainText('--{}--\n'.format(timestamp))
+                self.dev.ui.text_error.setTextColor(blackColor)
+                self.dev.ui.text_error.insertPlainText('{}\n'.format(e))
+                self.ui.check_powermeter.setCheckState(False)
+
+        if val is 0:
+            print ("forget about power")
+            self.ui.check_pwrPerm.setChecked(False)
     # -----------------------------------------------------------------------------
     # -- Free Scan --
     # -----------------------------------------------------------------------------

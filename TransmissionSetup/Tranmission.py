@@ -202,9 +202,9 @@ class Transmission(QMainWindow):
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
         self.my_plot.scene().sigMouseMoved.connect(self.onMove)
         # -- Setup apparence at launch --
-        self.ui.wdgt_param.setEnabled(False)
-        self.ui.wdgt_plot.setEnabled(False)
-        self.ui.group_PostProc.setEnabled(False)
+        # self.ui.wdgt_param.setEnabled(False)
+        # self.ui.wdgt_plot.setEnabled(False)
+        # self.ui.group_PostProc.setEnabled(False)
         # -- Misc --
         self._do_blink = False
         self.wlm = None

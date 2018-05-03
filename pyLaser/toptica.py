@@ -4,15 +4,8 @@ import ipdb
 import numpy as np
 
 import os
-try:
-    import clr
-    clr.AddReference(r'mscorlib')
-    from System.Text import StringBuilder
-    from System import Int32
-    from System.Reflection import Assembly
-except:
-    pass
-import ipdb
+import ipbd
+import socket
 
 path = os.path.realpath('../')
 if not path in sys.path:
@@ -21,7 +14,6 @@ from pyDecorators import InOut, ChangeState, Catch
 
 
 class Toptica1050():
-
     __author__ = "Gregory Moille"
     __copyright__ = "Copyright 2018, NIST"
     __credits__ = ["Gregory Moille",
@@ -34,59 +26,116 @@ class Toptica1050():
     __status__ = "Development"
 
     def __init__(self, **kwargs):
-        super(Toptica1050, self).__init__()
-        # some misc
-        self._set = "param-set!"
-        self._get = "param-ref"
-        self._lsr = "'laser1"
-        self._exec = 'exec '
-
-
-    # -- Methods -- 
+        super(<YourLaserName>, self).__init__()
+        self._addrs = kwargs.get('address', '169.254.122.1')
+        self._port = kwargs.get('port', 1998)
+        self._open = False
+        self._lbd = 0
+        self._cc = 0
+        self._scan_lim = []
+        self._scan_speed = 0
+        self._scan = 0
+        self._beep = 0
+        self._output = 0
+        self._is_scaning = False
+        # self._is_changing_lbd = False
+        # self._no_error = <>
+        self._haserr = False
+        # Miscs
+        self._err_msg = ''
+    # -- Methods --
     # ---------------------------------------------------------
-    def Querry(self, word):
-        pass
 
-    # -- Decorators --
+    def Query(self, word):
+        if not word is '':
+            self._dev.send(word.strip().encode() + b'\n')
+        time.sleep(0.001)
+        read = ''
+        while True:
+            try:
+                read +=self._dev.recv(1).decode()
+                if read[-1] is '>':
+                    break
+
+            except:
+                break
+        return read.replace('>', '').strip()
+
+
+    # -- Properties --
     # ---------------------------------------------------------
     @property
-    def connected(): 
-        pass
+    @InOut.output(bool)
+    def connected(self):
+        return self._open
+
+
+    @connected.setter
+    @Catch.error
+    def connected(self,value):
+        if value:
+            self._dev = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self._dev.settimeout(0.005)
+            self._dev.connect((self._addrs, self._port))
+            self._open = True
+        else:
+            self._dev.close()
+            self._open = False
 
     @property
     @InOut.output(bool)
-    def lbd(self):
-        word = '({} {}:ctl:wavelength-act)'.format(self._set, self._lsr)
-        return self.Querry(word)
+    def output(self):
+        # word = <>
+        self._output = self.Query(word)
+        return self._output
 
-    @lbd.setter
+    @output.setter
     @Catch.error
-    @InOut.accepts(float)
-    def lbd(self, value):
-        word = '({} {}:ctl:wavelength-set {:.3f})'.format(self._set, 
-                                                        self._lsr,
-                                                        value)
-        self.Querry(word)
+    @InOut.accepts(bool)
+    def output(self,value):
+        # word = <>
+        self.Query(word)
+        self._output = value
 
     @property
+    @InOut.output(float)
+    def lbd(self):
+        # word = <>
+        self._lbd = self.Query(word)
+        return self._lbd
+
+    @lbd.setter
+    @InOut.accepts(float)
+    @Catch.error
+    def lbd(self, value):
+        self._targetlbd = value
+        self.Query('OUTP:TRACK 1')
+        # word = <>
+        self.Query(word)
+        self._lbd = value
+
+    @property
+    @InOut.output(float)
     def current(self):
-        word = '({} {}dl:cc:current-act)'.format(self._set, self._lsr)
-        return self.Querry(word)
-    
+        # word = <>
+        self._cc = self.Query(word)
+        return self._cc
+
     @current.setter
+    @Catch.error
+    @InOut.accepts(float)
     def current(self, value):
-        word = '({} {}:dl:cc:current-set {:.3f})'.format(self._set, 
-                                                        self._lsr,
-                                                        value)
-        self.Querry(word)
+        # word = <>
+        self.Query(word)
+        self._cc = value
 
     @property
     @InOut.output(float,float)
     def scan_limit(self):
-        word1 = '({} {}ctl:scan:wavelength-begin)'.format(self._set, self._lsr)
-        word2 = '({} {}ctl:scan:wavelength-end)'.format(self._set, self._lsr)
-        self._scan_lim = [self.Querry(word1),
-                        self.Querry(word2)]
+        word1 = 'SOUR:WAVE:START?'
+        word2 = 'SOUR:WAVE:STOP?'
+        self._scan_lim = [self.Query(word1),
+                        self.Query(word2)]
         return self._scan_lim
 
     @scan_limit.setter
@@ -95,123 +144,113 @@ class Toptica1050():
     def scan_limit(self, value):
         start = value[0]
         stop = value[1]
-        word1 = '({} {}:ctl:scan:wavelength-begin {:.3f})'.format(self._set, 
-                                                        self._lsr,
-                                                        value)
-        self.Querry(word1)
-        word2 = '({} {}:ctl:scan:wavelength-end {:.3f})'.format(self._set, 
-                                                        self._lsr,
-                                                        value)
-        self.Querry(word2)
+        word1 = 'SOUR:WAVE:START {}'.format(start)
+        self.Query(word1)
+        word2 = 'SOUR:WAVE:STOP {}'.format(stop)
+        self.Query(word2)
         self._scan_lim = value
 
     @property
     @Catch.error
     @InOut.output(float)
     def scan_speed(self):
-        word = '({} {}:ctl:scan:speed'.format(self._set, self._lsr)
-        return self.Querry(word)
+        word1 = 'SOUR:WAVE:SLEW:FORW?'
+        self._scan_speed = self.Query(word1)
+        return self._scan_speed
 
     @scan_speed.setter
     @Catch.error
     @InOut.accepts(float)
     def scan_speed(self, value):
-        word = 'ctl:scan:speed {}'.format(value)
-        self.Querry(word)
+        # word = <>
+        self.Query(word)
+        # word = <>
+        self.Query(word)
         self._scan_speed = value
 
     @property
     @InOut.output(float)
     def scan(self):
-        word = 'SOUR:WAVE:DESSCANS?'
-        return self.Querry(word)
+        # word = <>
+        self._scan = self.Query(word)
+        return self._scan
 
     @scan.setter
     @Catch.error
     @ChangeState.scan("OUTPut:SCAN:START",'OUTPut:SCAN:STOP')
     @InOut.accepts(bool)
     def scan(self, value):
+        self.Query('SOUR:WAVE:DESSCANS 1')
         self._scan = value
         if self._scan:
-            word = '({} {}:ctl:scan:start'.format(self._set, self._lsr)
+            self.Query("OUTPut:SCAN:START")
         else:
-            word = '({} {}:ctl:scan:stop'.format(self._set, self._lsr)
-        self.Querry(word)
+            self.Query("OUTPut:SCAN:STOP")
+
 
     @property
     @InOut.output(float)
     def pzt(self):
-        pass
-        # word = 'SOUR:VOLT:PIEZ?'
-        # self._pzt = self.Querry(word)
-        # return self._pzt
+        # word = <>
+        self._pzt = self.Query(word)
+        return self._pzt
 
     @pzt.setter
     @Catch.error
     @InOut.accepts(float)
     def pzt(self, value):
-        pass
-        # word = 'SOUR:VOLT:PIEZ {}'.format(value)
-        # self.Querry(word)
-        # self._pzt = value
+        # word = <>
+        self.Query(word)
+        self._pzt = value
 
     @property
     @InOut.output(bool)
     def beep(self):
-        pass
-        # word = 'BEEP?'
-        # self._beep = self.Querry(word)
-        # return self.beep
+        # word = <>
+        self._beep = self.Query(word)
+        return self.beep
 
     @beep.setter
     @Catch.error
     @InOut.accepts(bool)
     def beep(self, value):
-        word = 'BEEP '.format(int(value))
-        self.Querry(word)
+        # word = <>
+        self.Query(word)
         self._beep = value
 
     @property
     def identity(self):
-        word = "*IDN?"
-        return self.Querry(word)
+        # word = <>
+        self._id = self.Query(word)
+        return self._id
 
     @property
-    @InOut.output(str)
     def error(self):
-        pass
-        # word = 'ERRSTR?'
-        # self._error = ''
-        # err = self.Querry(word)
-        # return err
+        # word = <>
+        self._error = ''
+        err = self.Query(word)
+        return err
+
+    @property
+    def has_error(self):
+        # word = <>
+        dum = self.Query(word)
+        if dum =='128': self._haserr = True
+        if dum == '0': self._haserr = False
+        return self._haserr
 
     @property
     @InOut.output(bool)
-    def has_error(self):
+    def _is_changing_lbd(self):
+        return self.Query('OUTP:TRACK?')
+
+    @property
+    def clear(self):
         pass
-        # word = '*STB?'
-        # dum = self.Querry(word)
-        # if dum =='128': self._haserr = True
-        # if dum == '0': self._haserr = False
-        # return self._haserr
 
-    @property
-    def _is_scanning(self):
-        word = '({} {}:ctl:state'.format(self._set, self._lsr)
-        dum = self.Querry(word)
-        # need to pass word
-
-    @property
-    def _is_changing_lbd(self): 
-        word = '({} {}:ctl:state'.format(self._set, self._lsr)
-        dum = self.Querry(word)
-        # need to pass word
-
-    @property
-    def _lbdscan(self):
-        if self._is_scanning:
-            word = '({} {}:ctl:scan:progress'.format(self._set, self._lsr)
-            return self.Querry(word)
-        else:
-            return self.lbd
+    @clear.setter
+    @InOut.accepts(bool)
+    def clear(self,val):
+        if val:
+            self.Query('*CLS')
 

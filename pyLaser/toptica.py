@@ -4,7 +4,7 @@ import ipdb
 import numpy as np
 
 import os
-import ipbd
+
 import socket
 
 path = os.path.realpath('../')
@@ -26,7 +26,7 @@ class Toptica1050():
     __status__ = "Development"
 
     def __init__(self, **kwargs):
-        super(<YourLaserName>, self).__init__()
+        super(Toptica1050, self).__init__()
         self._addrs = kwargs.get('address', '169.254.122.1')
         self._port = kwargs.get('port', 1998)
         self._open = False
@@ -43,6 +43,10 @@ class Toptica1050():
         self._haserr = False
         # Miscs
         self._err_msg = ''
+        self._set = "param-set! "
+        self._get = "param-ref "
+        self._lsr = "'laser1:"
+        self._exec = 'exec '
     # -- Methods --
     # ---------------------------------------------------------
 
@@ -62,6 +66,8 @@ class Toptica1050():
         return read.replace('>', '').strip()
 
 
+
+
     # -- Properties --
     # ---------------------------------------------------------
     @property
@@ -71,13 +77,27 @@ class Toptica1050():
 
 
     @connected.setter
-    @Catch.error
+    # @Catch.error
     def connected(self,value):
         if value:
             self._dev = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self._dev.settimeout(0.005)
+            self._dev.settimeout(0.01)
             self._dev.connect((self._addrs, self._port))
             self._open = True
+            time.sleep(0.5)
+            dum = b''
+            while True:
+                try: 
+                    dum += self._dev.recv(1)
+                    print(dum)
+                    time.sleep(0.001)
+                    if b'DeCoF Command Line\r\n ' in dum:
+                        print(dum)
+                        break
+                except Exception as e:
+                    print(e)
+                    print(dum)
+                    break
         else:
             self._dev.close()
             self._open = False
@@ -90,7 +110,7 @@ class Toptica1050():
         return self._output
 
     @output.setter
-    @Catch.error
+    # @Catch.error
     @InOut.accepts(bool)
     def output(self,value):
         # word = <>
@@ -98,68 +118,66 @@ class Toptica1050():
         self._output = value
 
     @property
-    @InOut.output(float)
+    # @InOut.output(float)
     def lbd(self):
-        # word = <>
+        word = "({} {}ctl:wavelength-act)".format(self._get, self._lsr)
         self._lbd = self.Query(word)
         return self._lbd
 
     @lbd.setter
     @InOut.accepts(float)
-    @Catch.error
+    # @Catch.error
     def lbd(self, value):
-        self._targetlbd = value
-        self.Query('OUTP:TRACK 1')
-        # word = <>
+        word = "({} {}ctl:wavelength-set {:.3f})".format(self._set  , self._lsr, value)
         self.Query(word)
         self._lbd = value
 
     @property
     @InOut.output(float)
     def current(self):
-        # word = <>
+        word = "({} {}dl:cc:current-act)".format(self._get, self._lsr)
         self._cc = self.Query(word)
         return self._cc
 
     @current.setter
-    @Catch.error
+    # @Catch.error
     @InOut.accepts(float)
     def current(self, value):
-        # word = <>
+        word = "({} {}dl:cc:current-set {:.3f})".format(self._set, self._lsr, value)
         self.Query(word)
         self._cc = value
 
     @property
     @InOut.output(float,float)
     def scan_limit(self):
-        word1 = 'SOUR:WAVE:START?'
-        word2 = 'SOUR:WAVE:STOP?'
+        word1 = "({} {}ctl:scan:wavelength-begin)".format(self._get, self._lsr)
+        word2 = "({} {}ctl:scan:wavelength-end)".format(self._get, self._lsr)
         self._scan_lim = [self.Query(word1),
                         self.Query(word2)]
         return self._scan_lim
 
     @scan_limit.setter
-    @Catch.error
+    # @Catch.error
     @InOut.accepts(list)
     def scan_limit(self, value):
         start = value[0]
         stop = value[1]
-        word1 = 'SOUR:WAVE:START {}'.format(start)
+        word1 = "({} {}ctl:scan:wavelength-begin {:.3f})".format(self._set, self._lsr, start)
         self.Query(word1)
-        word2 = 'SOUR:WAVE:STOP {}'.format(stop)
+        word2 = "({} {}ctl:scan:wavelength-end {:.3f})".format(self._set, self._lsr, stop)
         self.Query(word2)
         self._scan_lim = value
 
     @property
     @Catch.error
-    @InOut.output(float)
+    # @InOut.output(float)
     def scan_speed(self):
         word1 = 'SOUR:WAVE:SLEW:FORW?'
         self._scan_speed = self.Query(word1)
         return self._scan_speed
 
     @scan_speed.setter
-    @Catch.error
+    # @Catch.error
     @InOut.accepts(float)
     def scan_speed(self, value):
         # word = <>
@@ -231,13 +249,13 @@ class Toptica1050():
         err = self.Query(word)
         return err
 
-    @property
-    def has_error(self):
-        # word = <>
-        dum = self.Query(word)
-        if dum =='128': self._haserr = True
-        if dum == '0': self._haserr = False
-        return self._haserr
+    # @property
+    # def has_error(self):
+    #     # word = <>
+    #     dum = self.Query(word)
+    #     if dum =='128': self._haserr = True
+    #     if dum == '0': self._haserr = False
+    #     return self._haserr
 
     @property
     @InOut.output(bool)
@@ -254,3 +272,6 @@ class Toptica1050():
         if val:
             self.Query('*CLS')
 
+
+if __name__ is '__main__':
+    lsr = Toptica1050()

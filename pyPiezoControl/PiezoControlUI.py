@@ -92,7 +92,7 @@ class Stage(QMainWindow):
         self.stages = ['left', 'right']
         self.stageList = [yy + xx for xx in self.axis for yy in self.stages]
         self.piezo_address = {'left': self.instrWin.ui.line_left.text,
-                              'right': self.instrWin.ui.line_left.text
+                              'right': self.instrWin.ui.line_right.text
                               }
         self.frame = {'left': self.ui.frame_left,
                       'right': self.ui.frame_right, }
@@ -150,7 +150,7 @@ class Stage(QMainWindow):
 
             pzt.axis = aa
             self.lcdpiezo[stage + aa].display(pzt.V)
-            self.piezo[stage+aa].setValue(pzt.V*1e2)
+            self.piezo[stage+aa].setValue(pzt.V*self._slidefact)
 
     def Connect(self):
         if not self._connected:

@@ -1421,7 +1421,7 @@ QDateEdit::down-arrow:focus {
            </spacer>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_6">
+           <widget class="QComboBox" name="combo_Laser">
             <property name="minimumSize">
              <size>
               <width>87</width>
@@ -1446,12 +1446,12 @@ QDateEdit::down-arrow:focus {
             </item>
             <item>
              <property name="text">
-              <string>Toptica 1050</string>
+              <string>Toptica1050</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>Toptica 980</string>
+              <string>Toptica980</string>
              </property>
             </item>
            </widget>
@@ -1816,7 +1816,7 @@ QDateEdit::down-arrow:focus {
                    </size>
                   </property>
                   <property name="currentText">
-                   <string>ai16</string>
+                   <string>ai1</string>
                   </property>
                   <item>
                    <property name="text">
@@ -4456,7 +4456,7 @@ Update</string>
      <x>0</x>
      <y>0</y>
      <width>1074</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

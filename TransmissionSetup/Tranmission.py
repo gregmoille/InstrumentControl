@@ -326,16 +326,23 @@ class Transmission(QMainWindow):
     def Connect(self):
         if not self._connected:
             try:
-                idLaser = 4106
-                DeviceKey = '6700 SN10027'
-                self.laser = NewFocus6700(id=idLaser, key=DeviceKey)
-                print('Connection')
-                self.laser.connected = True
-                print('Connected... fetching Wavelength')
-                self.ui.but_connect.setText('Disconnect')
-                self._connected = True
-                self.RetrieveLaser()
-                self.dev.GetLaserErr()
+                lsr_type = self.ui.combo_Laser.currentText()
+
+                if lsr_type is NF6700:
+                    idLaser = 4106
+                    DeviceKey = '6700 SN10027'
+                    self.laser = NewFocus6700(id=idLaser, key=DeviceKey)
+                    print('Connection')
+                    self.laser.connected = True
+                    print('Connected... fetching Wavelength')
+                    self.ui.but_connect.setText('Disconnect')
+                    self._connected = True
+                    self.RetrieveLaser()
+                    self.dev.GetLaserErr()
+                elif lsr_type is Toptica1050:
+                    addrs = self.ui.instrWin.combo_Toptica1050.currentText()
+                    self.laser = Toptica1050(address = addrs) 
+
 
             except Exception as err:
                 err = str(err) + \

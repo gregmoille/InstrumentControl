@@ -37,7 +37,7 @@ class Toptica1050():
         self._scan = 0
         self._beep = 0
         self._output = 0
-        self._is_scaning = False
+        # self._is_scaning = False
         # self._is_changing_lbd = False
         # self._no_error = <>
         self._haserr = False
@@ -50,7 +50,7 @@ class Toptica1050():
 
         # QUick Fix
         self._has_err = False
-        self._current_err
+        self._current_err = False
     # -- Methods --
     # ---------------------------------------------------------
 
@@ -69,6 +69,20 @@ class Toptica1050():
                 break
         return read.replace('>', '').strip()
 
+    def _empty_buff(self):
+        dum = b''
+        while True:
+            try:
+                dum += self._dev.recv(1)
+                # print(dum)
+                time.sleep(0.001)
+                if b'DeCoF Command Line\r\n ' in dum:
+                    print(dum)
+                    break
+            except Exception as e:
+                # print(e)
+                # print(dum)
+                break
     # -- Properties --
     # ---------------------------------------------------------
     @property
@@ -85,19 +99,8 @@ class Toptica1050():
             self._dev.connect((self._addrs, self._port))
             self._open = True
             time.sleep(0.5)
-            dum = b''
-            while True:
-                try:
-                    dum += self._dev.recv(1)
-                    print(dum)
-                    time.sleep(0.001)
-                    if b'DeCoF Command Line\r\n ' in dum:
-                        print(dum)
-                        break
-                except Exception as e:
-                    print(e)
-                    print(dum)
-                    break
+            self._empty_buff()
+            
         else:
             self._dev.close()
             self._open = False
@@ -107,6 +110,7 @@ class Toptica1050():
     def output(self):
         # word = <>
         self._output = self.Query(word)
+        self._empty_buff()
         return self._output
 
     @output.setter
@@ -115,6 +119,7 @@ class Toptica1050():
     def output(self, value):
         # word = <>
         self.Query(word)
+        self._empty_buff()
         self._output = value
 
     @property
@@ -122,6 +127,7 @@ class Toptica1050():
     def lbd(self):
         word = "({} {}ctl:wavelength-act)".format(self._get, self._lsr)
         self._lbd = self.Query(word)
+        self._empty_buff()
         return self._lbd
 
     @lbd.setter
@@ -131,6 +137,7 @@ class Toptica1050():
         word = "({} {}ctl:wavelength-set {:.3f})".format(self._set,
                                                          self._lsr, value)
         self.Query(word)
+        self._empty_buff()
         self._lbd = value
 
     @property
@@ -138,6 +145,7 @@ class Toptica1050():
     def current(self):
         word = "({} {}dl:cc:current-act)".format(self._get, self._lsr)
         self._cc = self.Query(word)
+        self._empty_buff()
         return self._cc
 
     @current.setter
@@ -148,6 +156,7 @@ class Toptica1050():
                                                         self._lsr, 
                                                         value)
         self.Query(word)
+        self._empty_buff()
         self._cc = value
 
     @property
@@ -157,6 +166,7 @@ class Toptica1050():
         word2 = "({} {}ctl:scan:wavelength-end)".format(self._get, self._lsr)
         self._scan_lim = [self.Query(word1),
                           self.Query(word2)]
+        self._empty_buff()
         return self._scan_lim
 
     @scan_limit.setter
@@ -173,6 +183,7 @@ class Toptica1050():
                                                                self._lsr, 
                                                                stop)
         self.Query(word2)
+        self._empty_buff()
         self._scan_lim = value
 
     @property
@@ -180,7 +191,7 @@ class Toptica1050():
     @InOut.output(float)
     def scan_speed(self):
         word = "({} {}ctl:scan:speed)".format(self._get, self._lsr)
-        self._scan_speed = self.Query(word1)
+        self._scan_speed = self.Query(word)
         return self._scan_speed
 
     @scan_speed.setter
@@ -191,13 +202,12 @@ class Toptica1050():
                                                                self._lsr, 
                                                                value)
         self.Query(word)
+        self._empty_buff()
         self._scan_speed = value
 
     @property
     @InOut.output(float)
     def scan(self):
-        # word = <>
-        self._scan = self.Query(word)
         return self._scan
 
     @scan.setter
@@ -210,21 +220,25 @@ class Toptica1050():
         else:
             word = '({} {}ctl:scan:stop)'.format(self._exec, self._lsr)
         self.Query(word)
+        self._empty_buff()
 
     @property
     @InOut.output(float)
     def pzt(self):
         word = '({} {}scan:offset)'.format(self._get, self._lsr)
-        self._pzt = self.Query(word)
+        self._pzt = float(self.Query(word))
+        self._pzt = 100*self._pzt/140
+        self._empty_buff()
         return self._pzt
 
     @pzt.setter
-    @Catch.error
+    # @Catch.error
     @InOut.accepts(float)
     def pzt(self, value):
         val = 1e-2*value*140
         word = '({} {}scan:offset {:.3f})'.format(self._set, self._lsr, val)
         self.Query(word)
+        self._empty_buff()
         self._pzt = value
 
     @property
@@ -235,17 +249,19 @@ class Toptica1050():
         return self.beep
 
     @beep.setter
-    @Catch.error
+    # @Catch.error
     @InOut.accepts(bool)
     def beep(self, value):
         # word = <>
         self.Query(word)
+        self._empty_buff()
         self._beep = value
 
     @property
     def identity(self):
         word = '({} {}dl:type)'.format(self.get, self._lsr)
         self._id = self.Query(word)
+        self._empty_buff()
         return self._id
 
     @property
@@ -257,19 +273,29 @@ class Toptica1050():
         return self._has_err
 
     @property
-    @InOut.output(bool)
+    # @InOut.output(bool)
     def _is_changing_lbd(self):
         word = '({} {}ctl:state)'.format(self._get, self._lsr)
         dum = self.Query(word)
-        if dum is '1'
+        if dum is '1':
             return True
+        else:
+            return False
 
+    @property
     def _is_scaning(self):
         word = '({} {}ctl:state)'.format(self._get, self._lsr)
         dum = self.Query(word)
-        if dum is '3'
+        if dum is '3':
             return True
+        else:
+            return False
 
+       
+
+    @property   
+    def _lbdscan(self):
+        return self.lbd
 
 if __name__ is '__main__':
     lsr = Toptica1050()

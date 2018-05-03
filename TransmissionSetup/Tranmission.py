@@ -32,7 +32,7 @@ if not path in sys.path:
     sys.path.insert(0, path)
     print(path)
 import pyUtilities as ut
-from pyLaser import NewFocus6700
+from pyLaser import NewFocus6700,Toptica1050  
 from pyWavemeter import Wavemeter
 from pyPowerMeter import ThorlabsP1xx
 from workers import DcScan, FreeScan
@@ -202,9 +202,9 @@ class Transmission(QMainWindow):
         ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
         self.my_plot.scene().sigMouseMoved.connect(self.onMove)
         # -- Setup apparence at launch --
-        # self.ui.wdgt_param.setEnabled(False)
-        # self.ui.wdgt_plot.setEnabled(False)
-        # self.ui.group_PostProc.setEnabled(False)
+        self.ui.wdgt_param.setEnabled(False)
+        self.ui.wdgt_plot.setEnabled(False)
+        self.ui.group_PostProc.setEnabled(False)
         # -- Misc --
         self._do_blink = False
         self.wlm = None
@@ -327,21 +327,27 @@ class Transmission(QMainWindow):
         if not self._connected:
             try:
                 lsr_type = self.ui.combo_Laser.currentText()
-
-                if lsr_type is NF6700:
+                if self._debug :
+                    print(lsr_type)
+                if lsr_type == 'NF6700':
                     idLaser = 4106
                     DeviceKey = '6700 SN10027'
                     self.laser = NewFocus6700(id=idLaser, key=DeviceKey)
                     print('Connection')
                     self.laser.connected = True
-                    print('Connected... fetching Wavelength')
-                    self.ui.but_connect.setText('Disconnect')
-                    self._connected = True
-                    self.RetrieveLaser()
-                    self.dev.GetLaserErr()
-                elif lsr_type is Toptica1050:
-                    addrs = self.ui.instrWin.combo_Toptica1050.currentText()
+                   
+                    
+                elif lsr_type == 'Toptica1050':
+                    print('Toptica')
+                    addrs = self.instrWin.ui.combo_Toptica1050.currentText()
                     self.laser = Toptica1050(address = addrs) 
+                print('Connection')
+                self.laser.connected = True
+                print('Connected... fetching Wavelength')
+                self.ui.but_connect.setText('Disconnect')
+                self._connected = True
+                self.RetrieveLaser()
+                self.dev.GetLaserErr()
 
 
             except Exception as err:
@@ -705,6 +711,9 @@ class Transmission(QMainWindow):
         scan_speed = self.laser.scan_speed
         output = self.laser.output
         I = self.laser.current
+
+        # ipdb.set_trace()
+
         print('-'*30)
         print("Fetching error {}".format(self.laser.error))
         print("Laser output: {}".format(output))

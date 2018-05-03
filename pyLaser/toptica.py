@@ -108,8 +108,12 @@ class Toptica1050():
     @property
     @InOut.output(bool)
     def output(self):
-        # word = <>
+        word = "({} {}emission)".format(self._get, self._lsr)
         self._output = self.Query(word)
+        if self._output == '#t':
+            self._output = True
+        elif self._output == '#f':
+            self._output = False
         self._empty_buff()
         return self._output
 
@@ -117,13 +121,10 @@ class Toptica1050():
     # @Catch.error
     @InOut.accepts(bool)
     def output(self, value):
-        # word = <>
-        self.Query(word)
-        self._empty_buff()
-        self._output = value
+        pass
 
     @property
-    # @InOut.output(float)
+    @InOut.output(float)
     def lbd(self):
         word = "({} {}ctl:wavelength-act)".format(self._get, self._lsr)
         self._lbd = self.Query(word)

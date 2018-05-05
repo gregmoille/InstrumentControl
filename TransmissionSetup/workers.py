@@ -152,7 +152,7 @@ class DcScan(QThread):
 
         # -- Setup DAQ for acquisition  and create the reading 
         #.   THread -- 
-        scan_time = np.diff(scan_limit)[0]/laser.scan_speed
+        scan_time = np.diff(scan_limit)[0]/laser.scan_speed 
         if self._debug:
             print('Scan time: {}s'.format(scan_time))
         daq = DAQ(t_end = scan_time, dev = daqParam['dev'])
@@ -161,9 +161,12 @@ class DcScan(QThread):
 
         def _GetData():
             self.time_start_daq = time.time()
-            self.data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts))
+            self.data = daq.readtask.read(number_of_samples_per_channel=int(daq.Npts), timeout = scan_time*1.5)
             self.time_stop_daq = time.time()
             self._done_get_data = True
+            print('*'*30)
+            time.sleep(2)
+            print('*'*30)
             daq.readtask.stop()
             daq.readtask.close()
 
@@ -192,7 +195,10 @@ class DcScan(QThread):
                 print('Wavelength: {}nm'.format(lbd_scan))
                 print('Progress: {}%'.format(prgs))
             self._DCscan.emit((1, lbd_scan, prgs, None))
-            time.sleep(t_step)
+            # time.sleep(t_step)
+            if scan_limit[1] -lbd_scan < 0.75:
+                laser.scan = False
+                break  
         
         if self._debug:
             print('End of Scan: '+ '-'*30)

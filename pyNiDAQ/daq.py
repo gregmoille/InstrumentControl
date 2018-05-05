@@ -46,7 +46,7 @@ class DAQ(object):
         writetask = nidaqmx.Task()
         writetask.ao_channels.add_ao_voltage_chan("Dev1/ao0")
         writetask.timing.cfg_samp_clk_timing(int(self.clock),
-                                                        sample_mode=AcquisitionType.FINITE,
+                                                        sample_mode=AcquisitionType.CONTINUOUS,
                                                         samps_per_chan=int(Npts))
         # AcquisitionType.FINITE,
         self.writetask = writetask
@@ -66,7 +66,7 @@ class DAQ(object):
         readtask = nidaqmx.Task()
         readtask.ai_channels.add_ai_voltage_chan(self.read_ch)
         readtask.timing.cfg_samp_clk_timing(int(self.clock),\
-                                                    sample_mode=AcquisitionType.FINITE,
+                                                    sample_mode=AcquisitionType.CONTINUOUS,
                                                     samps_per_chan=int(self.Npts))
 
         self.readtask = readtask

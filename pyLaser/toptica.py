@@ -50,7 +50,7 @@ class Toptica1050():
 
         # QUick Fix
         self._has_err = False
-        self._current_err = False
+        self._current_err = ''
     # -- Methods --
     # ---------------------------------------------------------
 
@@ -128,7 +128,7 @@ class Toptica1050():
     def lbd(self):
         word = "({} {}ctl:wavelength-act)".format(self._get, self._lsr)
         self._lbd = self.Query(word)
-        self._empty_buff()
+        # self._empty_buff()
         return self._lbd
 
     @lbd.setter
@@ -213,6 +213,7 @@ class Toptica1050():
 
     @scan.setter
     # @Catch.error
+    # @ChangeState.scan(0.5)
     @InOut.accepts(bool)
     def scan(self, value):
         self._scan = value

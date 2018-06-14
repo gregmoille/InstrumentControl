@@ -21,9 +21,9 @@ except Exception as e:
 class ThorlabsP1xx(object):
     #USB0::0x1313::0x807B::17121241::INSTR
     def __init__(self,address='USB0::0x1313::0x8072::P2009986::INSTR'):
-        rm = visa.ResourceManager()
+        rm = visa.ResourceManager('@py')
         if address in rm.list_resources():
-            self._instr = rm.open_resource(address)
+            self._instr = rm.open_resource(address,timeout = 0.25)
             self._open = True
         else:
             print('Please connect or provide the correct address for the powermeter')
@@ -63,6 +63,11 @@ class ThorlabsP1xx(object):
             return 'auto'
         else:
             return self.Query('POW:RANGE:UPP?')
+
+
+    def close(self):
+        self._instr.close()
+    
 
     @property
     @isOpen

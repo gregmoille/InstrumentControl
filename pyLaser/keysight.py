@@ -27,12 +27,16 @@ class Keysight8164B():
     @connected.setter
     def connected(self, val):
         if val: 
-            rm = visa.ResourceManager()
-            if self.address in rm.list_resources():
-                self._instr = rm.open_resource(self.address)
-                self._connected = True
-                word = 'OUTP:POW:UNIT DBM'
-                self._instr.write(word)
+            try:
+                rm = visa.ResourceManager()
+                if self.address in rm.list_resources():
+                    self._instr = rm.open_resource(self.address)
+                    self._connected = True
+                    word = 'OUTP:POW:UNIT DBM'
+                    self._instr.write(word)
+            except Exception as e:
+                self._connected = False
+                print(e)
         else:
             self._inst.close()
             self._connected = False
@@ -66,6 +70,32 @@ class Keysight8164B():
 
     @property
     @_isOpen
+    def attenuation(self):
+        self._attenuation = self._instr.query('INP:ATT?')
+        self._attenuation = float(self._attenuation.strip())
+        return self._attenuation
+    
+    @attenuation.setter
+    @_isOpen
+    def attenuation(self,val):
+        word = "INP:ATT {:.3f}".format(val)
+        self._instr.write(word)
+
+    @property
+    @_isOpen
+    def attenuation_lbd(self):
+        self._attenuation = self._instr.query('INP:ATT?')
+        self._attenuation = float(self._attenuation.strip())*1e9
+        return self._attenuation
+    
+    @attenuation_lbd.setter
+    @_isOpen
+    def attenuation_lbd(self,val):
+        word = "INP:WAV {:.3f}E-9".format(val)
+        self._instr.write(word)
+
+    @property
+    @_isOpen
     def reset(self):
         return self._reset
     
@@ -79,19 +109,6 @@ class Keysight8164B():
             # Changing unit to dBm
             word = 'OUTP:POW:UNIT DBM'
             self._instr.write(word)
-
-    @property
-    @_isOpen
-    def attenuation(self):
-        self._attenuation = self._instr.query('INP:ATT?')
-        self._attenuation = float(self._attenuation.strip())
-        return self._attenuation
-    
-    @attenuation.setter
-    @_isOpen
-    def attenuation(self,val):
-        word = "INP:ATT {:.3f}".format(val)
-        self._instr.write(word)
 
 if __name__ == "__main__":
     lsr = Keysight8164B()

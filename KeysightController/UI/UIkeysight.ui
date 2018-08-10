@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>915</width>
-    <height>401</height>
+    <width>930</width>
+    <height>703</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1219,90 +1219,26 @@ QDateEdit::down-arrow:focus {
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
      <widget class="QWidget" name="widget" native="true">
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="1" column="2">
-        <widget class="QPushButton" name="pushButton_5">
-         <property name="text">
-          <string>Connect Laser</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="1">
-        <widget class="QComboBox" name="comboBox_2"/>
-       </item>
-       <item row="1" column="3">
-        <widget class="QLabel" name="led_connected">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">:/qss_icons/rc/radio_checked.png</pixmap>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
+        <widget class="QComboBox" name="detAdd">
+         <item>
+          <property name="text">
+           <string>USB0::0x0957::0x3718::SG48101083::INSTR</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="lsrAdd">
          <item>
           <property name="text">
            <string>GPIB0::20::INSTR</string>
           </property>
          </item>
-        </widget>
-       </item>
-       <item row="1" column="5">
-        <widget class="QLabel" name="led_connected_2">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="pixmap">
-          <pixmap resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">:/qss_icons/rc/radio_checked.png</pixmap>
-         </property>
-         <property name="scaledContents">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="4">
-        <widget class="QPushButton" name="pushButton_6">
-         <property name="text">
-          <string>Connect Det.</string>
-         </property>
         </widget>
        </item>
        <item row="0" column="0">
@@ -1341,14 +1277,149 @@ QDateEdit::down-arrow:focus {
          </property>
         </widget>
        </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="butConnectLaser">
+         <property name="text">
+          <string>Connect Laser</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QPushButton" name="butConnectDet">
+         <property name="text">
+          <string>Connect Det.</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="ledLsr">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">:/qss_icons/rc/radio_checked.png</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5">
+        <widget class="QLabel" name="ledDet">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="pixmap">
+          <pixmap resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">:/qss_icons/rc/radio_checked.png</pixmap>
+         </property>
+         <property name="scaledContents">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="butResetLaser">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Reset Laser</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="4">
+        <widget class="QPushButton" name="butResetDet">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Reset Det</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="widget_8" native="true">
+     <widget class="QFrame" name="frame_8">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>180</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>180</height>
+       </size>
+      </property>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QFrame" name="frame_7">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>180</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>180</height>
+          </size>
+         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -1375,7 +1446,7 @@ QDateEdit::down-arrow:focus {
               <number>12</number>
              </property>
              <property name="verticalSpacing">
-              <number>8</number>
+              <number>1</number>
              </property>
              <item row="2" column="1">
               <widget class="QLabel" name="label_3">
@@ -1414,7 +1485,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item row="3" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+              <widget class="QDoubleSpinBox" name="spinAttLbd">
                <property name="minimumSize">
                 <size>
                  <width>87</width>
@@ -1448,7 +1519,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox">
+              <widget class="QDoubleSpinBox" name="spinLaserLbd">
                <property name="minimumSize">
                 <size>
                  <width>87</width>
@@ -1482,7 +1553,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item row="3" column="0">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+              <widget class="QDoubleSpinBox" name="spinAtt">
                <property name="minimumSize">
                 <size>
                  <width>87</width>
@@ -1508,10 +1579,10 @@ QDateEdit::down-arrow:focus {
                 <number>3</number>
                </property>
                <property name="minimum">
-                <double>-10.000000000000000</double>
+                <double>0.000000000000000</double>
                </property>
                <property name="maximum">
-                <double>10.000000000000000</double>
+                <double>50.000000000000000</double>
                </property>
                <property name="singleStep">
                 <double>1.000000000000000</double>
@@ -1522,7 +1593,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+              <widget class="QDoubleSpinBox" name="spinLaserPow">
                <property name="minimumSize">
                 <size>
                  <width>87</width>
@@ -1609,11 +1680,17 @@ QDateEdit::down-arrow:focus {
              <property name="leftMargin">
               <number>0</number>
              </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
              <property name="rightMargin">
               <number>0</number>
              </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item>
-              <widget class="QPushButton" name="pushButton_3">
+              <widget class="QPushButton" name="butSet">
                <property name="minimumSize">
                 <size>
                  <width>130</width>
@@ -1632,7 +1709,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_4">
+              <widget class="QPushButton" name="butFetch">
                <property name="minimumSize">
                 <size>
                  <width>130</width>
@@ -1658,6 +1735,18 @@ QDateEdit::down-arrow:focus {
        </item>
        <item>
         <widget class="QFrame" name="frame_6">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>180</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>180</height>
+          </size>
+         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -1685,7 +1774,7 @@ QDateEdit::down-arrow:focus {
               </spacer>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="butUp">
                <property name="minimumSize">
                 <size>
                  <width>100</width>
@@ -1704,7 +1793,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="butDown">
                <property name="minimumSize">
                 <size>
                  <width>100</width>
@@ -1764,7 +1853,7 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="spinBox">
+              <widget class="QSpinBox" name="spinRes">
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
                </property>
@@ -1791,17 +1880,153 @@ QDateEdit::down-arrow:focus {
       </layout>
      </widget>
     </item>
+    <item>
+     <widget class="QFrame" name="frame">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QWidget" name="widget_Plot" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <layout class="QVBoxLayout" name="mplvl">
+          <property name="spacing">
+           <number>6</number>
+          </property>
+          <property name="sizeConstraint">
+           <enum>QLayout::SetMinAndMaxSize</enum>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>12</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_2">
+         <property name="minimumSize">
+          <size>
+           <width>200</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <spacer name="verticalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinTime">
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+            <property name="suffix">
+             <string> s</string>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="butAcquire">
+            <property name="text">
+             <string>Acquire</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="butClear">
+            <property name="text">
+             <string>Clear Graph</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
    <zorder>widget</zorder>
    <zorder>label_5</zorder>
-   <zorder>widget_8</zorder>
+   <zorder>frame_8</zorder>
+   <zorder>frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>915</width>
+     <width>930</width>
      <height>22</height>
     </rect>
    </property>
@@ -1809,24 +2034,119 @@ QDateEdit::down-arrow:focus {
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <tabstops>
-  <tabstop>comboBox</tabstop>
-  <tabstop>comboBox_2</tabstop>
-  <tabstop>pushButton_5</tabstop>
-  <tabstop>pushButton_6</tabstop>
-  <tabstop>doubleSpinBox</tabstop>
-  <tabstop>doubleSpinBox_2</tabstop>
-  <tabstop>doubleSpinBox_3</tabstop>
-  <tabstop>doubleSpinBox_4</tabstop>
-  <tabstop>pushButton_3</tabstop>
-  <tabstop>pushButton_4</tabstop>
-  <tabstop>spinBox</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
+  <tabstop>lsrAdd</tabstop>
+  <tabstop>detAdd</tabstop>
+  <tabstop>spinLaserLbd</tabstop>
+  <tabstop>spinLaserPow</tabstop>
+  <tabstop>spinAtt</tabstop>
+  <tabstop>spinAttLbd</tabstop>
+  <tabstop>butSet</tabstop>
+  <tabstop>butFetch</tabstop>
+  <tabstop>spinRes</tabstop>
+  <tabstop>butUp</tabstop>
+  <tabstop>butDown</tabstop>
   <tabstop>sliderStep</tabstop>
  </tabstops>
  <resources>
   <include location="QDarkStyleSheet-master/qdarkstyle/style.qrc"/>
   <include location="../../TransmissionSetup/UI/QDarkStyleSheet-master/qdarkstyle/style.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>butConnectDet</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>789</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>719</x>
+     <y>337</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>butConnectLaser</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>frame_8</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>650</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>461</x>
+     <y>300</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderStep</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinRes</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>729</x>
+     <y>265</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>813</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinRes</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderStep</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>850</x>
+     <y>227</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>727</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>butConnectLaser</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>butResetLaser</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>630</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>635</x>
+     <y>94</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>butConnectDet</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>butResetDet</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>816</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>816</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

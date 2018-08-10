@@ -28,15 +28,21 @@ def PlotDownSampleTrace(app, x, y, step):
     app._subsamb = step
     if not step is 1:
         app._toPlot = [x,y]
-def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
+
+
+def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1', xlabel = 'Wavelength',
+                   ylabel = 'Signal (V)',  InitPlot = True, N = 2):
     #Set first down sample
     app._old_subsamb = 1e6
     app._subsamb = 100
 
 
+    try:
+        for ii in range(app.ui.combo_line.count()):
+            app.ui.combo_line.removeItem(0)
+    except:
+        pass
 
-    for ii in range(app.ui.combo_line.count()):
-        app.ui.combo_line.removeItem(0)
     labelStyle = {'color': color, 'font-size': '14pt'}
     axispen = pg.mkPen(color=color, fontsize='14pt')
     axisfont = QtGui.QFont()
@@ -51,8 +57,8 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     # app.my_plot.ViewBox()
     app.my_plot.setRange(xRange=xrange, yRange=[0, 1])
     app.my_plot.setLabel(
-        'bottom', text='Wavelength (nm)', units=None,  **labelStyle)
-    app.my_plot.setLabel('left', 'Signal', 'V', **labelStyle)
+        'bottom', text=xlabel, units=None,  **labelStyle)
+    app.my_plot.setLabel('left', ylabel , units = None , **labelStyle)
 
     app.my_plot.plotItem.getAxis('bottom').setPen(axispen)
     app.my_plot.plotItem.getAxis('bottom').setFont(axisfont)
@@ -72,23 +78,26 @@ def CreatePyQtGraph(app, xrange, plot_widget, color='#eff0f1'):
     app.my_plot.plotItem.setDownsampling(auto=True, mode="subsample")
     
     plot_widget.addWidget(app.my_plot)
-
-    x = np.linspace(xrange[0], xrange[1], 1e7)
-    span = xrange[1] - xrange[0]
-    sigma = span/10 * np.random.rand(1)
-    y = np.sin(1e7*sigma*x/span)
-    sigma = span/5 * np.random.rand(1)
-    y2 = np.exp(-((x-(xrange[0]+span/2))**2)/(sigma**2))
-    app._clr = ['#81caf9', '#ffa691', '#cfffaf']
-    app._clr_deact = ['#5788a8', '#a06759', '#7b9968']
-    app.linepen = []
-    app.linepen += [pg.mkPen(color=(129, 202, 249), width=2)]
-    app.linepen += [pg.mkPen(color=(255, 166, 145), width=2)]
-    app.linepen += [pg.mkPen(color='#cfffaf', width= 1)]
-    app.linepenMZ_frwrd = pg.mkPen(color=color, width=1)
-    app.linepenMZ_bckwrd = pg.mkPen(color=color, width=1)
-    app.current_trace = []
-    PlotDownSampleTrace(app,[x,x], [y,y2], app._subsamb)
+    if InitPlot:
+        x = np.linspace(xrange[0], xrange[1], 1e7)
+        span = xrange[1] - xrange[0]
+        sigma = span/10 * np.random.rand(1)
+        y = np.sin(1e7*sigma*x/span)
+        sigma = span/5 * np.random.rand(1)
+        y2 = np.exp(-((x-(xrange[0]+span/2))**2)/(sigma**2))
+        app._clr = ['#81caf9', '#ffa691', '#cfffaf']
+        app._clr_deact = ['#5788a8', '#a06759', '#7b9968']
+        app.linepen = []
+        app.linepen += [pg.mkPen(color=(129, 202, 249), width=2)]
+        app.linepen += [pg.mkPen(color=(255, 166, 145), width=2)]
+        app.linepen += [pg.mkPen(color='#cfffaf', width= 1)]
+        app.linepenMZ_frwrd = pg.mkPen(color=color, width=1)
+        app.linepenMZ_bckwrd = pg.mkPen(color=color, width=1)
+        app.current_trace = []
+        if N == 1:
+            PlotDownSampleTrace(app,[x], [y], app._subsamb)
+        elif N>1:
+            PlotDownSampleTrace(app,[x,x], [y,y2], app._subsamb)
 
 def ReplaceData(app, x, y):
     # ipdb.set_trace()

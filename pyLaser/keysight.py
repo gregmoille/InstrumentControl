@@ -1,7 +1,7 @@
 import visa
 import numpy as np
 
-def KeysightLaser():
+def Keysight8164B():
 
     def __init__(self, **kwargs):
         self.address = kwargs.get('address', "GPIB0::20::INSTR")

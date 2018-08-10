@@ -103,6 +103,7 @@ class KeysightControll(QMainWindow):
             print(self._lsr.connected)
             if self._lsr.connected:
                 self.ui.ledLsr.setPixmap(self._led[True])
+                self._laserconnected = True
             else:
                 self.ui.butConnectLaser.setChecked(False)
         else:
@@ -117,6 +118,7 @@ class KeysightControll(QMainWindow):
             print(self._det.connected)
             if self._det.connected:
                 self.ui.ledDet.setPixmap(self._led[True])
+                self._detconnected = True
             else:
                 self.ui.butConnectDet.setChecked(False)
         else:
@@ -125,18 +127,18 @@ class KeysightControll(QMainWindow):
 
 
     @_isConnected('_laserconnected')
-    def SetLaser(self):
+    def SetLaser(self,val):
         self._lsr.lbd = self._lsr.lbd
         self._lsr.power = self.ui.spinLaserPow.value()
         self._lsr.attenuation = self.ui.spinAtt.value()
         self._lsr.attenuation_lbd = self.ui.spinAttLbd.value()
 
     @_isConnected('_laserconnected')
-    def FetchLaser(self):
-        self._lsr.spinLaserLbd.setValue(self._lsr.lbd)
+    def FetchLaser(self,val):
+        self.ui.spinLaserLbd.setValue(self._lsr.lbd)
         self.ui.spinLaserPow.setValue(self._lsr.power)
-        self.ui.spinAtt.value(self._lsr.attenuation)
-        self.ui.spinAttLbd.value(self._lsr.attenuation_lbd)
+        self.ui.spinAtt.setValue(self._lsr.attenuation)
+        self.ui.spinAttLbd.setValue(self._lsr.attenuation_lbd)
 
     @_isConnected('_detconnected')
     def PlotPower(self, val):
@@ -162,6 +164,7 @@ class KeysightControll(QMainWindow):
                 def __init__(self, **kwargs):
                     self._t = []
                     self.tscan = kwargs.get('tscan', 1)
+                    self._det = kwargs.get('det', 1)
                     self._Pdet = []
                     self._P0 = 0
                     self._t0 = time.time()
@@ -199,7 +202,7 @@ class KeysightControll(QMainWindow):
 
 
 
-            self.threadPlot = UpdateData(tscan = self._tscan)
+            self.threadPlot = UpdateData(tscan = self._tscan, det = self._det)
             self.threadPlot.data[tuple].connect(UpdatePlot)
             self.threadPlot.start()
 

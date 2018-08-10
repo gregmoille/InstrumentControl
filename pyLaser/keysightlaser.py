@@ -1,15 +1,10 @@
-*RST
-*INP:ATT
-WAV
-POW
-
 import visa
 import numpy as np
 
 def KeysightLaser():
 
     def __init__(self, **kwargs):
-        self.address = kwargs.get('address', None)
+        self.address = kwargs.get('address', "GPIB0::20::INSTR")
         self._lbd = None
         self._power = None
         self._attenuation = None

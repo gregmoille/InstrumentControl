@@ -1,5 +1,6 @@
 import visa
 import numpy as np
+import time
 
 def Keysight8164B():
 
@@ -39,7 +40,10 @@ def Keysight8164B():
         if val:
             word = "*RST"
             self.instr.write(word)
-            # need to change everything in dBm
+            time.sleep(0.5)
+            # Changing unit to dBm
+            word = 'pow:unit DBM'
+            self.instr.write(word)
 
     @property
     def attenuation(self):

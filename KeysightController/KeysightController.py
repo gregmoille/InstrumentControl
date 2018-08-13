@@ -148,27 +148,27 @@ class KeysightControll(QMainWindow):
         self.ui.lblWlgth.setText('{:.3f}'.format(self._lsr.lbd))
 
     @_isConnected('_laserconnected')
-    ChangeLbd(self,dir):
-    const = 1
-    if dir == 'down':
-        const = -1
+    def ChangeLbd(self,dir):
+        const = 1
+        if dir == 'down':
+            const = -1
 
-    step = self.ui.spinRes.value()*1e-3
-    self.ui.butUp.setEnabled(False)
-    self.ui.butDown.setEnabled(False)
-    self.ui.sliderStep.setEnabled(False)
-    self.ui.spinRes.setEnabled(False)
-    QApplication.processEvents()
-    λnow = self._lsr.lbd
-    self._lsr  = λnow + const* step
-    time.sleep(0.25)
-    self.ui.lblWlgth.setText('{:.3f}'.format(self._lsr.lbd))
+        step = self.ui.spinRes.value()*1e-3
+        self.ui.butUp.setEnabled(False)
+        self.ui.butDown.setEnabled(False)
+        self.ui.sliderStep.setEnabled(False)
+        self.ui.spinRes.setEnabled(False)
+        QApplication.processEvents()
+        λnow = self._lsr.lbd
+        self._lsr  = λnow + const* step
+        time.sleep(0.25)
+        self.ui.lblWlgth.setText('{:.3f}'.format(self._lsr.lbd))
 
-    self.ui.butUp.setEnabled(True)
-    self.ui.butDown.setEnabled(True)
-    self.ui.sliderStep.setEnabled(True)
-    self.ui.spinRes.setEnabled(True)
-    QApplication.processEvents()
+        self.ui.butUp.setEnabled(True)
+        self.ui.butDown.setEnabled(True)
+        self.ui.sliderStep.setEnabled(True)
+        self.ui.spinRes.setEnabled(True)
+        QApplication.processEvents()
 
     @_isConnected('_detconnected')
     def PlotPower(self, val):

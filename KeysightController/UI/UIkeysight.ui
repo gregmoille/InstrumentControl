@@ -1758,7 +1758,7 @@ QDateEdit::down-arrow:focus {
            <widget class="QWidget" name="widget_4" native="true">
             <layout class="QVBoxLayout" name="verticalLayout">
              <property name="spacing">
-              <number>-1</number>
+              <number>6</number>
              </property>
              <item>
               <spacer name="verticalSpacer">
@@ -1788,7 +1788,11 @@ QDateEdit::down-arrow:focus {
                 </size>
                </property>
                <property name="text">
-                <string>⇧</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">
+                 <normaloff>:/qss_icons/rc/up_arrow_disabled.png</normaloff>:/qss_icons/rc/up_arrow_disabled.png</iconset>
                </property>
               </widget>
              </item>
@@ -1807,7 +1811,11 @@ QDateEdit::down-arrow:focus {
                 </size>
                </property>
                <property name="text">
-                <string>⇩</string>
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">
+                 <normaloff>:/qss_icons/rc/branch_open.png</normaloff>:/qss_icons/rc/branch_open.png</iconset>
                </property>
               </widget>
              </item>
@@ -1900,6 +1908,18 @@ QDateEdit::down-arrow:focus {
                 </item>
                 <item>
                  <widget class="QFrame" name="frame_3">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>3</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>35</height>
+                   </size>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true">background-color: #000;</string>
                   </property>
@@ -1910,8 +1930,35 @@ QDateEdit::down-arrow:focus {
                    <enum>QFrame::Sunken</enum>
                   </property>
                   <layout class="QHBoxLayout" name="horizontalLayout_6">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
                    <item>
                     <widget class="QLabel" name="lblWlgth">
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>30</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>30</height>
+                      </size>
+                     </property>
                      <property name="frameShape">
                       <enum>QFrame::Box</enum>
                      </property>
@@ -2063,6 +2110,18 @@ QDateEdit::down-arrow:focus {
           </item>
           <item>
            <widget class="QFrame" name="frame_5">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>35</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>35</height>
+             </size>
+            </property>
             <property name="styleSheet">
              <string notr="true">background-color: #000;</string>
             </property>
@@ -2073,8 +2132,35 @@ QDateEdit::down-arrow:focus {
              <enum>QFrame::Sunken</enum>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QLabel" name="lblPower">
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>30</height>
+                </size>
+               </property>
                <property name="frameShape">
                 <enum>QFrame::Box</enum>
                </property>
@@ -2146,7 +2232,7 @@ QDateEdit::down-arrow:focus {
      <x>0</x>
      <y>0</y>
      <width>933</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

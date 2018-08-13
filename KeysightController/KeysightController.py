@@ -74,7 +74,7 @@ class KeysightControll(QMainWindow):
         self.ui.butSet.clicked.connect(self.SetLaser)
         self.ui.butFetch.clicked.connect(self.FetchLaser)
         self.ui.butUp.clicked.connect(lambda: self.ChangeLbd('up'))
-        self.ui.butDown.clicked.connect(lambda: self.ChangeLbd('up'))
+        self.ui.butDown.clicked.connect(lambda: self.ChangeLbd('down'))
 
         self.ui.butAcquire.clicked.connect(self.PlotPower)
         self.ui.butClear.clicked.connect(self.ClearPlot)
@@ -160,9 +160,11 @@ class KeysightControll(QMainWindow):
         self.ui.spinRes.setEnabled(False)
         QApplication.processEvents()
         λnow = self._lsr.lbd
-        self._lsr  = λnow + const* step
-        time.sleep(0.25)
-        self.ui.lblWlgth.setText('{:.3f}'.format(self._lsr.lbd))
+        time.sleep(0.01)
+        self._lsr.lbd  = λnow + const* step
+        time.sleep(0.01)
+        lbd = self._lsr.lbd
+        self.ui.lblWlgth.setText('{:.3f}'.format(lbd))
 
         self.ui.butUp.setEnabled(True)
         self.ui.butDown.setEnabled(True)

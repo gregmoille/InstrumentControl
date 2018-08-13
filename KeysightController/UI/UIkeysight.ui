@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>930</width>
-    <height>703</height>
+    <width>933</width>
+    <height>665</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1853,22 +1853,83 @@ QDateEdit::down-arrow:focus {
               </widget>
              </item>
              <item>
-              <widget class="QSpinBox" name="spinRes">
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
+              <widget class="QFrame" name="frame_4">
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
                </property>
-               <property name="suffix">
-                <string> pm</string>
+               <property name="frameShadow">
+                <enum>QFrame::Raised</enum>
                </property>
-               <property name="minimum">
-                <number>0</number>
-               </property>
-               <property name="maximum">
-                <number>100</number>
-               </property>
-               <property name="singleStep">
-                <number>5</number>
-               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_5">
+                <item>
+                 <widget class="QSpinBox" name="spinRes">
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="suffix">
+                   <string> pm</string>
+                  </property>
+                  <property name="minimum">
+                   <number>0</number>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>5</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_8">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>15</height>
+                   </size>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Current λ</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QFrame" name="frame_3">
+                  <property name="styleSheet">
+                   <string notr="true">background-color: #000;</string>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::StyledPanel</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Sunken</enum>
+                  </property>
+                  <layout class="QHBoxLayout" name="horizontalLayout_6">
+                   <item>
+                    <widget class="QLabel" name="lblWlgth">
+                     <property name="frameShape">
+                      <enum>QFrame::Box</enum>
+                     </property>
+                     <property name="text">
+                      <string>1430. 000</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                     <property name="margin">
+                      <number>0</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
             </layout>
@@ -1970,6 +2031,68 @@ QDateEdit::down-arrow:focus {
            </widget>
           </item>
           <item>
+           <spacer name="verticalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>15</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Power</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_5">
+            <property name="styleSheet">
+             <string notr="true">background-color: #000;</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Sunken</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QLabel" name="lblPower">
+               <property name="frameShape">
+                <enum>QFrame::Box</enum>
+               </property>
+               <property name="text">
+                <string>0.00</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="margin">
+                <number>0</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_5">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -2016,17 +2139,13 @@ QDateEdit::down-arrow:focus {
      </widget>
     </item>
    </layout>
-   <zorder>widget</zorder>
-   <zorder>label_5</zorder>
-   <zorder>frame_8</zorder>
-   <zorder>frame</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>930</width>
+     <width>933</width>
      <height>22</height>
     </rect>
    </property>
@@ -2042,7 +2161,6 @@ QDateEdit::down-arrow:focus {
   <tabstop>spinAttLbd</tabstop>
   <tabstop>butSet</tabstop>
   <tabstop>butFetch</tabstop>
-  <tabstop>spinRes</tabstop>
   <tabstop>butUp</tabstop>
   <tabstop>butDown</tabstop>
   <tabstop>sliderStep</tabstop>
@@ -2085,38 +2203,6 @@ QDateEdit::down-arrow:focus {
    </hints>
   </connection>
   <connection>
-   <sender>sliderStep</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>spinRes</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>729</x>
-     <y>265</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>813</x>
-     <y>223</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinRes</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>sliderStep</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>850</x>
-     <y>227</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>727</x>
-     <y>179</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>butConnectLaser</sender>
    <signal>toggled(bool)</signal>
    <receiver>butResetLaser</receiver>
@@ -2145,6 +2231,38 @@ QDateEdit::down-arrow:focus {
     <hint type="destinationlabel">
      <x>816</x>
      <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sliderStep</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>spinRes</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>728</x>
+     <y>259</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>804</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinRes</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>sliderStep</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>794</x>
+     <y>195</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>734</x>
+     <y>195</y>
     </hint>
    </hints>
   </connection>

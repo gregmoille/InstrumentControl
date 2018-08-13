@@ -73,8 +73,14 @@ class KeysightControll(QMainWindow):
         self.ui.butConnectDet.clicked.connect(self.ConnectDet)
         self.ui.butSet.clicked.connect(self.SetLaser)
         self.ui.butFetch.clicked.connect(self.FetchLaser)
+        self.ui.butUp.clicked.connect(lambda: self.ChangeLbd('up'))
+        self.ui.butDown.clicked.connect(lambda: self.ChangeLbd('up'))
+
         self.ui.butAcquire.clicked.connect(self.PlotPower)
         self.ui.butClear.clicked.connect(self.ClearPlot)
+
+
+
 
         # -- Create a graph --
         ut.CreatePyQtGraph(self, [0, 5], self.ui.mplvl, 
@@ -128,7 +134,7 @@ class KeysightControll(QMainWindow):
 
     @_isConnected('_laserconnected')
     def SetLaser(self,val):
-        self._lsr.lbd = self._lsr.lbd
+        self._lsr.lbd = self.ui.spinLaserLbd.value()
         self._lsr.power = self.ui.spinLaserPow.value()
         self._lsr.attenuation = self.ui.spinAtt.value()
         self._lsr.attenuation_lbd = self.ui.spinAttLbd.value()
@@ -139,11 +145,34 @@ class KeysightControll(QMainWindow):
         self.ui.spinLaserPow.setValue(self._lsr.power)
         self.ui.spinAtt.setValue(self._lsr.attenuation)
         self.ui.spinAttLbd.setValue(self._lsr.attenuation_lbd)
+        self.ui.lblWlgth.setText('{:.3f}'.format(self._lsr.lbd))
+
+    @_isConnected('_laserconnected')
+    ChangeLbd(self,dir):
+    const = 1
+    if dir == 'down':
+        const = -1
+
+    step = self.ui.spinRes.value()*1e-3
+    self.ui.butUp.setEnabled(False)
+    self.ui.butDown.setEnabled(False)
+    self.ui.sliderStep.setEnabled(False)
+    self.ui.spinRes.setEnabled(False)
+    QApplication.processEvents()
+    λnow = self._lsr.lbd
+    self._lsr  = λnow + const* step
+    time.sleep(0.25)
+    self.ui.lblWlgth.setText('{:.3f}'.format(self._lsr.lbd))
+
+    self.ui.butUp.setEnabled(True)
+    self.ui.butDown.setEnabled(True)
+    self.ui.sliderStep.setEnabled(True)
+    self.ui.spinRes.setEnabled(True)
+    QApplication.processEvents()
 
     @_isConnected('_detconnected')
     def PlotPower(self, val):
         if self._plotting:
-            
             self._plotting = False
             self.threadPlot.stop()
             self.ui.butAcquire.setText('Acquire')
@@ -193,6 +222,7 @@ class KeysightControll(QMainWindow):
             def UpdatePlot(tpl):
                 t = tpl[0]
                 P = tpl[1]
+                self.ui.lblPower.setText('{:.5f}'.format(P))
                 for line in self.current_trace:
                     self.my_plot.removeItem(line)
                 self.current_trace = [pg.PlotDataItem(x = t, y = P,

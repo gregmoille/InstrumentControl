@@ -79,8 +79,8 @@ class KeysightControll(QMainWindow):
         self.ui.butAcquire.clicked.connect(self.PlotPower)
         self.ui.butClear.clicked.connect(self.ClearPlot)
 
-
-
+        self.ui.butResetLaser.clicked.connect(self.resetLaser)
+        self.ui.butResetDet.clicked.connect(self.resetDet)
 
         # -- Create a graph --
         ut.CreatePyQtGraph(self, [0, 5], self.ui.mplvl, 
@@ -172,6 +172,14 @@ class KeysightControll(QMainWindow):
         self.ui.spinRes.setEnabled(True)
         QApplication.processEvents()
 
+    @_isConnected('_laserconnected')
+    def resetLaser(self, val):
+        self._lsr.reset = True
+
+    @_isConnected('_detconnected')
+    def resetDet(self, val):
+        self._det.reset = True
+
     @_isConnected('_detconnected')
     def PlotPower(self, val):
         if self._plotting:
@@ -224,11 +232,14 @@ class KeysightControll(QMainWindow):
             def UpdatePlot(tpl):
                 t = tpl[0]
                 P = tpl[1]
-                self.ui.lblPower.setText('{:.5f}'.format(P))
+                self.ui.lblPower.setText('{:.5f}'.format(P[-1]))
                 for line in self.current_trace:
                     self.my_plot.removeItem(line)
-                self.current_trace = [pg.PlotDataItem(x = t, y = P,
+                try:
+                    self.current_trace = [pg.PlotDataItem(x = t, y = P,
                                                 pen=self.linepen[0],color = self._clr[0])]
+                except:
+                    self.current_trace = []
                 for c in self.current_trace:
                     self.my_plot.addItem(c)
 

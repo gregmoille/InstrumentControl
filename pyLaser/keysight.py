@@ -103,7 +103,7 @@ class Keysight8164B():
     @_isOpen
     def reset(self, val):
         if val:
-            word = "*RST"
+            word = "SOUR0:WAV:SWEEP 0"
             self._instr.write(word)
             time.sleep(0.5)
             # Changing unit to dBm

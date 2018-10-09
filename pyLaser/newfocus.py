@@ -1,6 +1,6 @@
 import sys
 import time
-import ipdb
+# import ipdb
 import numpy as np
 
 import os
@@ -12,7 +12,7 @@ try:
     from System.Reflection import Assembly
 except:
     pass
-import ipdb
+# import ipdb
 
 path = os.path.realpath('../')
 if not path in sys.path:

@@ -45,6 +45,7 @@ class Keysight7744A():
     @property
     @_isOpen
     def lbd(self):
+
         self._lbd = self._instr.query('SENS:POW:WAV?')
         self._lbd = float(self._lbd.strip())
         return self._lbd*1e9
@@ -59,7 +60,8 @@ class Keysight7744A():
     @property
     @_isOpen
     def power(self):
-        self._power = self._instr.query('FETC:POW?')
+        self._instr.write('INIT:CHAN1:CONT 1')
+        self._power = self._instr.query('FETC:CHAN1:POW?')
         self._power = float(self._power.strip())*1e3
         return self._power
 
@@ -72,7 +74,7 @@ class Keysight7744A():
     @_isOpen
     def reset(self, val):
         if val:
-            word = "*RST"
+            word = "WAVE:SWEEP:STAT 0"
             self._instr.write(word)
             time.sleep(0.5)
             # Changing unit to dBm

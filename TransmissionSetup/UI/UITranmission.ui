@@ -1307,7 +1307,7 @@ QDateEdit::down-arrow:focus {
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">:/qss_icons/rc/radio_checked.png</pixmap>
+             <pixmap>:/qss_icons/rc/radio_checked.png</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>
@@ -1384,7 +1384,7 @@ QDateEdit::down-arrow:focus {
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">:/qss_icons/rc/radio_checked.png</pixmap>
+             <pixmap>:/qss_icons/rc/radio_checked.png</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>
@@ -2137,7 +2137,7 @@ QDateEdit::down-arrow:focus {
                    <string/>
                   </property>
                   <property name="pixmap">
-                   <pixmap resource="QDarkStyleSheet-master/qdarkstyle/style.qrc">:/qss_icons/rc/radio_checked.png</pixmap>
+                   <pixmap>:/qss_icons/rc/radio_checked.png</pixmap>
                   </property>
                   <property name="scaledContents">
                    <bool>true</bool>
@@ -4655,8 +4655,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>958</x>
-     <y>318</y>
+     <x>952</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>779</x>
@@ -4719,8 +4719,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>958</x>
-     <y>318</y>
+     <x>952</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>1048</x>
@@ -4735,8 +4735,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>958</x>
-     <y>318</y>
+     <x>952</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>952</x>
@@ -4751,8 +4751,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>958</x>
-     <y>318</y>
+     <x>952</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>1048</x>
@@ -4767,12 +4767,12 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>958</x>
-     <y>318</y>
+     <x>952</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
-     <x>615</x>
-     <y>193</y>
+     <x>597</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>
@@ -4835,8 +4835,8 @@ Update</string>
      <y>293</y>
     </hint>
     <hint type="destinationlabel">
-     <x>333</x>
-     <y>305</y>
+     <x>312</x>
+     <y>312</y>
     </hint>
    </hints>
   </connection>
@@ -4847,8 +4847,8 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>304</y>
+     <x>88</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel">
      <x>270</x>
@@ -4863,12 +4863,12 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>90</x>
-     <y>304</y>
+     <x>88</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>490</x>
-     <y>193</y>
+     <x>468</x>
+     <y>197</y>
     </hint>
    </hints>
   </connection>
@@ -4899,8 +4899,8 @@ Update</string>
      <y>291</y>
     </hint>
     <hint type="destinationlabel">
-     <x>199</x>
-     <y>292</y>
+     <x>196</x>
+     <y>312</y>
     </hint>
    </hints>
   </connection>
@@ -4911,12 +4911,12 @@ Update</string>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>72</x>
-     <y>283</y>
+     <x>88</x>
+     <y>311</y>
     </hint>
     <hint type="destinationlabel">
-     <x>197</x>
-     <y>266</y>
+     <x>196</x>
+     <y>280</y>
     </hint>
    </hints>
   </connection>

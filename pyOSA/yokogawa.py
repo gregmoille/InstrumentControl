@@ -8,8 +8,8 @@ class Yokogawa(object):
     """
     To Do:
         - detect when the OSA is back on local mode
-            - add a close buton    
-            - automatically reopen a socket when pressing connect 
+            - add a close buton
+            - automatically reopen a socket when pressing connect
               but cannot fetch any response from the OSA
         - add a parameter strcture when .mat is saved
         - everything is shift from 1 index in the resolution
@@ -62,7 +62,7 @@ class Yokogawa(object):
 
     def EmptyBuffer(self):
         ReadBuffer = b''
-        self.socket.send(b' \n') 
+        self.socket.send(b' \n')
         while not ReadBuffer == b'\n':
             try:
                 ReadBuffer = self.socket.recvfrom(1)[0]
@@ -96,7 +96,7 @@ class Yokogawa(object):
         self._params['resol'] = val['resol']
         self._params['pts'] = val['pts']
         self._params['pts_auto'] = val['pts_auto']
-        self._params['bdwdth'] =  val['bdwdth'] 
+        self._params['bdwdth'] =  val['bdwdth']
 
 
         self.Write_OSA(":SENSe:WAVelength:CENTer " + str(self._params['centwlgth']*1e9) + 'nm\n')
@@ -113,7 +113,7 @@ class Yokogawa(object):
             self.Write_OSA(":INITiate:SMODe 2\n")
             self.Write_OSA(":INITiate\n")
             self._scanStatus = 2
-            
+
         elif ScanType.lower() == 'single':
             self.Write_OSA(":INITiate:SMODe 1\n")
             self.Write_OSA(":INITiate\n")
@@ -129,17 +129,29 @@ class Yokogawa(object):
             for ii in range(x.size):
                 fid.write('{},{}\n'.format(x[ii], y[ii]))
 
-    def PlotlyTrace(self):
+    def PlotlyTrace(self, xlim = [], ylim = [], freq= False):
         init_notebook_mode(connected=True)
+        c = 299792458
         lbd, S = self.GetTrace('TRA')
+        if freq:
+            x = 1e-12*c/lbd
+        else:
+            x = lbd*1e9
         trace0 = go.Scatter(
-                        x = lbd*1e9,
+                        x = x,
                         y = S,
                         mode = 'lines',
                         name = 'T')
         data = [trace0]
-        layout = dict(xaxis = dict(title = 'Wavelength (nm)'),
-                  yaxis = dict(title = 'Signal (dBm)'),
+        layout = dict(xaxis = {'title' : 'Wavelength (nm)',
+                            'showspikes': True, 'spikethickness':1},
+                  yaxis = {'title': 'Signal (dBm)',
+                            'showspikes': True, 'spikethickness':1},
                   )
-        fig = go.Figure(data=data, layout=layout)
+        if xlim:
+            layout['xaxis'].update(range = xlim)
+        if ylim:
+            layout['yaxis'].update(range = ylim)
+        fig = go.Figure(data=data, layout = layout)
         iplot(fig)
+        return fig

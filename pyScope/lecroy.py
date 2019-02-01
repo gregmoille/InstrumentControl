@@ -46,7 +46,7 @@ class TimeStamp:
 class UnitDefinition:
     length = 48
     string = 'unit_definition'
-    
+
 # all commands to be querried as scope settings
 setting_commands = ['TIME_DIV', 'COMM_FORMAT', 'COMM_HEADER', 'COMM_ORDER'] + \
     ['TRIG_DELAY', 'TRIG_SELECT', 'TRIG_MODE', 'TRIG_PATTERN', 'SEQUENCE'] + \
@@ -119,7 +119,7 @@ wavedesc_template = ( ('descriptor_name'    , 0   , String),
                       ('vertical_vernier'   , 336 , Float),
                       ('acq_vert_offset'    , 340 , Float),
                       ('wave_source'        , 344 , Enum) )
-                      
+
 headerformat = '>BBBBL'
 
 errors = { 1  : 'unrecognized command/query header',
@@ -150,7 +150,7 @@ class LeCroyScope(object):
 
     def __del__(self):
         self.sock.close()
-    
+
     def clear(self, timeout=0.5):
         '''
         Clear any bytes in the oscilloscope's output queue by receiving
@@ -205,7 +205,7 @@ class LeCroyScope(object):
         if err in errors:
             self.sock.close()
             raise Exception(errors[err])
-        
+
     def get_settings(self):
         '''
         Captures the current settings of the scope as a dict of Command->Setting.
@@ -243,7 +243,7 @@ class LeCroyScope(object):
         further commands, i.e. nonblocking.
         '''
         self.send('arm;wait')
-        
+
     def set_sequence_mode(self, nsequence):
         '''
         Sets the scope to use sequence mode for aquisition.
@@ -265,7 +265,7 @@ class LeCroyScope(object):
 
         msg = self.recv()
         print(msg[1])
-       
+
         # if not int(msg[1]) == channel:
         #     raise RuntimeError('waveforms out of sync or comm_header is off.')
 
@@ -274,7 +274,7 @@ class LeCroyScope(object):
         startpos = re.search(b'WAVEDESC', data.read()).start()
 
         wavedesc = {}
-        
+
         # check endian
         data.seek(startpos + 34)
         if struct.unpack('<'+Enum.packfmt, data.read(Enum.length)) == 0:
@@ -309,9 +309,9 @@ class LeCroyScope(object):
     def get_waveform(self, channel):
         '''
         Capture the raw data for `channel` from the scope and return a tuple
-        containing the wave descriptor and a numpy array of the digitized 
+        containing the wave descriptor and a numpy array of the digitized
         scope readout.
-        ''' 
+        '''
         self.send('c{:d}:wf? dat1'.format(channel))
         msg = self.recv().decode('cp1252')
         # ipdb.set_trace()
@@ -322,7 +322,7 @@ class LeCroyScope(object):
         x = np.linspace(0 , wavedesc['horiz_interval']*y.size, y.size )
 
         return x, y , wavedesc
-        
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     scope = LeCroyScope('169.0.0.2')
@@ -332,4 +332,3 @@ if __name__ == '__main__':
     # ax.plot(b[::10])
     # f.show()
     scope.sock.close()
-    

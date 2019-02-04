@@ -16,10 +16,10 @@ from matplotlib.animation import FuncAnimation
 work_dir = path = os.path.abspath(__file__ + '/..')
 path = 'Z:/PythonSoftware/NewInstrumentControl'
 if not path in sys.path:
-    sys.path.insert(0, path) 
+    sys.path.insert(0, path)
 # import pyUtilities as ut
 import msvcrt
-from pyLaser import NewFocus6700,Toptica1050  
+from pyLaser import NewFocus6700,Toptica1050
 from pyWavemeter import Wavemeter
 from pyPowerMeter import ThorlabsP1xx
 # from workers import DcScan, FreeScan
@@ -39,7 +39,7 @@ class DCScan():
         self.wavemeter = kwargs.get('wavemeter', None)
         self.wavemeter_ch = kwargs.get('wavemeter_ch', 2)
         self.daq_ch = kwargs.get('daq_ch', ['ai0'])
-        self.daq_dev = kwargs.get('daq_dev', 'Dev1') 
+        self.daq_dev = kwargs.get('daq_dev', 'Dev1')
         self.Pin_ratio = kwargs.get('Pin_ratio', 2/98)
         self.Pout_ratio = kwargs.get('Pout_ratio', 1/10)
         self.Pmeter_in = kwargs.get('Pmeter_in', None)
@@ -64,19 +64,15 @@ class DCScan():
         print('Scan Speed: {} nm/s'.format(speed))
         print('Scan Time: {}s'.format(scan_time))
 
-        
+
         while lsr._is_changing_lbd or np.abs(lsr.lbd -lim[0])>0.5 :
             print('setting lbd: {:.3f}nm'.format(lsr.lbd),end = "\r")
             time.sleep(0.1)
         print('setting lbd: {:.3f}nm'.format(lsr.lbd))
 
-
-
-        # -- Wait for tabilization --
+        # -- Wait for stabilization --
         # -----------------------------------------------
         time.sleep(1)
-
-
         if wlm:
             wlm.pulsemode = False
             wlm.widemode = False
@@ -93,8 +89,8 @@ class DCScan():
 
         else:
             lbd_start = lsr.lbd
-        
-        
+
+
         # Setup the DAQ
         ch = self.daq_ch
         dev = self.daq_dev
@@ -105,7 +101,7 @@ class DCScan():
         Npts = scan_time*clk
         self.readtask = nidaqmx.Task()
 
-        
+
         if not type(ch)==list:
             ch = [ch]
         ch = dev + '/' +  ',{}/'.format(dev).join(ch)
@@ -115,8 +111,8 @@ class DCScan():
         print('\tReading from {}'.format(ch))
         print('\tNpts: {}'.format(Npts))
         self.readtask.ai_channels.add_ai_voltage_chan(ch,min_val=-0.5, max_val=10)
-        self.readtask.timing.cfg_samp_clk_timing(clk, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=int(Npts)) 
-        
+        self.readtask.timing.cfg_samp_clk_timing(clk, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=int(Npts))
+
         # daq.SetupRead(read_ch=['ai0', 'ai23'])
         self._daqScanning = True
         self.data = []
@@ -132,8 +128,8 @@ class DCScan():
             self.readtask.close()
             self.data = np.array(self.data)
             self._done_get_data = True
-            
-            
+
+
 
         threadDAQdata = threading.Thread(target=_GetData, args=())
         threadDAQdata.daemon = True
@@ -141,20 +137,20 @@ class DCScan():
         lsr.scan = True
         self.readtask.start()
         t1 = time.time()
-        _lbdscan = [lsr._lbdscan]
-        # t_scan = 
+        _lbdscan = [lsr.lbd]
+        # t_scan =
         threadDAQdata.start()
         print('-'*20 + 'Start Scan')
-        while lsr._lbdscan <= lim[1]-1:
-            _lbdscan += [lsr._lbdscan] 
-            print('\t lbd: {:.3f}'.format(lsr._lbdscan),end = "\r")
+        while _lbdscan<= lim[1]-1 or lsr._lim[0] >= _lbdscan or _lbdscan >= lsr._lim[1]:
+            _lbdscan += [lsr.lbd]
+            print('\t lbd: {:.3f}'.format(lsr.lbd),end = "\r")
             time.sleep(0.001)
 
         lsr.scan = False
         self._daqScanning = False
-            
+
         t2 = time.time()
-        print('\t lbd: {:.3f}'.format(lsr._lbdscan))
+        print('\t lbd: {:.3f}'.format(lsr.lbd))
 
         print('-'*20 + 'End Scan')
         t_end = t2-t1
@@ -165,7 +161,7 @@ class DCScan():
 
         T = self.data[0]
         MZ = self.data[1]
-        t_daq = np.linspace(0,self.time_end_daq-self.time_start_daq, T.size) 
+        t_daq = np.linspace(0,self.time_end_daq-self.time_start_daq, T.size)
         _lbdscan = np.array(_lbdscan)
         t_scan = np.linspace(0, t_end, _lbdscan.size)
         lbdscan = np.interp(t_daq, t_scan,_lbdscan)
@@ -179,7 +175,7 @@ class DCScan():
         lbdscan = lbdscan[ind]
 
 
-        
+
         # -- Get Input and Output Power --
         # --------------------------------------------------------
         if self.Pmeter_in:
@@ -193,7 +189,7 @@ class DCScan():
             if self.Pmeter_out:
                 self.Pmeter_out.lbd = 1050
                 Pout = self.Pmeter_out.read*self.Pout_ratio
-                Pout = 10*np.log10(Pout*1e3)            
+                Pout = 10*np.log10(Pout*1e3)
                 # self.Pmeter_out._instr.close()
                 print('\tOutput Power {:.3f}dBm'.format(Pout))
                 print('\tInsertion losses: {:.3f}dB'.format(Pin-Pout))
@@ -203,7 +199,7 @@ class DCScan():
             Pin = None
             self.Pmeter_out.lbd = 1050
             Pout = self.Pmeter_out.read/self.Pout_ratio
-            Pout = 10*np.log10(Pout*1e3)            
+            Pout = 10*np.log10(Pout*1e3)
             # self.Pmeter_out._instr.close()
             print('\tOutput Power {:.3f}dBm'.format(Pout))
             print('\tInsertion losses: {:.3f}dB'.format(Pin-Pout))
@@ -228,44 +224,20 @@ class DCScan():
             lbd_stop = lsr.lbd
 
         # downsample the data
-        dataT = np.array([lbdscan, T]).T 
-        dataMZ = np.array([lbdscan, MZ]).T 
+        dataT = np.array([lbdscan, T]).T
+        dataMZ = np.array([lbdscan, MZ]).T
         # ipdb.set_trace()
         if self.sub >1:
             dataTsmall =  np.array([lbdscan[::self.sub], T[::self.sub]]).T
             dataMZsmall =  np.array([lbdscan[::self.sub], MZ[::self.sub]]).T
-            # fix for the NF 67xx
-            # ind = np.where(lbdscan>lbdscan[0])
-            # t_daq = t_daq[ind]
-            # T = T[ind]
-            # MZ= MZ[ind]
-            # lbdscan = lbdscan[ind]
-            # ind = np.where(lbdscan<lbdscan[-1])
-            # t_daq = t_daq[ind]
-            # T = T[ind]
-            # MZ= MZ[ind]
-            # lbdscan = lbdscan[ind]
- 
-            # ind = np.where(np.logical_not(
-            #                 np.logical_or(np.sign(np.diff(lbdscan))==0, 
-            #                 np.sign(np.diff(lbdscan))==-1))
-            #             )
-            # t_daq = t_daq[ind]
-            # T = T[ind]
-            # MZ= MZ[ind]
-            # lbdscan = lbdscan[ind]
 
-
-            # dataTsmall = lttb.downsample(dataT, n_out=int(MZ.size/self.sub))
-            
-            # dataMZsmall = lttb.downsample(dataMZ, n_out=int(MZ.size/self.sub))
         else:
             dataTsmall = dataT
             dataMZsmall = dataMZ
-        # # -- Dictionarry of full data -- 
+        # # -- Dictionarry of full data --
         # --------------------------------------------------------
         full_data = {'lbd_start': lbd_start,
-                    'lbd_stop': lbd_stop, 
+                    'lbd_stop': lbd_stop,
                     'lbd_scan': lbdscan,
                     'T': T,
                     'MZ': MZ,
@@ -304,7 +276,7 @@ class DCScan():
 class FreeRun():
     def __init__(self,**kwargs):
         self.daq_ch = kwargs.get('daq_ch', 'ai0')
-        self.daq_dev = kwargs.get('daq_dev', 'Dev1') 
+        self.daq_dev = kwargs.get('daq_dev', 'Dev1')
         self.lsr = kwargs.get('laser', None)
 
     def run(self):
@@ -313,7 +285,7 @@ class FreeRun():
         T = 1/20
         # _laser = self.lsr
         Npts = T*clk * 2
-        # -- define the writting signal -- 
+        # -- define the writting signal --
         t= np.linspace(0, 2*T, Npts)
         # -- setup the daq --
         dev = self.daq_dev
@@ -331,12 +303,12 @@ class FreeRun():
             readtask = nidaqmx.Task()
             # print(ch_read)
             readtask.ai_channels.add_ai_voltage_chan(ch_read,min_val=0, max_val=5)
-            readtask.timing.cfg_samp_clk_timing(clk, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=int(Npts)) 
+            readtask.timing.cfg_samp_clk_timing(clk, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=int(Npts))
             data = readtask.read(number_of_samples_per_channel=int(Npts))
             readtask.close()
             return data
 
-     # -- Define the Animation for Matplotlib -- 
+     # -- Define the Animation for Matplotlib --
         class MyDataFetchClass(threading.Thread):
             def __init__(self):
                 threading.Thread.__init__(self)
@@ -350,19 +322,16 @@ class FreeRun():
                 f, ax = plt.subplots()
                 self.hLine = []
                 self.hLine += ax.plot(self.X,self.Y)
-                # self.hLine += ax.plot(t,write, '.', ms = 4)
-                # self.hLine += ax.plot(t,write)
-                # self.hLine += ax.plot(t[0],write[0], 'v')
                 f.show()
                 self.ani = FuncAnimation(f, self.update, frames =  2000000,interval = 10)
                 self.f_num = f.number
                 # self.lsr = _laser
 
-            def update(self, i):  
+            def update(self, i):
                 for ii in range(len(self.X)):
                     self.hLine[ii].set_data(self.X[ii], self.Y[ii])
-               
-            
+
+
 
 
             def run(self):
@@ -370,21 +339,12 @@ class FreeRun():
                     nt = int(Npts/2)
                     data = FetchDAQ(clk, Npts,dev, ch_read)
                     Trans  = np.array(data[0])
-                    # print(V)
-                    # self.X = [t]
-                    # self.Y = [y_smooth]
                     self.X = [t]
                     self.Y = [Trans]
-                    # self._nextCall = self._nextCall + self._period;
-                    # time.sleep(1)
-        # self.data = MyDataClass()
-        # plotter = MyPlotClass(self.data)
-        
-        # def Slide(x):
-        #     self.lsr.pzt = x
+
 
         fetcher = MyDataFetchClass()
-        
+
         # fetcher.daemon = True
         fetcher.start()
         # interact(Slide, x= widgets.FloatSlider(min=0,max=100, step = 0.01))
@@ -403,20 +363,20 @@ class PiezoScan():
         self.daq_ch = kwargs.get('daq_ch', 'ai0')
         self.daq_write = kwargs.get('daq_write', 'ao0')
         self.daq_probe = kwargs.get('daq_probe', 'ai16')
-        self.daq_dev = kwargs.get('daq_dev', 'Dev1') 
+        self.daq_dev = kwargs.get('daq_dev', 'Dev1')
 
     def Triangle(self, T, Npts):
         clk = 0.75e6
-        Vmax = self.Vmax/self.Vcoeff 
+        Vmax = self.Vmax/self.Vcoeff
         Vmin = 0
         t = np.linspace(0, 2*T, Npts)
         down = lambda x : x *(Vmin-Vmax)/(T*0.5) + Vmax
         up = lambda x : x *(Vmax-Vmin)/(T*0.5)
-        t = np.linspace(0, 2*T, Npts)    
+        t = np.linspace(0, 2*T, Npts)
         x = t[np.where(t<T/2)]
         ydown = list(down(x))
         yup = list(up(x))
-        y = ydown + yup 
+        y = ydown + yup
         to_add = int(t.size/4)
         y = list(np.zeros(to_add)) + y + list(np.zeros(to_add))
 
@@ -428,14 +388,14 @@ class PiezoScan():
 
     def Slope(self, T, Npts):
         clk = 0.75e6
-        Vmax = self.Vmax/self.Vcoeff 
+        Vmax = self.Vmax/self.Vcoeff
         Vmin = self.Vmin
         t = np.linspace(0, 2*T, Npts)
         up = lambda x : -x *(Vmax-Vmin)/T + Vmin + Vmax
-        t = np.linspace(0, 2*T, Npts)    
+        t = np.linspace(0, 2*T, Npts)
         x = t[np.where(t<=T)]
         yup = list(up(x))
-        y = yup 
+        y = yup
         to_add = int(t.size/4)
         y = list(np.zeros(to_add)) + y + list(np.zeros(to_add))
 
@@ -454,7 +414,7 @@ class PiezoScan():
         clk = 0.1e6
         T = 1/20
         Npts = T*clk * 2
-        # -- define the writting signal -- 
+        # -- define the writting signal --
         t, write = self.Slope(T, Npts)
         ind_T =  np.where(t<=T)[0][-1]
         # -- setup the daq --
@@ -474,7 +434,7 @@ class PiezoScan():
             readtask = nidaqmx.Task()
             # print(ch_read)
             readtask.ai_channels.add_ai_voltage_chan(ch_read,min_val=-0.5, max_val=1.1*Vmax)
-            readtask.timing.cfg_samp_clk_timing(clk, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=int(Npts)) 
+            readtask.timing.cfg_samp_clk_timing(clk, sample_mode=AcquisitionType.CONTINUOUS, samps_per_chan=int(Npts))
 
             writetask = nidaqmx.Task()
             writetask.ao_channels.add_ao_voltage_chan("{}/{}".format(dev, ch_write))
@@ -489,7 +449,7 @@ class PiezoScan():
             return data
 
 
-        # -- Define the Animation for Matplotlib -- 
+        # -- Define the Animation for Matplotlib --
         class MyDataFetchClass(threading.Thread):
             def __init__(self):
                 threading.Thread.__init__(self)
@@ -505,14 +465,11 @@ class PiezoScan():
                 x = np.linspace(Vmin*Vcoeff, Vmax*Vcoeff, write.size)
                 self.hLine += ax.plot(x,write)
                 self.hLine += ax.plot(x, write)
-                # self.hLine += ax.plot(t,write, '.', ms = 4)
-                # self.hLine += ax.plot(t,write)
-                # self.hLine += ax.plot(t[0],write[0], 'v')
                 f.show()
                 self.ani = FuncAnimation(f, self.update, frames =  2000000,interval = 20)
                 self.f_num = f.number
 
-            def update(self, i):  
+            def update(self, i):
                 for ii in range(len(self.X)):
                     self.hLine[ii].set_data(self.X[ii], self.Y[ii])
 
@@ -524,47 +481,13 @@ class PiezoScan():
                         data = WriteAndFetchDAQ(clk, Npts,dev, ch_read, ch_write)
                         Trans  = np.array(data[0])
                         probe = np.array(data[2])
-                        # box = np.ones(int(len(probe)/nt))/(len(probe)/nt)
-                        # y_smooth = np.convolve(probe, box, mode='same')
-                        # # ind = (np.diff(np.sign(np.diff(y_smooth))) < 0).nonzero()[0] + 1
-                        # # ind = ind[y_smooth[ind]>Vmax/2][0]
-                        # # limd_T =  [ind,ind + ind_T]
-                        # indl = y_smooth.argmin()
-                        # indr = y_smooth.argmax()
-                        # ind = [indl, indr]
-                        # limd_T  = ind
-                        # t_sync = t[ind]
-                        # t_marker = t[limd_T]- t_sync
-                        # ind = range(limd_T[0], limd_T[1])
-                        # # ipdb.set_trace()
-                        # t_new = t[ind]  
-                        # t_new = t_new  -t_new[0]
-                        # V = probe[ind]
-                        # T = Trans[ind]
-                        # Prb = probe[ind]
-                        # ind_min = np.argmin(V)
-                        # ind1 = range(0, ind_min)
-                        # ind2  = range(ind_min, V.size)
-                        # V1 = V[ind1]
-                        # V2 = V[ind2]
-                        # T1 = T[ind1]
-                        # T2 = T[ind2]
-                        
-
-
-                        
-                        # print(V)
                         self.X = [probe*Vcoeff]
                         self.Y = [Trans]
-                        # self._nextCall = self._nextCall + self._period;
-                        # time.sleep(1)
-                    else: 
+                    else:
                         print('stop')
                         break
-        # self.data = MyDataClass()
-        # plotter = MyPlotClass(self.data)
         fetcher = MyDataFetchClass()
-        # fetcher.daemon = True
+
         fetcher.start()
 
 def ReadPmeter(Pmeter, ratio):
@@ -574,7 +497,7 @@ def ReadPmeter(Pmeter, ratio):
             if ord(msvcrt.getch()) == 27:
                 break
         else:
-            
+
             print("Power Read: {:.3f}uW".format(Pmeter.read*1e6 *ratio), end = "\r")
 
 def SaveDCdata(data, path,fname):
@@ -610,9 +533,9 @@ if __name__ =="__main__":
                         daq_probe = 'ai16', daq_write = 'ao0' )
 
         Free = FreeRun(laser = lsr,daq_ch = ['ai0'], daq_dev = 'Dev3',)
-   
-   
-        DC = TopticaWorker(laser = lsr, wavemeter = None, 
+
+
+        DC = TopticaWorker(laser = lsr, wavemeter = None,
                              daq_ch = daq_ch, daq_dev = 'Dev3',
                             Pmeter_in = None, Pmeter_out = None,
                             Pin_ratio= 10, Pout_ratio= 10)
@@ -622,4 +545,4 @@ if __name__ =="__main__":
         # fname = 'LigentechG3_1b11_RW810G520_600mW'
         # # io.savemat(path + '/' + fname + '.mat', data)
         # plt.close('all')
-        # 
+        #

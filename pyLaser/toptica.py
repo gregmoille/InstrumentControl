@@ -47,6 +47,7 @@ class Toptica1050():
         self._get = "param-ref "
         self._lsr = "'laser1:"
         self._exec = 'exec '
+        lsr._lim = [1020, 1070]
 
         # QUick Fix
         self._has_err = False
@@ -100,7 +101,7 @@ class Toptica1050():
             self._open = True
             time.sleep(0.5)
             self._empty_buff()
-            
+
         else:
             self._dev.close()
             self._open = False
@@ -135,11 +136,12 @@ class Toptica1050():
     @InOut.accepts(float)
     # @Catch.error
     def lbd(self, value):
-        word = "({} {}ctl:wavelength-set {:.3f})".format(self._set,
-                                                         self._lsr, value)
-        self.Query(word)
-        self._empty_buff()
-        self._lbd = value
+        if lsr._lim[0] <= value <= lsr._lim[1]:
+            word = "({} {}ctl:wavelength-set {:.3f})".format(self._set,
+                                                             self._lsr, value)
+            self.Query(word)
+            self._empty_buff()
+            self._lbd = value
 
     @property
     @InOut.output(float)
@@ -154,7 +156,7 @@ class Toptica1050():
     @InOut.accepts(float)
     def current(self, value):
         word = "({} {}dl:cc:current-set {:.3f})".format(self._set,
-                                                        self._lsr, 
+                                                        self._lsr,
                                                         value)
         self.Query(word)
         self._empty_buff()
@@ -181,7 +183,7 @@ class Toptica1050():
                                                                  start)
         self.Query(word1)
         word2 = "({} {}ctl:scan:wavelength-end {:.3f})".format(self._set,
-                                                               self._lsr, 
+                                                               self._lsr,
                                                                stop)
         self.Query(word2)
         self._empty_buff()
@@ -200,7 +202,7 @@ class Toptica1050():
     @InOut.accepts(float)
     def scan_speed(self, value):
         word = "({} {}ctl:scan:speed {:.3f})".format(self._set,
-                                                               self._lsr, 
+                                                               self._lsr,
                                                                value)
         self.Query(word)
         self._empty_buff()
@@ -293,9 +295,9 @@ class Toptica1050():
         else:
             return False
 
-       
 
-    @property   
+
+    @property
     def _lbdscan(self):
         return self.lbd
 

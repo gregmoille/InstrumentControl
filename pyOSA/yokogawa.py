@@ -136,38 +136,21 @@ class Yokogawa(object):
 
     def PlotlyTrace(self, xlim = [], ylim = [], freq= False):
         init_notebook_mode(connected=True)
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-        freq, S = self.GetTrace('TRA')
-        
-        trace0 = go.Scatter(
-                        x = freq*1e-12,
-=======
-=======
->>>>>>> 1410c337b1a639760da0b6c2f2a2282650891862
->>>>>>> 646110f4d9a998e5ac97c2cd100b192191a06a36
         c = 299792458
         lbd, S = self.GetTrace('TRA')
         if freq:
             x = 1e-12*c/lbd
+            xlabel = 'Frequency (THz)'
         else:
+            xlabel = 'Wavelength (nm)'
             x = lbd*1e9
         trace0 = go.Scatter(
                         x = x,
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 1410c337b1a639760da0b6c2f2a2282650891862
-=======
->>>>>>> 1410c337b1a639760da0b6c2f2a2282650891862
->>>>>>> 646110f4d9a998e5ac97c2cd100b192191a06a36
                         y = S,
                         mode = 'lines',
                         name = 'T')
         data = [trace0]
-        layout = dict(xaxis = {'title' : 'Wavelength (nm)',
+        layout = dict(xaxis = {'title' : xlabel,
                             'showspikes': True, 'spikethickness':1},
                   yaxis = {'title': 'Signal (dBm)',
                             'showspikes': True, 'spikethickness':1},

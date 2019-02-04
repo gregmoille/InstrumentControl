@@ -47,7 +47,7 @@ class Toptica1050():
         self._get = "param-ref "
         self._lsr = "'laser1:"
         self._exec = 'exec '
-        lsr._lim = [1020, 1070]
+        self._lim = [1020, 1070]
 
         # QUick Fix
         self._has_err = False
@@ -136,7 +136,7 @@ class Toptica1050():
     @InOut.accepts(float)
     # @Catch.error
     def lbd(self, value):
-        if lsr._lim[0] <= value <= lsr._lim[1]:
+        if self._lim[0] <= value <= self._lim[1]:
             word = "({} {}ctl:wavelength-set {:.3f})".format(self._set,
                                                              self._lsr, value)
             self.Query(word)

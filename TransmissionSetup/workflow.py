@@ -50,8 +50,9 @@ class DCScan():
         lsr = self.lsr
         time.sleep(0.05)
         wlm = self.wavemeter
-        time.sleep(0.05)
+        time.sleep(0.5)
         lim = lsr.scan_limit
+        print('LIMITS: {}'.format(lim))
         time.sleep(0.05)
         lsr.lbd = lim[0]
         time.sleep(0.05)
@@ -133,7 +134,8 @@ class DCScan():
 
         threadDAQdata = threading.Thread(target=_GetData, args=())
         threadDAQdata.daemon = True
-        lim = lsr.scan_limit
+        # lim = lsr.scan_limit
+        print(lim)
         lsr.scan = True
         self.readtask.start()
         t1 = time.time()
@@ -141,9 +143,10 @@ class DCScan():
         # t_scan =
         threadDAQdata.start()
         print('-'*20 + 'Start Scan')
-        while _lbdscan<= lim[1]-1 or lsr._lim[0] >= _lbdscan or _lbdscan >= lsr._lim[1]:
+        print(lim)
+        while _lbdscan[-1] <= lim[1]-1 or not(lsr._lim[0] <= _lbdscan[-1] <= lsr._lim[1]):
             _lbdscan += [lsr.lbd]
-            print('\t lbd: {:.3f}'.format(lsr.lbd),end = "\r")
+            print('\t lbd: {:.3f}'.format(_lbdscan[-1]), end = '\r')
             time.sleep(0.001)
 
         lsr.scan = False

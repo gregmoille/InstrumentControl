@@ -1,6 +1,6 @@
 import sys
 import time
-import ipdb
+# import ipdb
 import numpy as np
 
 import os
@@ -12,7 +12,7 @@ try:
     from System.Reflection import Assembly
 except:
     pass
-import ipdb
+# import ipdb
 
 path = os.path.realpath('../')
 if not path in sys.path:
@@ -107,7 +107,6 @@ class NewFocus6700(object):
         super(NewFocus6700, self).__init__()
         # Load usb ddl Newport
         try:
-
             dllpath = 'C:\\Anaconda3\\DLLs\\'
             Assembly.LoadFile(dllpath + 'UsbDllWrap.dll')
             clr.AddReference(r'UsbDllWrap')

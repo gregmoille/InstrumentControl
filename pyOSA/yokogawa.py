@@ -71,14 +71,9 @@ class Yokogawa(object):
 
     def GetTrace(self, trace = 'TRA'):
         N = self.QuerryData(":TRACe:SNUMber? TRA\n", 1)
-        X = self.QuerryData(":TRACe:X? " + trace  + "\n" , int(N)*100000)
-        Y = self.QuerryData(":TRACe:Y? " + trace + "\n" , int(N)*100000)
-<<<<<<< HEAD
+        X = self.QuerryData(":TRACe:X? " + trace  + "\n" , int(N))
+        Y = self.QuerryData(":TRACe:Y? " + trace + "\n" , int(N))
         X = np.array([float(xx) for xx in X.split(',')])
-=======
-        c = 299792458
-        X = c/np.array([float(xx) for xx in X.split(',')])
->>>>>>> 646110f4d9a998e5ac97c2cd100b192191a06a36
         Y = np.array([float(xx) for xx in Y.split(',')])
         return (X,Y)
 

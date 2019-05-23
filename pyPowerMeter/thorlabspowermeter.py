@@ -4,6 +4,7 @@ import numpy as np
 import os
 import sys
 import time
+import platform
 path = os.path.realpath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
@@ -20,8 +21,12 @@ except Exception as e:
 
 class ThorlabsP1xx(object):
     #USB0::0x1313::0x807B::17121241::INSTR
-    def __init__(self,address='USB0::0x1313::0x8072::P2009986::INSTR'):
-        rm = visa.ResourceManager('@py')
+    def __init__(self,address='USB0::4883::32882::P2009986::0::INSTR'):
+        try:
+            rm = visa.ResourceManager()
+        except:
+            # Get only pythonistic version of pyvisq
+            rm = visa.ResourceManager('@py')
         if address in rm.list_resources():
             self._instr = rm.open_resource(address,timeout = 0.25)
             self._open = True
@@ -35,7 +40,7 @@ class ThorlabsP1xx(object):
             if self_app._open:
                 out = fun(*args, **kwargs)
                 return out
-        return wrapper 
+        return wrapper
 
     def Query(self, word):
         return self._instr.query(word).strip()
@@ -59,7 +64,7 @@ class ThorlabsP1xx(object):
     @isOpen
     def range(self):
         auto = self.Querry('POW:RANGE:AUTO?')
-        if auto: 
+        if auto:
             return 'auto'
         else:
             return self.Query('POW:RANGE:UPP?')
@@ -67,7 +72,7 @@ class ThorlabsP1xx(object):
 
     def close(self):
         self._instr.close()
-    
+
 
     @property
     @isOpen

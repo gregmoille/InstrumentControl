@@ -1,0 +1,4 @@
+sudo apt-get install python3-pyqt5
+sudo apt-get install python3-ipdb	
+sudo apt-get install python3-scipy
+sudo apt-get install python3-pyvisa

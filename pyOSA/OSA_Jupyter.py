@@ -102,7 +102,7 @@ dd['clr'] = wdg.Button(description = 'Clear Trace',button_style = 'info',tooltip
 dd['clr'].add_class("osa_clear")
 dd['save'] = wdg.Button(description = 'Save Spectra',button_style = 'info')
 dd['save'].add_class("osa_save")
-dd['picker'] = FileChooser('./../Projects')
+dd['picker'] = FileChooser('./../')
 dd['picker'].use_dir_icons = True
 dd['picker'].rows = 5
 dd['picker'].width = 200

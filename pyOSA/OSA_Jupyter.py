@@ -12,26 +12,23 @@ import re
 from IPython.display import display, HTML
 import time
 from IPython.display import clear_output
-try: 
-    work_dir =  os.path.abspath('G:/My Drive/Work/ExperimentalSetup/PythonSoftware/InstrumentControl/')
-    path = os.path.abspath(work_dir + '/../')
-    if not work_dir in sys.path:
-         sys.path.insert(0, work_dir)
-         print(work_dir)
-    from pyOSA import Yokogawa
-except: 
-    work_dir =  os.path.abspath('/Volumes/GoogleDrive/My Drive/Work/ExperimentalSetup/PythonSoftware/InstrumentControl/')
-    path = os.path.abspath(work_dir + '/../')
-    if not work_dir in sys.path:
-         sys.path.insert(0, work_dir)
-         print(work_dir)
-    from pyOSA import Yokogawa
+# print('*'*60)
+# print()
 
-import sys
+work_dir = os.path.join(os.path.dirname(__file__), '../../')
+work_dir = os.path.abspath(work_dir)
+path = os.path.abspath(work_dir + '/../')
+# print()
+
+if not work_dir in sys.path:
+     sys.path.insert(0, work_dir)
+     # print(work_dir)
+from pyOSA import Yokogawa
+
 
 
 print(sys.argv)
-xlim = [ float(re.findall("\d+",sys.argv[1])[0]), 
+xlim = [ float(re.findall("\d+",sys.argv[1])[0]),
         float(re.findall("\d+",sys.argv[2])[0])]
 print(xlim)
 
@@ -165,7 +162,7 @@ def scan_osa(change):
         osa.scan = change.new.lower()
         if change.new.lower() == 'single' or change.new.lower() == 'repeat':
             run_thread = True
-            
+
             thread_osa = threading.Thread(target=worker, args=(figOSA, osa))
             thread_osa.start()
         if change.new.lower() == 'stop':

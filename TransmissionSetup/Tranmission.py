@@ -1,177 +1,73 @@
-#!/usr/bin/env python
-
 import sys
-# Import PyQt wrappers
-from PyQt5.QtWidgets import QMainWindow, QApplication
-# from PyQt5.QtCore import QObject, QThread, pyqtSlot, pyqtSignal
-# from PyQt5.QtCore import pyqtSlot
-# from PyQt5 import QtCore
-# from PyQt5.QtGui import QPainter, QFont, QColor, QPen, QFontDatabase
-from PyQt5 import uic
-from PyQt5 import QtGui
-import PyQt5
+import scipy.io as io
+import numpy as np
+# import ipdb
 
-import time
+from numpy import NaN, Inf, arange, isscalar, asarray, array
+c = 299792458
 
-import threading
-
-import os
-path = os.path.realpath('./UI/QDarkStyleSheet-master/qdarkstyle/')
-if not path in sys.path:
-    sys.path.insert(0, path)
-path = os.path.realpath('../')
-if not path in sys.path:
-    sys.path.insert(0, path)
-
-Ui_MainWindow, QtBaseClass = uic.loadUiType('./UI/UITranmission.ui')
-Ui_DevWindow, QtBaseClass = uic.loadUiType('./UI/DevWindow.ui')
-# from UITranmission import Ui_MainWindow as Ui_MainWindow
-import pyUtilities as ut
-from pyNFLaser import NewFocus6700
-from pyWavemeter import Wavemeter
-import ipdb
-
-class DevWind(QMainWindow):
-    def __init__(self, parent = None):
-        super(DevWind, self).__init__(parent)
-        self.ui = Ui_DevWindow()
-        self.ui.setupUi(self)
-        self.ui.butt_clearError.clicked.connect(lambda:
-                                self.ui.text_lastError.setText(''))
-
-        self.parent = parent
-        self.ui.butt_getLaserErr.clicked.connect(self.GetLaserErr)
-
-    def GetLaserErr(self):
-        try: 
-            err = self.parent.laser.error
-            self.ui.text_lastError.setText(str(err))
-        except Exception as err:
-            self.ui.text_lastError.setText(str(err))
-
-
-class Transmission(QMainWindow):
-    def __init__(self, **kwargs):
-        super(Transmission, self).__init__()
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-        self._led = {False: QtGui.QPixmap(':/qss_icons/rc/radio_checked.png'),
-                    True: QtGui.QPixmap(':/qss_icons/rc/radio_checked_focus.png')
-                    }
-        self._blink = False
-        self.ui.slide_pzt.valueChanged[int].connect(lambda x: self.ui.spnbx_pzt.setValue(x/100))
-        self.ui.spnbx_pzt.valueChanged[float].connect(self.Pzt_Value)
-        # self.ui.slide_test.valueChanged[int].connect(self.Scan)
-        self.ui.spnbx_lbd.valueChanged[float].connect(self.SetWavelength)
-        self.ui.but_connect.clicked.connect(self.Connect)
-
-
-        # self.ui.but_connect.clicked[bool].connect(self.EnableDCscan)
-
-        self._connected = False
-        self.ui.wdgt_param.setEnabled(False)
-        self.ui.wdgt_plot.setEnabled(False)
-        ut.CreatePyQtGraph(self, [1500, 1600], self.ui.mplvl)
-
-        self.dev = DevWind(parent = self)
-        # ipdb.set_trace()
-        self.ui.actionGet_Errors.triggered.connect(self.dev.show)
-    # -- Some Decorators --
-    # -----------------------------------------------------------------------------
-    def Blinking(condition):
-        def decorator(fun):
-            def wrapper(*args,**kwargs):
-                self_app = args[0]
-                def blink():
-                    self.ui.groupBox_DCscan.setEnabled(False)
-                    while self_app._test_blink:
-                        self_app._blink = not(self_app._blink)
-                        self_app.ui.led_SetWavelength.setPixmap(self_app._led[self_app._blink])
-                        time.sleep(0.1)
-                    self_app.ui.led_SetWavelength.setPixmap(self_app._led[False])
-                    self.ui.groupBox_DCscan.setEnabled(True)
-
-                
-                self_app._test_blink = getattr(self_app, condition)
-                out = fun(*args,**kwargs)
-                self_app.threadscan = threading.Thread(target=blink, args=())
-                self_app.threadscan.daemon = True
-                self_app.threadscan.start()
-                return out
-            return wrapper
-        return decorator
-
-    def isConnected(fun):
-        def wrapper(*args, **kwargs):
-            self_app = args[0]
-            if self_app._connected:
-                out = fun(*args, **kwargs)
-            else:
-                out = None
-                self.dev.ui.text_lastError.setText('Laser is not connected')
-            return out
-        return wrapper
-
-
-    # -- Methods --
-    # -----------------------------------------------------------------------------
-
-    def Connect(self):
-        if not self._connected:
-            try: 
-                idLaser = 4106
-                DeviceKey = '6700 SN10027'
-                self.laser = NewFocus6700(id =idLaser, key = DeviceKey)
-                self.laser.beep = False
-                self.laser.connected = True
-                self.ui.but_connect.setText('Disconnect')
-                self._connected = True
-            except Exception as err:
-                err = str(err) + '\nLaser is not connected, please try to connect it.'
-                self.dev.ui.text_lastError.setText(err)
+def FindPeaks(v, delta, x=None):
+    maxtab = []
+    mintab = []
+    if x is None:
+        x = arange(len(v))
+    v = asarray(v)
+    if len(v) != len(x):
+        sys.exit('Input vectors v and x must have same length')
+    if not isscalar(delta):
+        sys.exit('Input argument delta must be a scalar')
+    if delta <= 0:
+        sys.exit('Input argument delta must be positive')
+    mn, mx = Inf, -Inf
+    mnpos, mxpos = NaN, NaN
+    lookformax = True
+    for i in arange(len(v)):
+        this = v[i]
+        if this > mx:
+            mx = this
+            mxpos = x[i]
+        if this < mn:
+            mn = this
+            mnpos = x[i]
+        if lookformax:
+            if this < mx-delta:
+                maxtab.append((mxpos, mx))
+                mn = this
+                mnpos = x[i]
+                lookformax = False
         else:
-            try:
-                self.laser.connected = False
-                self.ui.but_connect.setText('Connect')
-                self._connected = False
-            except Exception as err:
-                err = str(err) + '\nCannot disconnect the laser.'
-                self.dev.ui.text_lastError.setText(str(err))
+            if this > mn+delta:
+                mintab.append((mnpos, mn))
+                mx = this
+                mxpos = x[i]
+                lookformax = True
 
-        self.ui.wdgt_param.setEnabled(self._connected)
-        self.ui.wdgt_plot.setEnabled(self._connected)
-        self.ui.led_connected.setPixmap(self._led[self._connected])
-
-    @isConnected
-    @Blinking('_is_changing_lbd')
-    def SetWavelength(self,value):
-        self.laser.lbd = value
-
-    @isConnected
-    def Pzt_Value(self,val):
-        self.ui.slide_pzt.setValue(val*100)
-        lbd.pzt = val
-        
-    @isConnected
-    def Scan(self, value):
-        self.ui.spnbx_lbd.blockSignals(True)
-        
-        self.ui.spnbx_lbd.blockSignals(False)
-
-
-
-    # -- Utilities --
-    # -----------------------------------------------------------------------------
-    def FetchDaqParam(self):
-        pass
+    return array(maxtab), array(mintab)
 
 
 if __name__ == "__main__":
-    app = QApplication([])
-    window = Transmission()
-    # app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-    window.show()
-    sys.exit(app.exec_())
+    from matplotlib.pyplot import plot, scatter, show
+    series = [0, 0, 0, 2, 0, 0, 0, -2, 0, 0, 0, 2, 0, 0, 0, -2, 0]
+    maxtab, mintab = peakdet(series, .3)
+    plot(series)
+    scatter(array(maxtab)[:, 0], array(maxtab)[:, 1], color='blue')
+    scatter(array(mintab)[:, 0], array(mintab)[:, 1], color='red')
+    show()
 
 
+def MZCalibrate(data, FSR):
+    tdaq = data['tdaq']
+    MZ = data['MZ'][:]
+    ind = np.where(np.diff(np.signbit(MZ-MZ.mean())))[0]
+    f_stop = 1e9*c/data['lbd_stop'][:][0]
+    f_start = 1e9*c/data['lbd_start'][:][0]
+    FSR = 2*(f_start-f_stop)/ind.size
+    print(ind.size)
+    freq = f_start - 0.5*FSR*np.arange(ind.size)
+    lbd_cal = c/freq
+    T_cal = data['T'][:][ind]
+    # cs = CubicSpline(tdaq[ind], freq)
+    # f = cs(tdaq)
+    T_cal = T_cal/T_cal.max()
 
+    return freq, T_cal

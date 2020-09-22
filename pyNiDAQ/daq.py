@@ -1,11 +1,15 @@
-from nidaqmx.constants import AcquisitionType, TaskMode
-import nidaqmx
+try:
+    from nidaqmx.constants import AcquisitionType, TaskMode
+    import nidaqmx
+except:
+    pass
 
 
 class DAQ(object):
     '''
-
-
+    ------------------------------------------------------
+    G. Moille - NIST - 2018
+    ------------------------------------------------------
     '''
     __author__ = "Gregory Moille"
     __copyright__ = "Copyright 2018, NIST"
@@ -23,7 +27,7 @@ class DAQ(object):
         super(DAQ, self).__init__()
         self.t_end = kwargs.get('t_end', None)
         self._dev = kwargs.get('dev', None)
-        self.clock = 1e6
+        self.clock = kwargs.get('clock', 0.75e6)
         self.Npts = self.t_end*self.clock
         
         system = nidaqmx.system.System.local()
@@ -31,18 +35,20 @@ class DAQ(object):
         self.device.reset_device()
         
     def SetupWrite(self,**kwargs):
-        Npts = self.Npts
+        
 
         t_end = self.t_end
         self.write_ch = kwargs.get('write_ch', [])
         if not type(self.write_ch) == list:
             self.write_ch = [self.write_ch]
+
         self.write_ch = self._dev + '/' + ''.join(self.write_ch)
         writetask = nidaqmx.Task()
         writetask.ao_channels.add_ao_voltage_chan("Dev1/ao0")
-        writetask.timing.cfg_samp_clk_timing(self.clock,
+        writetask.timing.cfg_samp_clk_timing(int(self.clock),
                                                         sample_mode=AcquisitionType.CONTINUOUS,
                                                         samps_per_chan=int(Npts))
+        # AcquisitionType.FINITE,
         self.writetask = writetask
         return writetask
 
@@ -53,12 +59,14 @@ class DAQ(object):
         if not type(self.read_ch) == list:
             self.read_ch = [self.read_ch]
         self.Nch_read = len(self.read_ch)
+        # self.Npts = self.Npts/self.Nch_read
+        # print("Npts= {}".format(self.Npts))
         self.read_ch = self._dev + '/' +  ',{}/'.format(self._dev).join(self.read_ch)
         Npts = self.Npts
         readtask = nidaqmx.Task()
         readtask.ai_channels.add_ai_voltage_chan(self.read_ch)
-        readtask.timing.cfg_samp_clk_timing(self.clock,
-                                                    sample_mode=AcquisitionType.FINITE,
+        readtask.timing.cfg_samp_clk_timing(int(self.clock),\
+                                                    sample_mode=AcquisitionType.CONTINUOUS,
                                                     samps_per_chan=int(self.Npts))
 
         self.readtask = readtask

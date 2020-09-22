@@ -1,1 +1,1 @@
-from .createpyqtgraph import CreatePyQtGraph
+from .createpyqtgraph import CreatePyQtGraph, ReplaceData, ShowDataTip, SetPen, PlotDownSampleTrace

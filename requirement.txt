@@ -1,0 +1,7 @@
+pyvisa
+plotly
+toptica-lasersdk
+nest_asyncio
+ipdb
+nidaqmx
+colorlover

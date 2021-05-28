@@ -1,1 +1,2 @@
-from .wavemeter import Wavemeter
+from .highfinesse import HighFinesse
+from .bristol import Bristol

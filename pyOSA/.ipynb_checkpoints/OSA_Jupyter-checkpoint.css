@@ -1,0 +1,58 @@
+.osa_scan_button button{
+    margin: 0px;
+    padding: 0px;
+    width: 70px;
+}
+.osa_scan_button label{
+    margin: 0px;
+    padding: 0px;
+    width: 0px;
+}
+
+.osa_marker{
+    margin-left = 0px;
+    padding: 0px;
+    width: 70px;
+}
+
+.osa_clear{
+    margin-left: 92px;
+    width:195px
+    margin-top:50px;
+}
+
+
+.widget-gridbox{
+    max-width:100%;
+    display: inline-block;
+}
+
+.widget-html > .widget-html-content, .widget-htmlmath > .widget-html-content {
+    width: 150px;
+    max-width: 150px;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-left: 0px;
+    text-overflow: ellipsis;
+    float: left;
+}
+
+
+.lm-Widget .p-Widget .jupyter-widgets .widget-inline-hbox .widget-html > span{
+    max-width: 150px;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+    float: left;
+    text-overflow: clip;
+    position: relative;
+}
+
+.osa_save{
+    margin-left: 92px;
+    width:195px;
+    margin-top: 50px;
+
+}

@@ -3,7 +3,8 @@ import numpy as np
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import plotly.graph_objs as go
 import pandas as pd
-
+import logging
+logger = logging.getLogger()
 
 class Yokogawa(object):
 
@@ -31,32 +32,44 @@ class Yokogawa(object):
         self._connected = False
         self._trace = 'TRA'
         self._scan = 'stop'
+
+    def __enter__(self):
+        self.connected = True
+        return self
+
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.connected = False
+        return self
+
     @property
     def connected(self):
         return self._connected
 
     @connected.setter
     def connected(self, val):
-        if val:
+        if val and not(self._connected):
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(0.5)
+            cnt = 0
             try:
                 s.connect((self.ip, self.port))
                 self.socket = s
                 self._InitConnection()
                 self._connected = True
-            except Exception as err:
-                print(err)
-                ret = s.error
-                self._connected =s.error
-
+            except socket.error as exc:
+                print(f'Error Conection: {exc}')
+                self._connected = False
+                # ret = s.error
+                # self._connected =s.error
+        elif not(val) and self._connected:
+            self.socket.close()
+            self._connected = False
 
     def _InitConnection(self):
         Opening = 'open "anonymous"\n'
         buf = self._QuerryData(Opening , self._BUFFER_SIZE)
-        print(buf)
         buf = self._QuerryData(" " + "\n" , self._BUFFER_SIZE) #LOGIN step2
-        print(buf)
         self.EmptyBuffer()
 
     def _Write_OSA(self, MESSAGE):
@@ -64,14 +77,17 @@ class Yokogawa(object):
         return N
 
     def _QuerryData(self,MESSAGE, BUFFER_SIZE):
-        N = self.socket.send(MESSAGE.encode())
-        readout = ''
-        ReadBuffer = b' '
-        KeepDoing = True
-        while not ReadBuffer.decode()[-1] == '\n' :
-            ReadBuffer = self.socket.recvfrom(BUFFER_SIZE)[0]
-            readout = readout + ReadBuffer.decode()
-        return readout
+        try:
+            N = self.socket.send(MESSAGE.encode())
+            readout = ''
+            ReadBuffer = b' '
+            KeepDoing = True
+            while not ReadBuffer.decode()[-1] == '\n' :
+                ReadBuffer = self.socket.recvfrom(BUFFER_SIZE)[0]
+                readout = readout + ReadBuffer.decode()
+            return readout
+        except:
+            return None
 
     def EmptyBuffer(self):
         ReadBuffer = b''
@@ -83,13 +99,24 @@ class Yokogawa(object):
                 break
 
     @property
+    def identity(self):
+        ID = self._QuerryData("*IDN?\n", 1).strip().split(',')
+
+        return dict(maker = ID[0],
+                    model = ID[1],
+                    SN = ID[2])
+
+    @property
     def trace(self):
-        N = self._QuerryData(":TRACe:SNUMber? " +  self._trace +"\n", 1)
-        X = self._QuerryData(":TRACe:X? " + self._trace  + "\n" , int(N))
-        Y = self._QuerryData(":TRACe:Y? " + self._trace + "\n" , int(N))
-        X = np.array([float(xx) for xx in X.split(',')])
-        Y = np.array([float(xx) for xx in Y.split(',')])
-        return pd.DataFrame({'lbd':X, 'S':Y})
+        try:
+            N = self._QuerryData(":TRACe:SNUMber? " +  self._trace +"\n", 1)
+            X = self._QuerryData(":TRACe:X? " + self._trace  + "\n" , int(N))
+            Y = self._QuerryData(":TRACe:Y? " + self._trace + "\n" , int(N))
+            X = np.array([float(xx) for xx in X.split(',')])
+            Y = np.array([float(xx) for xx in Y.split(',')])
+            return pd.DataFrame({'lbd':X, 'S':Y})
+        except:
+            return None
 
     @trace.setter
     def trace(self, val):

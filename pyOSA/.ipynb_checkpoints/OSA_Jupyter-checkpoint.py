@@ -9,29 +9,27 @@ import plotly.graph_objects as go
 import pandas as pd
 import sys
 import re
+from scipy import constants as cts
 from IPython.display import display, HTML
 import time
 from IPython.display import clear_output
-try: 
-    work_dir =  os.path.abspath('C:/Users/nphoton/Box/Work/ExperimentalSetup/PythonSoftware/InstrumentControl/')
-    path = os.path.abspath(work_dir + '/../')
-    if not work_dir in sys.path:
-         sys.path.insert(0, work_dir)
-         print(work_dir)
-    from pyOSA import Yokogawa
-except: 
-    work_dir =  os.path.abspath('/Volumes/GoogleDrive/My Drive/Work/ExperimentalSetup/PythonSoftware/InstrumentControl/')
-    path = os.path.abspath(work_dir + '/../')
-    if not work_dir in sys.path:
-         sys.path.insert(0, work_dir)
-         print(work_dir)
-    from pyOSA import Yokogawa
+# print('*'*60)
+# print()
 
-import sys
+work_dir = os.path.join(os.path.dirname(__file__), '../')
+work_dir = os.path.abspath(work_dir)
+path = os.path.abspath(work_dir + '/../')
+print(work_dir)
+
+if not work_dir in sys.path:
+     sys.path.insert(0, work_dir)
+     # print(work_dir)
+from pyOSA import Yokogawa
+
 
 
 print(sys.argv)
-xlim = [ float(re.findall("\d+",sys.argv[1])[0]), 
+xlim = [ float(re.findall("\d+",sys.argv[1])[0]),
         float(re.findall("\d+",sys.argv[2])[0])]
 print(xlim)
 
@@ -64,6 +62,7 @@ class _dic2struct():
         return str(list(self._dic.keys()))
 dd = {}
 dd['cnct'] =  wdg.Checkbox(value = False, description = "Connected")
+dd['freq_scale'] =  wdg.Checkbox(value = False, description = "Frequency ?")
 dd['ip'] =  wdg.Text(value = '10.0.0.11', description = 'IP:')
 dd['λ'] = wdg.IntRangeSlider(value = (xlim[0], xlim[1]),
                                 min =xlim[0], max = xlim[1], step = 5,
@@ -105,7 +104,7 @@ dd['clr'] = wdg.Button(description = 'Clear Trace',button_style = 'info',tooltip
 dd['clr'].add_class("osa_clear")
 dd['save'] = wdg.Button(description = 'Save Spectra',button_style = 'info')
 dd['save'].add_class("osa_save")
-dd['picker'] = FileChooser('./')
+dd['picker'] = FileChooser('./../')
 dd['picker'].use_dir_icons = True
 dd['picker'].rows = 5
 dd['picker'].width = 200
@@ -117,11 +116,22 @@ ui = _dic2struct(dd)
 run_thread = True
 def worker(f, instr):
     while run_thread:
-        trace = instr.trace
-#         x = np.linspace(600, 1700, 50001)
-#         y = np.log10(np.random.rand(50001)*(1/np.cosh((x-(700+1850)/2)/10))**2)
-        f.data[0].x = trace.lbd.values*1e9
-        f.data[0].y = trace.S.values
+        try:
+            #with Yokogawa(ip=ip) as instr:
+            trace = instr.trace
+    #         x = np.linspace(600, 1700, 50001)
+    #         y = np.log10(np.random.rand(50001)*(1/np.cosh((x-(700+1850)/2)/10))**2)
+            f.data[0].x = trace.lbd.values*1e9
+            f.data[0].y = trace.S.values
+        except:
+            print('Comunication error')
+            time.sleep(0.1)
+            #with Yokogawa(ip=ip) as instr:
+            trace = instr.trace
+    #       x = np.linspace(600, 1700, 50001)
+    #       y = np.log10(np.random.rand(50001)*(1/np.cosh((x-(700+1850)/2)/10))**2)
+            f.data[0].x = trace.lbd.values*1e9
+            f.data[0].y = trace.S.values
         time.sleep(0.1)
 
 # ----------------------------------
@@ -131,96 +141,133 @@ connected = False
 def connect(change):
     global connected
     global osa
-
     ip = ui.ip.value
-    osa = Yokogawa(ip=ip)
     if change.new:
         connected = True
-        osa.connected = True
-        para = osa.settings
-        lbd_start = para['centwlgth'] - para['span']/2
-        lbd_end = para['centwlgth'] + para['span']/2
-        print((1e9*lbd_start, 1e9*lbd_end))
-        #ax.set_xlim([1e9*lbd_start, 1e9*lbd_end])
-        figOSA.update_xaxes(range = [1e9*lbd_start, 1e9*lbd_end])
-        ui.λ.value = (1e9*lbd_start, 1e9*lbd_end)
-        ui.bandwidth.value = Bdwt_val[1e9*para['bdwdth']]
-        ui.res.index = int(para['resol'])
-        ui.pts.value = int(para['pts'])
+        with Yokogawa(ip=ip) as osa:
+            para = osa.settings
+            trace = osa.trace
+            lbd_start = para['centwlgth'] - para['span']/2
+            lbd_end = para['centwlgth'] + para['span']/2
+            # print((1e9*lbd_start, 1e9*lbd_end))
+            #ax.set_xlim([1e9*lbd_start, 1e9*lbd_end])
 
-        trace = osa.trace
-        figOSA.data[0].x = trace.lbd.values*1e9
-        figOSA.data[0].y = trace.S.values
+            figOSA.update_xaxes(range = [1e9*lbd_start, 1e9*lbd_end])
+            ui.λ.value = (1e9*lbd_start, 1e9*lbd_end)
+            ui.bandwidth.value = Bdwt_val[1e9*para['bdwdth']]
+            try:
+                ui.res.index = int(para['resol'])
+            except:
+                pass
+            try:
+                ui.pts.value = int(para['pts'])
+            except:
+                pass
+
+            time.sleep(0.5)
+
+            figOSA.data[0].x = trace.lbd.values*1e9
+            figOSA.data[0].y = trace.S.values
 
     else:
         connected = False
-        osa.connected = False
-    print(connected)
+
 
 def scan_osa(change):
     global thread_osa
     global run_thread
     run_thread = False
+    ip = ui.ip.value
     if connected:
-        osa.scan = change.new.lower()
+        # osa.scan = change.new.lower()
+        run_thread = False
         if change.new.lower() == 'single' or change.new.lower() == 'repeat':
-            run_thread = True
-            
-            thread_osa = threading.Thread(target=worker, args=(figOSA, osa))
-            thread_osa.start()
+            with Yokogawa(ip=ip) as osa:
+                osa.scan = change.new.lower()
+                run_thread = True
+                thread_osa = threading.Thread(target=worker, args=(figOSA, osa))
+                thread_osa.start()
         if change.new.lower() == 'stop':
+            with Yokogawa(ip=ip) as osa:
+                osa.scan = change.new.lower()
+
             print('Trying to kill the stuff')
             run_thread = False
 
 
 def select_trace(change):
+    ip = ui.ip.value
     if connected:
-        osa.trace = change.new.replace('Trace ', '')
+        with Yokogawa(ip=ip) as osa:
+            osa.trace = change.new.replace('Trace ', '')
 
 def update_λ(change):
-
+    ip = ui.ip.value
     if connected:
         # print(change.new)
         centwlgth =  (change.new[1] + change.new[0])/2
         span = (change.new[1] - change.new[0])
-        para = osa.settings
-        para['centwlgth'] = centwlgth*1e-9
-        para['span'] = span*1e-9
-        print(para)
-        osa.settings = para
+        with Yokogawa(ip=ip) as osa:
+            para = osa.settings
+            para['centwlgth'] = centwlgth*1e-9
+            para['span'] = span*1e-9
+            print(para)
+            osa.settings = para
+
         figOSA.update_xaxes(range = change.new)
 
 def update_res(change):
+    ip = ui.ip.value
     if connected:
         para = osa.settings
         para['resol'] = change.new
-        osa.settings = para
+        with Yokogawa(ip=ip) as osa:
+            osa.settings = para
 
 def update_bdwt(change):
+    ip = ui.ip.value
     if connected:
         para = osa.settings
         para['bdwdth'] = float(change.new.replace(' nm', ''))*1e-9
-        osa.settings = para
-        para = osa.settings
+        with Yokogawa(ip=ip) as osa:
+            osa.settings = para
+            para = osa.settings
         ui.bandwidth.value = Bdwt_val[1e9*para['bdwdth']]
 
 def update_points(change):
+    ip = ui.ip.value
     if connected:
         para = osa.settings
         para['pts'] = change.new
-        osa.settings = para
-        para = osa.settings
+        with Yokogawa(ip=ip) as osa:
+            osa.settings = para
+            para = osa.settings
         ui.pts.value = int(para['pts'])
 
 def clear_trace(change):
     figOSA.data[0].x = []
     figOSA.data[0].y = []
 
+def freq_scale(change):
+    xdata = figOSA.data[0].x
+    ydata = figOSA.data[0].y
+    if change.new:        
+        newx =  1e-12*cts.c/(xdata*1e-9)
+    else:
+        newx =  1e-9*cts.c/(xdata*1e12)
+    
+    figOSA.data[0].x =newx
+    figOSA.data[0].y = ydata
+    figOSA.update_xaxes(range = [newx.min(), newx.max()])
+
+
 def save_data(change):
+    ip = ui.ip.value
     fname = ui.picker.selected
     if fname:
         if not os.path.exists(ui.picker.selected):
-            trace = osa.trace
+            with Yokogawa(ip=ip) as osa:
+                trace = osa.trace
             trace.to_parquet(fname)
 
 # ----------------------------------
@@ -229,13 +276,13 @@ def save_data(change):
 ui.cnct.observe(connect, 'value')
 ui.scan.observe(scan_osa,'value')
 ui.trace.observe(select_trace, 'value')
-# ui.marker.observe(show_marker, 'value')
 ui.λ.observe(update_λ, 'value')
 ui.bandwidth.observe(update_bdwt, 'value')
 ui.pts.observe(update_points, 'value')
 ui.res.observe(update_res, 'index')
 ui.clr.on_click(clear_trace)
 ui.save.on_click(save_data)
+ui.freq_scale.observe(freq_scale, 'value')
 
 
 # ----------------------------------
@@ -262,7 +309,7 @@ ui.picker.layout = wdg.Layout(display='flex',
                     justify_content =  'center',
                     align_items='stretch',
                     width='100%')
-cc = [ui.cnct, ui.ip,ui.scan, ui.trace, ui.res,ui.bandwidth, ui.pts,ui.λ, ui.clr,ui.save,ui.picker]
+cc = [ui.cnct,ui.freq_scale, ui.ip,ui.scan, ui.trace, ui.res,ui.bandwidth, ui.pts,ui.λ, ui.clr,ui.save,ui.picker]
 ctrl = wdg.Box(children = cc,layout = box_layout)
 otp = wdg.Box(children = [figOSA], layout = outp_layout)
 display(wdg.HBox([ctrl, otp]))

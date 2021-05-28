@@ -14,8 +14,16 @@ class Keysight335500B(object):
         self._connected = False
         self._trace = 'TRA'
 
+    def __enter__(self):
+        self.connected = True
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.output = False
+        self.connected = False
+        return self
+        
     @property
-    def connected(self):
+    def connected(self, ):
         return self._connected
 
     @connected.setter
@@ -56,7 +64,7 @@ class Keysight335500B(object):
     def _InitConnection(self):
         Opening = '*IDN?\n'
         buf = self._QuerryData(Opening , self._BUFFER_SIZE)
-        print(buf.strip())
+        #print(buf.strip())
         # buf = self._QuerryData(" " + "\n" , self._BUFFER_SIZE) #LOGIN step2
         # print(buf)
         self.EmptyBuffer()
@@ -81,13 +89,33 @@ class Keysight335500B(object):
 
     @property
     def function(self):
-        msg = 'OUTPut?\n'
-        return float(self._QuerryData(msg , self._BUFFER_SIZE))
+        msg = 'FUNCtion?\n'
+
+        fun_dict = {"SINusoid": 'sine', 
+              "SQUare": 'square',
+              'RAMP': 'ramp', 
+              'PULSe': 'pulse',
+              'NOISe': 'noise',
+             'DC': 'dc', 
+             'USER': 'user',
+             }
+         
+        return self._QuerryData(msg , self._BUFFER_SIZE)
 
     @function.setter
     def function(self, val):
         if val.lower() in ['sine', 'square', 'ramp', 'pulse', 'noise', 'dc', 'user']:
-            msg = 'OUTPut {}\n'.format(val)
+            fun_dict = dict(sine="SINusoid", 
+                            square="SQUare",
+                            ramp='RAMP', 
+                            pulse='PULSe',
+                            noise='NOISe',
+                            dc= 'DC', 
+                            user = 'USER')
+            
+            
+            
+            msg = f'FUNCtion {fun_dict[val.lower()]}\n'
             self.WriteData(msg)
 
     # ---------
@@ -102,6 +130,8 @@ class Keysight335500B(object):
         msg = 'VOLTAGE:HIGH {:.3f}\n'.format(val)
         self.WriteData(msg)
 
+    
+        
     # ---------
 
     @property
@@ -116,6 +146,17 @@ class Keysight335500B(object):
 
     # ---------
 
+    @property
+    def Voffset(self):
+        msg = 'VOLTage:OFFSet?\n'
+        return float(self._QuerryData(msg , self._BUFFER_SIZE))
+
+    @Voffset.setter
+    def Voffset(self, val):
+        msg = 'VOLTAGE:OFFSet {:.3f}\n'.format(val)
+        self.WriteData(msg)
+    
+    # ---------
     @property
     def Vamp(self):
         msg = 'VOLTage?\n'

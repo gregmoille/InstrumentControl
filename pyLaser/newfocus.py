@@ -56,8 +56,6 @@ class NewFocus6700(object):
                                 wavelength
         self._is_scaning : track in background if the scan is
                            still ongoing
-        self._lbdscan: fetch in background the laser lbd during
-                       a scan
 
     Example:
         import time
@@ -70,42 +68,35 @@ class NewFocus6700(object):
         laser = NewFocus6700(id =idLaser, key = DeviceKey)
         laser.connected = True
         old_lbd = laser.lbd
-        print('Laser wavelength:')
-        print("\t{}".format(old_lbd))
+        print(f'Laser wavelength: {old_lbd}nm')
         laser.scan_limit = [1520, 1550]
         laser.scan_speed = 10
         laser.lbd = laser.scan_limit[0]
         print('waiting until laser parked at correct lbd')
         while laser._is_changing_lbd:
             time.sleep(0.25)
-        print('Current wavelength:')
-        print('\t{}nm'.format(laser.lbd))
+        print(f'Current wavelength: {laser.lbd}nm')
+        print('Now turning on the laser')
         laser.output = True
         t = np.array([])
         lbd = np.array([])
         print('Starting scan')
         laser.scan = True
         while laser._is_scaning:
-            t = np.append(t, time.time())
-            lbd = np.append(lbd, laser._lbdscan)
+            pass
+        print('Finished scanning... now turning off the laser')
         laser.output = False
-        print('Ploting')
-        f, ax = plt.subplots()
-        ax.plot(t-t[0], lbd)
-        ax.set_xlabel('Time (s)')
-        ax.set_ylabel('Wavelength (nm)')
-        f.show()
+        print('All Done!')
     '''
 
     __author__ = "Gregory Moille"
-    __copyright__ = "Copyright 2018, NIST"
+    __copyright__ = "Copyright 2021, JQI"
     __credits__ = ["Gregory Moille",
-                   "Xiyuan Lu",
                    "Kartik Srinivasan"]
     __license__ = "GPL"
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
     __maintainer__ = "Gregory Moille"
-    __email__ = "gregory.moille@mist.gov"
+    __email__ = "gmoille@umd.edu"
     __status__ = "Development"
 
     def __init__(self, **kwargs):

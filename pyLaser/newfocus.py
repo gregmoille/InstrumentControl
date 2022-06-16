@@ -22,7 +22,7 @@ else:
 path = os.path.realpath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
-from pyDecorators import InOut, ChangeState, Catch
+# from pyDecorators import InOut, ChangeState, Catch
 
 
 class NewFocus6700(object):
@@ -159,7 +159,7 @@ class NewFocus6700(object):
     # -- Properties --
     # ---------------------------------------------------------
     @property
-    @InOut.output(bool)
+    #@InOut.output(bool)
     def connected(self):
         return self._open
 
@@ -199,7 +199,7 @@ class NewFocus6700(object):
             self._open = False
 
     @property
-    @InOut.output(bool)
+    #@InOut.output(bool)
     def output(self):
         word = 'OUTPut:STATe?'
         self._output = self.Query(word)
@@ -207,21 +207,21 @@ class NewFocus6700(object):
 
     @output.setter
     # @Catch.error
-    @InOut.accepts(bool)
+    #@InOut.accepts(bool)
     def output(self,value):
         word = "OUTPut:STATe {}".format(int(value))
         self.Query(word)
         self._output = value
 
     @property
-    @InOut.output(float)
+    #@InOut.output(float)
     def lbd(self):
         word = 'SENSe:WAVElength?'
         self._lbd = self.Query(word)
         return self._lbd
 
     @lbd.setter
-    @InOut.accepts(float)
+    #@InOut.accepts(float)
     # @Catch.error
     def lbd(self, value):
         self._targetlbd = value
@@ -231,7 +231,7 @@ class NewFocus6700(object):
         self._lbd = value
 
     @property
-    @InOut.output(float)
+    # @InOut.output(float)
     def current(self):
         word = 'SOUR:CURR:DIOD?'
         self._cc = self.Query(word)
@@ -239,7 +239,7 @@ class NewFocus6700(object):
 
     @current.setter
     # @Catch.error
-    @InOut.accepts(float)
+    #@InOut.accepts(float)
     def current(self, value):
         word = 'SOUR:CURR:DIOD {}'.format(value)
         self.Query(word)
@@ -256,7 +256,7 @@ class NewFocus6700(object):
 
     @scan_limit.setter
     # @Catch.error
-    @InOut.accepts(list)
+    #@InOut.accepts(list)
     def scan_limit(self, value):
         start = value[0]
         stop = value[1]
@@ -268,7 +268,7 @@ class NewFocus6700(object):
 
     @property
     # @Catch.error
-    @InOut.output(float)
+    #@InOut.output(float)
     def scan_speed(self):
         word1 = 'SOUR:WAVE:SLEW:FORW?'
         self._scan_speed = self.Query(word1)
@@ -276,7 +276,7 @@ class NewFocus6700(object):
 
     @scan_speed.setter
     # @Catch.error
-    @InOut.accepts(float)
+    #@InOut.accepts(float)
     def scan_speed(self, value):
         word = 'SOUR:WAVE:SLEW:FORW {}'.format(value)
         self.Query(word)
@@ -285,7 +285,7 @@ class NewFocus6700(object):
         self._scan_speed = value
 
     @property
-    @InOut.output(float)
+    #@InOut.output(float)
     def scan(self):
         word = 'SOUR:WAVE:DESSCANS?'
         self._scan = self.Query(word)
@@ -293,8 +293,8 @@ class NewFocus6700(object):
 
     @scan.setter
     # @Catch.error
-    @ChangeState.scan("OUTPut:SCAN:START",'OUTPut:SCAN:STOP')
-    @InOut.accepts(bool)
+    #@ChangeState.scan("OUTPut:SCAN:START",'OUTPut:SCAN:STOP')
+    #@InOut.accepts(bool)
     def scan(self, value):
         self.Query('SOUR:WAVE:DESSCANS 1')
         self._scan = value
@@ -305,7 +305,7 @@ class NewFocus6700(object):
 
 
     @property
-    @InOut.output(float)
+    #@InOut.output(float)
     def pzt(self):
         word = 'SOUR:VOLT:PIEZ?'
         self._pzt = self.Query(word)
@@ -313,14 +313,14 @@ class NewFocus6700(object):
 
     @pzt.setter
     # @Catch.error
-    @InOut.accepts(float)
+    #@InOut.accepts(float)
     def pzt(self, value):
         word = 'SOUR:VOLT:PIEZ {}'.format(value)
         self.Query(word)
         self._pzt = value
 
     @property
-    @InOut.output(bool)
+    #@InOut.output(bool)
     def beep(self):
         word = 'BEEP?'
         self._beep = self.Query(word)
@@ -328,7 +328,7 @@ class NewFocus6700(object):
 
     @beep.setter
     # @Catch.error
-    @InOut.accepts(bool)
+    #@InOut.accepts(bool)
     def beep(self, value):
         word = 'BEEP '.format(int(value))
         self.Query(word)
@@ -356,7 +356,7 @@ class NewFocus6700(object):
         return self._haserr
 
     @property
-    @InOut.output(bool)
+    #@InOut.output(bool)
     def _is_changing_lbd(self):
         return self.Query('OUTP:TRACK?')
 
@@ -365,7 +365,7 @@ class NewFocus6700(object):
         pass
 
     @clear.setter
-    @InOut.accepts(bool)
+    #@InOut.accepts(bool)
     def clear(self,val):
         if val:
             self.Query('*CLS')

@@ -2,8 +2,11 @@ import socket
 import numpy as np
 import pandas as pd
 import logging
+<<<<<<< HEAD
 import time
 import sys
+=======
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
 logger = logging.getLogger()
 
 class Yokogawa(object):
@@ -37,7 +40,10 @@ class Yokogawa(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.connected = False
+<<<<<<< HEAD
         time.sleep(0.2)
+=======
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
         return self
 
     @property
@@ -48,8 +54,12 @@ class Yokogawa(object):
     def connected(self, val):
         if val and not(self._connected):
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+<<<<<<< HEAD
             s.settimeout(0.2)
             s.setblocking(True)
+=======
+            s.settimeout(0.5)
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
             cnt = 0
             try:
                 s.connect((self.ip, self.port))
@@ -59,11 +69,17 @@ class Yokogawa(object):
             except socket.error as exc:
                 print(f'Error Conection: {exc}')
                 self._connected = False
+<<<<<<< HEAD
+=======
+                # ret = s.error
+                # self._connected =s.error
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
         elif not(val) and self._connected:
             self.socket.close()
             self._connected = False
 
     def _InitConnection(self):
+<<<<<<< HEAD
         MESSAGE = 'open "anonymous"\r\n'
         self.socket.send(MESSAGE.encode())
         readout = self.socket.recvfrom(self._BUFFER_SIZE)
@@ -78,11 +94,18 @@ class Yokogawa(object):
         print(f'*STB? {readout.decode()}')
 
         print(self.identity)
+=======
+        Opening = 'open "anonymous"\n'
+        buf = self._QuerryData(Opening , self._BUFFER_SIZE)
+        buf = self._QuerryData(" " + "\n" , self._BUFFER_SIZE) #LOGIN step2
+        self.EmptyBuffer()
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
 
     def _Write_OSA(self, MESSAGE):
         N = self.socket.send(MESSAGE.encode())
         return N
 
+<<<<<<< HEAD
     def _QuerryData(self, MESSAGE, BUFFER_SIZE):
         readout = b''
         self.socket.send(MESSAGE.encode())
@@ -90,6 +113,20 @@ class Yokogawa(object):
             # print(readout)
             readout += self.socket.recvfrom(BUFFER_SIZE)[0]
         return readout
+=======
+    def _QuerryData(self,MESSAGE, BUFFER_SIZE):
+        try:
+            N = self.socket.send(MESSAGE.encode())
+            readout = ''
+            ReadBuffer = b' '
+            KeepDoing = True
+            while not ReadBuffer.decode()[-1] == '\n' :
+                ReadBuffer = self.socket.recvfrom(BUFFER_SIZE)[0]
+                readout = readout + ReadBuffer.decode()
+            return readout
+        except:
+            return None
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
 
 
     @property
@@ -103,8 +140,17 @@ class Yokogawa(object):
             return None
 
     @property
+    def identity(self):
+        ID = self._QuerryData("*IDN?\n", 1).strip().split(',')
+
+        return dict(maker = ID[0],
+                    model = ID[1],
+                    SN = ID[2])
+
+    @property
     def trace(self):
         try:
+<<<<<<< HEAD
             MESSAGE = ":TRACe:DATA:X? TRA\r\n"
             xread =  self._QuerryData(MESSAGE, self._BUFFER_SIZE)
             x = [float(xx) for xx in xread.decode().split(',')]
@@ -116,6 +162,15 @@ class Yokogawa(object):
             return trace
         except Exception as err:
             print(err)
+=======
+            N = self._QuerryData(":TRACe:SNUMber? " +  self._trace +"\n", 1)
+            X = self._QuerryData(":TRACe:X? " + self._trace  + "\n" , int(N))
+            Y = self._QuerryData(":TRACe:Y? " + self._trace + "\n" , int(N))
+            X = np.array([float(xx) for xx in X.split(',')])
+            Y = np.array([float(xx) for xx in Y.split(',')])
+            return pd.DataFrame({'lbd':X, 'S':Y})
+        except:
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
             return None
 
     @trace.setter

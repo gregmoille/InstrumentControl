@@ -21,8 +21,12 @@ class Keysight335500B(object):
         self.output = False
         self.connected = False
         return self
+<<<<<<< HEAD
     
     
+=======
+        
+>>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
     @property
     def connected(self, ):
         return self._connected

@@ -94,7 +94,7 @@ class RSA306(object):
 
     @property
     def run(self):
-        return self.run
+        return self._run
 
     @run.setter
     def run(self, val):
@@ -141,7 +141,7 @@ class RSA306(object):
         return time
 
 
-    def config_trigger(self, trigMode='Free', trigLevel=-10, trigSource="ext"):
+    def config_trigger(self, trigMode='Free', trigLevel=-10, trigSource="ext", trigPositionPercent=50):
         if trigMode.lower() == 'free':
             self.rsa.TRIG_SetTriggerMode(c_int(0))
         else:
@@ -151,22 +151,44 @@ class RSA306(object):
             self.rsa.TRIG_SetTriggerSource(c_int(0))
         else:
             self.rsa.TRIG_SetTriggerSource(c_int(1))
-        self.rsa.TRIG_SetTriggerPositionPercent(c_double(50))
+        if trigPositionPercent is None:
+            trigPositionPercent = 50
+        trigPositionPercent = min(99.0, max(1.0, float(trigPositionPercent)))
+        self.rsa.TRIG_SetTriggerPositionPercent(c_double(trigPositionPercent))
 
     
-    def acquire_block_iq(self, recordLength=10e3):
+    def acquire_block_iq(self, recordLength=10e3, timeout_ms=100, max_wait_ms=10000):
         recordLength = int(recordLength)
         ready = c_bool(False)
         iqArray = c_float * recordLength
         iData = iqArray()
         qData = iqArray()
-        outLength = 0
-        self.rsa.DEVICE_Run()
-        self.rsa.IQBLK_AcquireIQData()
-        while not ready.value:
-            self.rsa.IQBLK_WaitForIQDataReady(c_int(100), byref(ready))
-        self.rsa.IQBLK_GetIQDataDeinterleaved(byref(iData), byref(qData),
-                                         byref(c_int(outLength)), c_int(recordLength))
-        self.rsa.DEVICE_Stop()
-    
-        return np.array(iData) + 1j * np.array(qData)
+        outLength = c_int(0)
+        waited_ms = 0
+
+        self.err_check(self.rsa.DEVICE_Run())
+        self._run = True
+        try:
+            self.err_check(self.rsa.IQBLK_AcquireIQData())
+            while not ready.value:
+                self.err_check(self.rsa.IQBLK_WaitForIQDataReady(c_int(timeout_ms), byref(ready)))
+                waited_ms += int(timeout_ms)
+                if waited_ms >= int(max_wait_ms):
+                    raise TimeoutError("Timed out waiting for IQ block data.")
+
+            self.err_check(
+                self.rsa.IQBLK_GetIQDataDeinterleaved(
+                    iData,
+                    qData,
+                    byref(outLength),
+                    c_int(recordLength),
+                )
+            )
+        finally:
+            self.rsa.DEVICE_Stop()
+            self._run = False
+
+        valid = outLength.value if outLength.value > 0 else recordLength
+        i_np = np.ctypeslib.as_array(iData)[:valid].copy()
+        q_np = np.ctypeslib.as_array(qData)[:valid].copy()
+        return i_np + 1j * q_np

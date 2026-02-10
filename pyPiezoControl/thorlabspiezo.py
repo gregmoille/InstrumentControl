@@ -1,7 +1,7 @@
 import numpy as np
 import os
 try:
-    import visa
+    import pyvisa as visa
 except:
     print('\033[93m' + '-'*10 + 'EXCEPTION:')
     print(__file__)

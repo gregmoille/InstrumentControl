@@ -17,7 +17,7 @@ import os
 import ipdb
 #import pyqtgraph as pg
 import scipy.io as io
-import visa
+import pyvisa as visa
 from copy import copy
 
 

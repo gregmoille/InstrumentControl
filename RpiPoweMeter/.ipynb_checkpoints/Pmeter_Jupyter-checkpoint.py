@@ -6,10 +6,10 @@ import time
 import numpy as np
 import logging
 from IPython.display import display, HTML
-import visa
+import pyvisa as visa
 import os 
 import sys 
-
+import asyncio
 
 work_dir =  os.path.abspath(__file__ + '/..')
 path = os.path.abspath(work_dir + '/../')
@@ -24,8 +24,11 @@ from pyPowerMeter import ThorlabsP1xx
 # ------------------------------------
 # -- Get the detectors
 # ------------------------------------
-rm = visa.ResourceManager()
-rm = visa.ResourceManager()
+try:
+    rm = visa.ResourceManager()
+except: 
+    print('Using python backend')
+    rm = visa.ResourceManager('@py')
 connected_instr = {}
 try:
     dev = rm.list_resources()
@@ -105,7 +108,7 @@ LOSS = VBox([ui.Losses.label_top,
             ui.Losses.loss,
             ui.Losses.label_bottom])
 
-
+out = widgets.Output()
 grid = VBox([ui.running,
              HBox([VBox([ui.IN.label,
                    IN,
@@ -122,12 +125,12 @@ output = widgets.Output
 # ------------------------------------
 
 Pmeter = {'IN':None, 'OUT':None}
+
 def work(running, ui_slot, P, Loss, in_out):
     total = 100
     maxi = 0
     need_connect = True
     while True:
-       
         if ui_slot.Cnct.value:
             if need_connect:
                 instr = connected_instr[ui_slot.Det.value]

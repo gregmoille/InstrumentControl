@@ -6,14 +6,15 @@ import sys
 import time
 import platform
 import pyvisa.errors as VisaError
-from visa import constants
+from  pyvisa import constants
+import asyncio
 path = os.path.realpath('../')
 if not path in sys.path:
     sys.path.insert(0, path)
 from pyDecorators import InOut, ChangeState, Catch
 
 try:
-    import visa
+    import pyvisa as visa
 except Exception as e:
     print('\033[93m' + '-'*10 + 'EXCEPTION:')
     print(__file__)
@@ -76,12 +77,11 @@ class ThorlabsP1xx(object):
                 self._instr.close()
                 self._open = False
 
-    @property
+    
     @InOut.output(float)
-    @waiter
-    def power(self):
+#     @waiter
+    def _get_power(self):
         self._instr.write('Measure:Power?')
-
         try:
             data = self._instr.read()
             return data.strip()
@@ -92,6 +92,17 @@ class ThorlabsP1xx(object):
             self._instr.close()
             self._instr = self._rm.open_resource(self._address,timeout = 10)
             self._instr.timeout = 10000
+            
+    async def _get_power_async(self):
+        self._instr.write('Measure:Power?')
+        data = self._instr.read()
+        await asyncio.sleep(0.1)
+        return data.strip()
+            
+    @property  
+    def power(self):
+        return self._get_power()
+    
     # return self.Query('Measure:Power?')
 
     @property

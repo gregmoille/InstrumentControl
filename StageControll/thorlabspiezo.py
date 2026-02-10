@@ -1,6 +1,6 @@
 import numpy as np
 import os
-import visa
+import pyvisa as visa
 import time
 import re
 

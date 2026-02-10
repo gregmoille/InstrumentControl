@@ -8,7 +8,7 @@ from PyQt5 import QtGui
 import PyQt5
 
 # import utility packages
-# import visa
+# import pyvisa as visa
 import ipdb
 import os
 import sys

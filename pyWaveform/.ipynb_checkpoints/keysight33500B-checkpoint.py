@@ -14,7 +14,6 @@ class Keysight335500B(object):
         self._connected = False
         self._trace = 'TRA'
 
-<<<<<<< HEAD
     def __enter__(self):
         self.connected = True
         return self
@@ -26,10 +25,6 @@ class Keysight335500B(object):
     
     @property
     def connected(self, ):
-=======
-    @property
-    def connected(self):
->>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
         return self._connected
 
     @connected.setter
@@ -70,7 +65,6 @@ class Keysight335500B(object):
     def _InitConnection(self):
         Opening = '*IDN?\n'
         buf = self._QuerryData(Opening , self._BUFFER_SIZE)
-<<<<<<< HEAD
         #print(buf.strip())
         # buf = self._QuerryData(" " + "\n" , self._BUFFER_SIZE) #LOGIN step2
         # print(buf)
@@ -80,12 +74,6 @@ class Keysight335500B(object):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.shutdown(socket.SHUT_RDWR)
         #s.close()
-=======
-        print(buf.strip())
-        # buf = self._QuerryData(" " + "\n" , self._BUFFER_SIZE) #LOGIN step2
-        # print(buf)
-        self.EmptyBuffer()
->>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
 
     # ---------
 
@@ -107,7 +95,6 @@ class Keysight335500B(object):
 
     @property
     def function(self):
-<<<<<<< HEAD
         msg = 'FUNCtion?\n'
 
         fun_dict = {"SINusoid": 'sine', 
@@ -120,15 +107,10 @@ class Keysight335500B(object):
              }
          
         return self._QuerryData(msg , self._BUFFER_SIZE)
-=======
-        msg = 'OUTPut?\n'
-        return float(self._QuerryData(msg , self._BUFFER_SIZE))
->>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
 
     @function.setter
     def function(self, val):
         if val.lower() in ['sine', 'square', 'ramp', 'pulse', 'noise', 'dc', 'user']:
-<<<<<<< HEAD
             fun_dict = dict(sine="SINusoid", 
                             square="SQUare",
                             ramp='RAMP', 
@@ -140,9 +122,6 @@ class Keysight335500B(object):
             
             
             msg = f'FUNCtion {fun_dict[val.lower()]}\n'
-=======
-            msg = 'OUTPut {}\n'.format(val)
->>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
             self.WriteData(msg)
 
     # ---------
@@ -157,11 +136,8 @@ class Keysight335500B(object):
         msg = 'VOLTAGE:HIGH {:.3f}\n'.format(val)
         self.WriteData(msg)
 
-<<<<<<< HEAD
     
         
-=======
->>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
     # ---------
 
     @property
@@ -177,7 +153,6 @@ class Keysight335500B(object):
     # ---------
 
     @property
-<<<<<<< HEAD
     def Voffset(self):
         msg = 'VOLTage:OFFSet?\n'
         return float(self._QuerryData(msg , self._BUFFER_SIZE))
@@ -189,8 +164,6 @@ class Keysight335500B(object):
     
     # ---------
     @property
-=======
->>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
     def Vamp(self):
         msg = 'VOLTage?\n'
         return float(self._QuerryData(msg , self._BUFFER_SIZE))

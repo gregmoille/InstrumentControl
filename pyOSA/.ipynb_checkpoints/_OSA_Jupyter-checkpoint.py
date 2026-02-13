@@ -31,12 +31,8 @@ from pyOSA import uiOSA
 class OSAjupyter(uiOSA):
     OSAmodel = {'AQ6375B': dict(span=[1200.0, 2400.0]),
                'AQ6374': dict(span=[350.0, 1750.0]),
-<<<<<<< HEAD
                'AQ6370D': dict(span=[600.0, 1700.0]), 
               'AQ6380': dict(span=[1200.0, 1650.0])}
-=======
-               'AQ6370D': dict(span=[600.0, 1700.0])}
->>>>>>> 30e7bbfd2f73f5821b3ddd766d9abac5a294c22d
 
 
     def __init__(self, **kwargs):
